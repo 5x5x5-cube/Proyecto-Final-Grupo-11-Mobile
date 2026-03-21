@@ -1,0 +1,31 @@
+{
+  "status": {
+    "confirmed": "Confirmed",
+    "pending": "Pending",
+    "cancelled": "Cancelled",
+    "past": "Past"
+  },
+  "nav": {
+    "home": "Home",
+    "hotels": "Hotels",
+    "offers": "Offers",
+    "myReservations": "My reservations",
+    "login": "Log in",
+    "searchDestinations": "Search destinations",
+    "detail": "Detail"
+  },
+  "checkout": {
+    "accommodation": "Accommodation",
+    "confirm": "Confirm",
+    "payment": "Payment",
+    "confirmation": "Confirmation"
+  },
+  "bottomNav": {
+    "search": "Search",
+    "myReservations": "My Reservations",
+    "profile": "Profile"
+  },
+  "offline": {
+    "banner": "No connection — Saved data"
+  }
+}
