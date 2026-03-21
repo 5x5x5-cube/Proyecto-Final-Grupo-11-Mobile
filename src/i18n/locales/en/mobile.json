@@ -1,0 +1,161 @@
+{
+  "login": {
+    "subtitle": "Sign in to manage your reservations",
+    "title": "Sign in",
+    "email": "Email",
+    "password": "Password",
+    "button": "Sign in",
+    "noAccount": "Don't have an account?",
+    "register": "Sign up"
+  },
+  "register": {
+    "subtitle": "Create your account to start booking",
+    "title": "Create account",
+    "fullName": "Full name",
+    "email": "Email",
+    "phone": "Phone",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "button": "Create account",
+    "hasAccount": "Already have an account?",
+    "login": "Sign in"
+  },
+  "search": {
+    "heroLine1": "Your next",
+    "heroLine2": "adventure",
+    "heroSubtitle": "Find the best hotels in Latin America",
+    "guests": "{{count}} adults",
+    "searchButton": "Search",
+    "popularDestinations": "Popular destinations",
+    "hotels": "{{count}} hotels"
+  },
+  "results": {
+    "filterPrice": "Price",
+    "filterType": "Type",
+    "filterRating": "Rating",
+    "filterServices": "Services",
+    "propertiesFound": "{{count}} properties found",
+    "photos": "{{count}} photos",
+    "perNight": "/night"
+  },
+  "propertyDetail": {
+    "photos": "+{{count}} photos",
+    "reviews": "{{count}} reviews",
+    "description": "Enjoy an unforgettable stay at one of Cartagena's most iconic hotels. Located in the heart of the historic center, it offers a perfect blend of history, luxury, and modern comfort.",
+    "includedServices": "Included services",
+    "availableRooms": "Available rooms",
+    "perNight": "/night",
+    "guestReviews": "Guest reviews",
+    "bookNow": "Book now",
+    "rooms": {
+      "superior": "Superior Room",
+      "double": "Double Room",
+      "juniorSuite": "Junior Suite",
+      "bedKing": "1 King bed",
+      "bedDouble": "2 double beds",
+      "bedKingSuite": "1 King bed + living room"
+    },
+    "reviewTexts": {
+      "review1": "Excellent location and service. Would come back without hesitation.",
+      "review2": "Very good hotel, varied breakfast. The pool is beautiful.",
+      "review3": "Incredible experience. The staff is very friendly."
+    }
+  },
+  "summary": {
+    "title": "Reservation summary",
+    "roomInfo": "Superior Room · 1 King bed",
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "duration": "Duration",
+    "nights": "{{count}} nights",
+    "guests": "Guests",
+    "guestsValue": "{{count}} adults",
+    "priceDetail": "Price detail",
+    "nightsBreakdown": "COP 480k × {{count}} nights",
+    "taxes": "Taxes ({{percent}}%)",
+    "total": "Total",
+    "freeCancellation": "Free cancellation",
+    "cancellationPolicy": "Free cancellation up to 48 hours before check-in. After that, 50% of the first night is charged.",
+    "continueToPayment": "Continue to payment"
+  },
+  "payment": {
+    "title": "Payment method",
+    "selectMethod": "Select a method",
+    "creditCard": "Credit card",
+    "debitCard": "Debit card",
+    "digitalWallet": "Digital wallet",
+    "transfer": "Bank transfer",
+    "cardDetails": "Card details",
+    "cardNumber": "Card number",
+    "cardHolder": "Cardholder name",
+    "expiry": "Expiry",
+    "cvv": "CVV",
+    "nights": "{{count}} nights",
+    "total": "Total",
+    "securityNote": "Transaction protected with SSL encryption",
+    "payButton": "Pay {{amount}}"
+  },
+  "success": {
+    "title": "Reservation created successfully",
+    "subtitle": "We have sent the confirmation to your email",
+    "reservationCode": "RESERVATION CODE",
+    "hotel": "Hotel",
+    "dates": "Dates",
+    "room": "Room",
+    "guests": "Guests",
+    "guestsValue": "{{count}} adults",
+    "total": "Total",
+    "viewReservations": "View my reservations",
+    "backToHome": "Back to home",
+    "roomValue": "Superior · 1 King bed"
+  },
+  "myReservations": {
+    "title": "My reservations",
+    "active": "Active",
+    "past": "Past",
+    "cancelled": "Cancelled"
+  },
+  "reservationDetail": {
+    "title": "Reservation detail",
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "duration": "Duration",
+    "nights": "{{count}} nights",
+    "guests": "Guests",
+    "room": "Room",
+    "paymentSummary": "Payment summary",
+    "accommodation": "Accommodation ({{count}} nights)",
+    "taxes": "Taxes",
+    "totalPaid": "Total paid",
+    "showQR": "Show QR",
+    "cancelReservation": "Cancel reservation"
+  },
+  "cancelReservation": {
+    "title": "Cancel reservation",
+    "cancellationPolicy": "Cancellation policy",
+    "cancellationPolicyText": "If you cancel more than 48 hours in advance, you will receive a 100% refund. Late cancellations receive a 50% refund.",
+    "refundDetail": "Refund detail",
+    "amountPaid": "Amount paid",
+    "refund": "Refund ({{percent}}%)",
+    "totalRefund": "Total refund",
+    "refundTime": "Refund in 5-10 business days",
+    "back": "Back",
+    "confirm": "Confirm"
+  },
+  "qrCheckIn": {
+    "title": "QR code check-in",
+    "instruction": "Show this code at the front desk for a quick and contactless check-in.",
+    "downloadQR": "Download QR"
+  },
+  "profile": {
+    "personalInfo": "Personal information",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "preferences": "Preferences",
+    "language": "Language",
+    "currency": "Currency",
+    "notifications": "Notifications",
+    "logout": "Sign out"
+  }
+}
