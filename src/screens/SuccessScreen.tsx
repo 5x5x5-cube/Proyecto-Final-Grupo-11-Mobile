@@ -35,40 +35,38 @@ export default function SuccessScreen() {
         <MaterialCommunityIcons name="check-circle" size={40} color={palette.success} />
       </View>
 
-      <Text style={styles.title}>Reserva creada exitosamente</Text>
-      <Text style={styles.subtitle}>
-        Tu reserva ha sido confirmada. Recibiras un correo con los detalles.
-      </Text>
+      <Text style={styles.title}>{t('success.title')}</Text>
+      <Text style={styles.subtitle}>{t('success.subtitle')}</Text>
 
       {/* Reservation code */}
       <View style={styles.codeBadge}>
-        <Text style={styles.codeLabel}>CODIGO DE RESERVA</Text>
+        <Text style={styles.codeLabel}>{t('success.reservationCode')}</Text>
         <Text style={styles.codeValue}>TH-2026-48291</Text>
       </View>
 
       {/* Summary card */}
       <View style={styles.summaryCard}>
         <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>Hotel</Text>
+          <Text style={styles.summaryLabel}>{t('success.hotel')}</Text>
           <Text style={styles.summaryValue}>{hotel.name}</Text>
         </View>
         <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>Fechas</Text>
+          <Text style={styles.summaryLabel}>{t('success.dates')}</Text>
           <Text style={styles.summaryValue}>
             {formatDate(new Date('2026-03-20'), 'short')} - {formatDate(new Date('2026-03-25'), 'short')}
           </Text>
         </View>
         <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>Habitacion</Text>
-          <Text style={styles.summaryValue}>Superior</Text>
+          <Text style={styles.summaryLabel}>{t('success.room')}</Text>
+          <Text style={styles.summaryValue}>{t('success.roomValue')}</Text>
         </View>
         <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>Huespedes</Text>
-          <Text style={styles.summaryValue}>2 adultos</Text>
+          <Text style={styles.summaryLabel}>{t('success.guests')}</Text>
+          <Text style={styles.summaryValue}>{t('success.guestsValue', { count: 2 })}</Text>
         </View>
         <View style={styles.divider} />
         <View style={styles.summaryRow}>
-          <Text style={styles.totalLabel}>Total</Text>
+          <Text style={styles.totalLabel}>{t('success.total')}</Text>
           <Text style={styles.totalValue}>{formatPrice(total)}</Text>
         </View>
       </View>
@@ -76,13 +74,13 @@ export default function SuccessScreen() {
       {/* Actions */}
       <Pressable
         style={styles.primaryButton}
-        onPress={() => navigation.navigate('MainTabs')}
+        onPress={() => navigation.navigate('MainTabs', { screen: 'MyReservations' })}
       >
-        <Text style={styles.primaryButtonText}>Ver mis reservas</Text>
+        <Text style={styles.primaryButtonText}>{t('success.viewReservations')}</Text>
       </Pressable>
 
-      <Pressable onPress={() => navigation.navigate('MainTabs')}>
-        <Text style={styles.linkText}>Volver al inicio</Text>
+      <Pressable onPress={() => navigation.navigate('MainTabs', { screen: 'Search' })}>
+        <Text style={styles.linkText}>{t('success.backToHome')}</Text>
       </Pressable>
     </ScrollView>
   );
