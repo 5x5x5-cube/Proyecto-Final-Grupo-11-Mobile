@@ -4,19 +4,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { palette } from '../theme/palette';
 import { MainTabParamList } from './types';
-import PlaceholderScreen from '../screens/PlaceholderScreen';
+import SearchScreen from '../screens/SearchScreen';
+import MyReservationsScreen from '../screens/MyReservationsScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
-
-function SearchPlaceholder() {
-  return <PlaceholderScreen name="Search" />;
-}
-function ReservationsPlaceholder() {
-  return <PlaceholderScreen name="My Reservations" />;
-}
-function ProfilePlaceholder() {
-  return <PlaceholderScreen name="Profile" />;
-}
 
 export default function MainTabs() {
   const { t } = useTranslation('common');
@@ -41,7 +33,7 @@ export default function MainTabs() {
     >
       <Tab.Screen
         name="Search"
-        component={SearchPlaceholder}
+        component={SearchScreen}
         options={{
           tabBarLabel: t('bottomNav.search'),
           tabBarIcon: ({ color, size }) => (
@@ -51,7 +43,7 @@ export default function MainTabs() {
       />
       <Tab.Screen
         name="MyReservations"
-        component={ReservationsPlaceholder}
+        component={MyReservationsScreen}
         options={{
           tabBarLabel: t('bottomNav.myReservations'),
           tabBarIcon: ({ color, size }) => (
@@ -61,7 +53,7 @@ export default function MainTabs() {
       />
       <Tab.Screen
         name="Profile"
-        component={ProfilePlaceholder}
+        component={ProfileScreen}
         options={{
           tabBarLabel: t('bottomNav.profile'),
           tabBarIcon: ({ color, size }) => (
