@@ -1,11 +1,10 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   View,
   Text,
   TextInput,
   Pressable,
   StyleSheet,
-  Platform,
   KeyboardAvoidingView,
   ScrollView,
 } from 'react-native';
@@ -24,24 +23,34 @@ type FieldDef = {
   key: string;
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
   placeholder: string;
+  keyboardType?: 'default' | 'email-address' | 'phone-pad';
+  autoCapitalize?: 'none' | 'sentences' | 'words';
+  secure?: boolean;
 };
 
 const fields: FieldDef[] = [
-  { key: 'fullName', icon: 'account-outline', placeholder: 'Juan Perez' },
-  { key: 'email', icon: 'email-outline', placeholder: 'viajero@email.com' },
-  { key: 'phone', icon: 'phone-outline', placeholder: '+57 300 123 4567' },
-  { key: 'password', icon: 'lock-outline', placeholder: '••••••••' },
-  { key: 'confirmPassword', icon: 'lock-outline', placeholder: '••••••••' },
+  { key: 'fullName', icon: 'account-outline', placeholder: 'Juan Perez', autoCapitalize: 'words' },
+  { key: 'email', icon: 'email-outline', placeholder: 'viajero@email.com', keyboardType: 'email-address', autoCapitalize: 'none' },
+  { key: 'phone', icon: 'phone-outline', placeholder: '+57 300 123 4567', keyboardType: 'phone-pad' },
+  { key: 'password', icon: 'lock-outline', placeholder: '••••••••', secure: true },
+  { key: 'confirmPassword', icon: 'lock-outline', placeholder: '••••••••', secure: true },
 ];
 
 export default function RegisterScreen() {
   const navigation = useNavigation<Nav>();
   const { t } = useTranslation('mobile');
+  const inputRefs = useRef<(TextInput | null)[]>([]);
+
+  const focusNext = (index: number) => {
+    if (index < fields.length - 1) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
 
   return (
     <KeyboardAvoidingView
       style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior="padding"
     >
       <ScrollView
         style={styles.flex}
@@ -63,7 +72,7 @@ export default function RegisterScreen() {
         <View style={styles.card}>
           <Text style={styles.cardTitle}>{t('register.title')}</Text>
 
-          {fields.map((field) => (
+          {fields.map((field, index) => (
             <View key={field.key} style={styles.fieldGroup}>
               <Text style={styles.label}>
                 {t(`register.${field.key}` as any)}
@@ -75,9 +84,15 @@ export default function RegisterScreen() {
                   color={palette.onSurfaceVariant}
                 />
                 <TextInput
+                  ref={(ref) => { inputRefs.current[index] = ref; }}
                   style={styles.input}
                   defaultValue={field.placeholder}
-                  secureTextEntry={field.key === 'password' || field.key === 'confirmPassword'}
+                  secureTextEntry={field.secure}
+                  keyboardType={field.keyboardType ?? 'default'}
+                  autoCapitalize={field.autoCapitalize}
+                  returnKeyType={index < fields.length - 1 ? 'next' : 'done'}
+                  onSubmitEditing={() => focusNext(index)}
+                  blurOnSubmit={index === fields.length - 1}
                 />
               </View>
             </View>
