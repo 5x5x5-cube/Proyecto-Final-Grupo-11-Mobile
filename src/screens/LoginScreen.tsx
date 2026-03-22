@@ -1,11 +1,10 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   View,
   Text,
   TextInput,
   Pressable,
   StyleSheet,
-  Platform,
   KeyboardAvoidingView,
   ScrollView,
 } from 'react-native';
@@ -23,11 +22,12 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 export default function LoginScreen() {
   const navigation = useNavigation<Nav>();
   const { t } = useTranslation('mobile');
+  const passwordRef = useRef<TextInput>(null);
 
   return (
     <KeyboardAvoidingView
       style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior="padding"
     >
       <ScrollView
         style={styles.flex}
@@ -62,6 +62,9 @@ export default function LoginScreen() {
                 defaultValue="viajero@email.com"
                 keyboardType="email-address"
                 autoCapitalize="none"
+                returnKeyType="next"
+                onSubmitEditing={() => passwordRef.current?.focus()}
+                blurOnSubmit={false}
               />
             </View>
           </View>
@@ -75,9 +78,11 @@ export default function LoginScreen() {
                 color={palette.onSurfaceVariant}
               />
               <TextInput
+                ref={passwordRef}
                 style={styles.input}
                 defaultValue="••••••••"
                 secureTextEntry
+                returnKeyType="done"
               />
             </View>
           </View>
