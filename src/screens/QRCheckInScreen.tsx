@@ -51,14 +51,14 @@ export default function QRCheckInScreen() {
         {/* Instruction card */}
         <View style={styles.instructionCard}>
           <Text style={styles.instructionText}>
-            Presenta este codigo QR en la recepcion del hotel para realizar tu check-in de forma rapida.
+            {t('qrCheckIn.instruction')}
           </Text>
         </View>
 
         {/* Download button */}
         <Pressable style={styles.downloadButton}>
           <MaterialCommunityIcons name="download" size={20} color={palette.primary} />
-          <Text style={styles.downloadText}>Descargar QR</Text>
+          <Text style={styles.downloadText}>{t('qrCheckIn.downloadQR')}</Text>
         </Pressable>
       </ScrollView>
     </View>

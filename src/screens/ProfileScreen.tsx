@@ -53,53 +53,53 @@ export default function ProfileScreen() {
 
       {/* Personal info card */}
       <View style={styles.card}>
-        <Text style={styles.sectionTitle}>Informacion personal</Text>
+        <Text style={styles.sectionTitle}>{t('profile.personalInfo')}</Text>
         <ProfileMenuRow
           icon={<MaterialCommunityIcons name="account-outline" size={20} color={palette.onSurfaceVariant} />}
-          label="Nombre"
+          label={t('profile.name')}
           value="Carlos Martinez"
         />
         <View style={styles.separator} />
         <ProfileMenuRow
           icon={<MaterialCommunityIcons name="email-outline" size={20} color={palette.onSurfaceVariant} />}
-          label="Email"
+          label={t('profile.email')}
           value="carlos.martinez@email.com"
         />
         <View style={styles.separator} />
         <ProfileMenuRow
           icon={<MaterialCommunityIcons name="phone-outline" size={20} color={palette.onSurfaceVariant} />}
-          label="Telefono"
+          label={t('profile.phone')}
           value="+57 300 123 4567"
         />
       </View>
 
       {/* Preferences card */}
       <View style={styles.card}>
-        <Text style={styles.sectionTitle}>Preferencias</Text>
+        <Text style={styles.sectionTitle}>{t('profile.preferences')}</Text>
         <ProfileMenuRow
           icon={<MaterialCommunityIcons name="web" size={20} color={palette.onSurfaceVariant} />}
-          label="Idioma"
+          label={t('profile.language')}
           value={`${language} \u2014 ${languageNames[language]}`}
           onPress={() => setLangModalVisible(true)}
         />
         <View style={styles.separator} />
         <ProfileMenuRow
           icon={<MaterialCommunityIcons name="currency-usd" size={20} color={palette.onSurfaceVariant} />}
-          label="Moneda"
+          label={t('profile.currency')}
           value={`${currency} \u2014 ${currencyNames[currency]}`}
           onPress={() => setCurrModalVisible(true)}
         />
         <View style={styles.separator} />
         <ProfileMenuRow
           icon={<MaterialCommunityIcons name="bell-outline" size={20} color={palette.onSurfaceVariant} />}
-          label="Notificaciones"
+          label={t('profile.notifications')}
         />
       </View>
 
       {/* Logout button */}
       <Pressable style={styles.logoutButton} onPress={() => navigation.navigate('Login')}>
         <MaterialCommunityIcons name="logout" size={20} color={palette.error} />
-        <Text style={styles.logoutText}>Cerrar sesion</Text>
+        <Text style={styles.logoutText}>{t('profile.logout')}</Text>
       </Pressable>
 
       {/* Modals */}
@@ -109,7 +109,7 @@ export default function ProfileScreen() {
         options={languageOptions}
         selected={language}
         onSelect={setLanguage}
-        title="Idioma"
+        title={t('profile.language')}
       />
       <PickerModal
         visible={currModalVisible}
@@ -117,7 +117,7 @@ export default function ProfileScreen() {
         options={currencyOptions}
         selected={currency}
         onSelect={setCurrency}
-        title="Moneda"
+        title={t('profile.currency')}
       />
     </ScrollView>
   );
