@@ -2,7 +2,6 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { palette } from '../theme/palette';
 import { MainTabParamList } from './types';
 import SearchScreen from '../screens/SearchScreen';
@@ -13,7 +12,6 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 
 export default function MainTabs() {
   const { t, i18n } = useTranslation('common');
-  const insets = useSafeAreaInsets();
 
   return (
     <Tab.Navigator
@@ -23,8 +21,7 @@ export default function MainTabs() {
         tabBarActiveTintColor: palette.primary,
         tabBarInactiveTintColor: palette.onSurfaceVariant,
         tabBarStyle: {
-          height: 56 + insets.bottom,
-          paddingBottom: insets.bottom,
+          height: 56,
           backgroundColor: '#fff',
           borderTopColor: palette.outlineVariant,
           borderTopWidth: 1,

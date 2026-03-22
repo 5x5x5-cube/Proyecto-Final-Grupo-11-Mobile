@@ -9,7 +9,6 @@ import {
   KeyboardAvoidingView,
   ScrollView,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -36,7 +35,6 @@ const fields: FieldDef[] = [
 ];
 
 export default function RegisterScreen() {
-  const insets = useSafeAreaInsets();
   const navigation = useNavigation<Nav>();
   const { t } = useTranslation('mobile');
 
@@ -49,7 +47,7 @@ export default function RegisterScreen() {
         style={styles.flex}
         contentContainerStyle={[
           styles.container,
-          { paddingTop: 36 + insets.top },
+          { paddingTop: 36 },
         ]}
         keyboardShouldPersistTaps="handled"
       >

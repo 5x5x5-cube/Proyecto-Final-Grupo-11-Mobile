@@ -9,7 +9,6 @@ import {
   KeyboardAvoidingView,
   ScrollView,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -22,7 +21,6 @@ import LanguagePill from '../components/LanguagePill';
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export default function LoginScreen() {
-  const insets = useSafeAreaInsets();
   const navigation = useNavigation<Nav>();
   const { t } = useTranslation('mobile');
 
@@ -35,7 +33,7 @@ export default function LoginScreen() {
         style={styles.flex}
         contentContainerStyle={[
           styles.container,
-          { paddingTop: 48 + insets.top },
+          { paddingTop: 48 },
         ]}
         keyboardShouldPersistTaps="handled"
       >

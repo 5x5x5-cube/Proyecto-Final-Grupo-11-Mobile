@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -11,7 +10,6 @@ import { useLocale } from '../contexts/LocaleContext';
 import { palette } from '../theme/palette';
 
 export default function SuccessScreen() {
-  const insets = useSafeAreaInsets();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { t } = useTranslation('mobile');
   const { formatPrice, formatDate } = useLocale();
@@ -27,7 +25,7 @@ export default function SuccessScreen() {
       style={styles.scroll}
       contentContainerStyle={[
         styles.container,
-        { paddingTop: 48 + insets.top },
+        { paddingTop: 48 },
       ]}
     >
       {/* Success icon */}

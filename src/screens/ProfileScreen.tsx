@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -27,7 +26,6 @@ const currencyOptions: { key: Currency; label: string }[] = [
 ];
 
 export default function ProfileScreen() {
-  const insets = useSafeAreaInsets();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { t } = useTranslation('mobile');
   const { language, currency, setLanguage, setCurrency } = useLocale();
@@ -38,7 +36,7 @@ export default function ProfileScreen() {
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={[styles.contentContainer, { paddingTop: insets.top + 20 }]}
+      contentContainerStyle={styles.contentContainer}
     >
       {/* Header */}
       <View style={styles.header}>
@@ -130,6 +128,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingHorizontal: 16,
+    paddingTop: 20,
     paddingBottom: 16,
   },
   header: {

@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { palette } from '../theme/palette';
 
 interface ActionBarProps {
@@ -8,10 +7,8 @@ interface ActionBarProps {
 }
 
 export default function ActionBar({ children }: ActionBarProps) {
-  const insets = useSafeAreaInsets();
-
   return (
-    <View style={[styles.container, { paddingBottom: Math.max(insets.bottom, 12) }]}>
+    <View style={styles.container}>
       {children}
     </View>
   );
@@ -23,6 +20,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: palette.outlineVariant,
     paddingHorizontal: 16,
-    paddingTop: 12,
+    paddingVertical: 12,
   },
 });
