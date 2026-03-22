@@ -2,6 +2,7 @@ import React from 'react';
 import {
   View,
   Text,
+  TextInput,
   Pressable,
   StyleSheet,
   Platform,
@@ -75,7 +76,11 @@ export default function RegisterScreen() {
                   size={18}
                   color={palette.onSurfaceVariant}
                 />
-                <Text style={styles.placeholder}>{field.placeholder}</Text>
+                <TextInput
+                  style={styles.input}
+                  defaultValue={field.placeholder}
+                  secureTextEntry={field.key === 'password' || field.key === 'confirmPassword'}
+                />
               </View>
             </View>
           ))}
@@ -161,11 +166,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 12,
   },
-  placeholder: {
+  input: {
     fontSize: 14,
-    color: palette.outline,
+    color: palette.onSurface,
     fontFamily: 'Roboto_400Regular',
     flex: 1,
+    padding: 0,
   },
   primaryButton: {
     backgroundColor: palette.primary,
