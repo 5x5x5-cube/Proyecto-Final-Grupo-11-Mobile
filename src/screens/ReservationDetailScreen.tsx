@@ -70,11 +70,11 @@ export default function ReservationDetailScreen() {
                   sub: '12:00 PM',
                 },
                 {
-                  label: 'Duracion',
-                  value: `${reservation.nights} noches`,
+                  label: t('reservationDetail.duration'),
+                  value: t('reservationDetail.nights', { count: reservation.nights }),
                 },
                 {
-                  label: 'Huespedes',
+                  label: t('reservationDetail.guests'),
                   value: reservation.guests,
                 },
               ]}
@@ -85,7 +85,7 @@ export default function ReservationDetailScreen() {
         {/* Room card */}
         <View style={styles.card}>
           <View style={styles.cardInner}>
-            <Text style={styles.roomLabel}>Habitacion</Text>
+            <Text style={styles.roomLabel}>{t('reservationDetail.room')}</Text>
             <Text style={styles.roomValue}>{reservation.room}</Text>
           </View>
         </View>
@@ -93,13 +93,13 @@ export default function ReservationDetailScreen() {
         {/* Price breakdown */}
         <View style={styles.card}>
           <View style={styles.cardInner}>
-            <Text style={styles.priceTitle}>Resumen de pago</Text>
+            <Text style={styles.priceTitle}>{t('reservationDetail.paymentSummary')}</Text>
             <PriceBreakdown
               rows={[
-                { label: 'Alojamiento', value: formatPrice(accommodationCop) },
-                { label: 'Impuestos y tasas', value: formatPrice(taxesCop) },
+                { label: t('reservationDetail.accommodation', { count: reservation.nights }), value: formatPrice(accommodationCop) },
+                { label: t('reservationDetail.taxes'), value: formatPrice(taxesCop) },
               ]}
-              totalLabel="Total"
+              totalLabel={t('reservationDetail.totalPaid')}
               totalValue={formatPrice(reservation.totalPriceCop)}
             />
           </View>
@@ -112,13 +112,13 @@ export default function ReservationDetailScreen() {
             onPress={() => navigation.navigate('QRCheckIn', { id: reservation.id })}
           >
             <MaterialCommunityIcons name="qrcode" size={20} color={palette.onPrimary} />
-            <Text style={styles.primaryButtonText}>Mostrar QR</Text>
+            <Text style={styles.primaryButtonText}>{t('reservationDetail.showQR')}</Text>
           </Pressable>
           <Pressable
             style={styles.errorButton}
             onPress={() => navigation.navigate('CancelReservation', { id: reservation.id })}
           >
-            <Text style={styles.errorButtonText}>Cancelar reserva</Text>
+            <Text style={styles.errorButtonText}>{t('reservationDetail.cancelReservation')}</Text>
           </Pressable>
         </View>
       </ScrollView>
