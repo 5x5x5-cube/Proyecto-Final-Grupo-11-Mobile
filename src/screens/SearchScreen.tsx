@@ -12,7 +12,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../navigation/types';
 import { palette } from '../theme/palette';
 import { useLocale } from '../contexts/LocaleContext';
@@ -25,10 +24,9 @@ export default function SearchScreen() {
   const navigation = useNavigation<Nav>();
   const { t } = useTranslation('mobile');
   const { formatDate } = useLocale();
-  const insets = useSafeAreaInsets();
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top }]}>
+    <ScrollView style={styles.screen} contentContainerStyle={styles.scrollContent}>
       <View style={styles.brandRow}>
         <Brand size={22} variant="nav" />
       </View>

@@ -7,7 +7,6 @@ import {
   FlatList,
   StyleSheet,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -48,7 +47,6 @@ const reviews = [
 ];
 
 export default function PropertyDetailScreen() {
-  const insets = useSafeAreaInsets();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<NativeStackScreenProps<RootStackParamList, 'PropertyDetail'>['route']>();
   const { t } = useTranslation('mobile');
@@ -68,7 +66,7 @@ export default function PropertyDetailScreen() {
         >
           <Pressable
             onPress={() => navigation.goBack()}
-            style={[styles.backButton, { top: insets.top + 8 }]}
+            style={[styles.backButton, { top: 8 }]}
           >
             <MaterialCommunityIcons name="arrow-left" size={18} color="#fff" />
           </Pressable>
