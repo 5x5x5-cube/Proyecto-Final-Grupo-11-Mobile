@@ -2,6 +2,7 @@ import React from 'react';
 import {
   View,
   Text,
+  TextInput,
   Pressable,
   StyleSheet,
   Platform,
@@ -58,7 +59,12 @@ export default function LoginScreen() {
                 size={18}
                 color={palette.onSurfaceVariant}
               />
-              <Text style={styles.placeholder}>viajero@email.com</Text>
+              <TextInput
+                style={styles.input}
+                defaultValue="viajero@email.com"
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
             </View>
           </View>
 
@@ -70,7 +76,11 @@ export default function LoginScreen() {
                 size={18}
                 color={palette.onSurfaceVariant}
               />
-              <Text style={styles.placeholder}>••••••••</Text>
+              <TextInput
+                style={styles.input}
+                defaultValue="••••••••"
+                secureTextEntry
+              />
             </View>
           </View>
 
@@ -153,11 +163,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 12,
   },
-  placeholder: {
+  input: {
     fontSize: 14,
-    color: palette.outline,
+    color: palette.onSurface,
     fontFamily: 'Roboto_400Regular',
     flex: 1,
+    padding: 0,
   },
   primaryButton: {
     backgroundColor: palette.primary,
