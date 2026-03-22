@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../navigation/types';
 import { palette } from '../theme/palette';
 import { useLocale } from '../contexts/LocaleContext';
@@ -34,6 +35,7 @@ export default function MyReservationsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { t } = useTranslation('mobile');
   const { formatPrice, formatDate } = useLocale();
+  const insets = useSafeAreaInsets();
   const [tab, setTab] = useState<Tab>('active');
 
   const tabs: { key: Tab; label: string; count: number }[] = [
@@ -81,9 +83,9 @@ export default function MyReservationsScreen() {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <OfflineBanner />
-      <Text style={styles.title}>Mis reservas</Text>
+      <Text style={styles.title}>{t('myReservations.title')}</Text>
       <View style={styles.tabBar}>
         {tabs.map((t) => (
           <Pressable

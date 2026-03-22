@@ -12,6 +12,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../navigation/types';
 import { palette } from '../theme/palette';
 import { useLocale } from '../contexts/LocaleContext';
@@ -24,9 +25,10 @@ export default function SearchScreen() {
   const navigation = useNavigation<Nav>();
   const { t } = useTranslation('mobile');
   const { formatDate } = useLocale();
+  const insets = useSafeAreaInsets();
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.scrollContent}>
+    <ScrollView style={styles.screen} contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top }]}>
       <View style={styles.brandRow}>
         <Brand size={22} variant="nav" />
       </View>
@@ -102,7 +104,7 @@ export default function SearchScreen() {
       </LinearGradient>
 
       <View style={styles.destinationsSection}>
-        <Text style={styles.sectionTitle}>{t('search.popularTitle')}</Text>
+        <Text style={styles.sectionTitle}>{t('search.popularDestinations')}</Text>
         <FlatList
           data={mockDestinations}
           horizontal
@@ -119,7 +121,7 @@ export default function SearchScreen() {
               <Text style={styles.destName}>{item.name}</Text>
               <Text style={styles.destCountry}>{item.country}</Text>
               <Text style={styles.destCount}>
-                {item.hotelCount} {t('search.hotels')}
+                {t('search.hotels', { count: item.hotelCount })}
               </Text>
             </LinearGradient>
           )}
@@ -204,7 +206,6 @@ const styles = StyleSheet.create({
   },
   destinationsSection: {
     marginTop: 24,
-    paddingHorizontal: 20,
   },
   sectionTitle: {
     fontSize: 17,
@@ -212,9 +213,11 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto_700Bold',
     color: palette.onSurface,
     marginBottom: 14,
+    paddingHorizontal: 20,
   },
   destinationsList: {
     gap: 10,
+    paddingHorizontal: 20,
   },
   destCard: {
     minWidth: 130,
