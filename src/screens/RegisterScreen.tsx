@@ -51,18 +51,18 @@ type TouchedFields = {
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function getError(key: keyof FormValues, values: FormValues): string | null {
+function getErrorKey(key: keyof FormValues, values: FormValues): string | null {
   switch (key) {
     case 'fullName':
-      return values.fullName.trim() === '' ? 'El nombre es obligatorio' : null;
+      return values.fullName.trim() === '' ? 'register.nameRequired' : null;
     case 'email':
-      return !emailRegex.test(values.email) ? 'Email invalido' : null;
+      return !emailRegex.test(values.email) ? 'register.invalidEmail' : null;
     case 'phone':
-      return values.phone.trim() === '' ? 'El telefono es obligatorio' : null;
+      return values.phone.trim() === '' ? 'register.phoneRequired' : null;
     case 'password':
-      return values.password.length < 6 ? 'Minimo 6 caracteres' : null;
+      return values.password.length < 6 ? 'register.passwordMinLength' : null;
     case 'confirmPassword':
-      return values.confirmPassword !== values.password ? 'Las contrasenas no coinciden' : null;
+      return values.confirmPassword !== values.password ? 'register.passwordMismatch' : null;
     default:
       return null;
   }
@@ -99,7 +99,7 @@ export default function RegisterScreen() {
   };
 
   const isFormValid = fields.every(
-    (field) => getError(field.key as keyof FormValues, values) === null
+    (field) => getErrorKey(field.key as keyof FormValues, values) === null
   );
 
   const handleRegister = () => {
@@ -138,8 +138,8 @@ export default function RegisterScreen() {
 
           {fields.map((field, index) => {
             const fieldKey = field.key as keyof FormValues;
-            const error = getError(fieldKey, values);
-            const showError = touched[fieldKey] && error !== null;
+            const errorKey = getErrorKey(fieldKey, values);
+            const showError = touched[fieldKey] && errorKey !== null;
 
             return (
               <View key={field.key} style={styles.fieldGroup}>
@@ -168,8 +168,8 @@ export default function RegisterScreen() {
                     blurOnSubmit={index === fields.length - 1}
                   />
                 </View>
-                {showError && (
-                  <Text style={styles.errorText}>{error}</Text>
+                {showError && errorKey && (
+                  <Text style={styles.errorText}>{t(errorKey)}</Text>
                 )}
               </View>
             );

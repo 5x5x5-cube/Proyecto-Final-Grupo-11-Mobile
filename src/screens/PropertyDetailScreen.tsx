@@ -72,7 +72,7 @@ export default function PropertyDetailScreen() {
           </Pressable>
           <View style={styles.photoBadge}>
             <MaterialCommunityIcons name="camera" size={14} color="#fff" />
-            <Text style={styles.photoBadgeText}>+{hotel.photoCount} fotos</Text>
+            <Text style={styles.photoBadgeText}>{t('propertyDetail.photos', { count: hotel.photoCount })}</Text>
           </View>
         </LinearGradient>
 
@@ -88,12 +88,12 @@ export default function PropertyDetailScreen() {
               <Text style={styles.ratingBadgeText}>{hotel.rating}</Text>
             </View>
             <MaterialCommunityIcons name="star" size={16} color={palette.star} />
-            <Text style={styles.reviewCount}>{hotel.reviewCount} resenas</Text>
+            <Text style={styles.reviewCount}>{t('propertyDetail.reviews', { count: hotel.reviewCount })}</Text>
           </View>
 
           {/* Description */}
           <Text style={styles.description}>
-            Disfruta de una experiencia unica en {hotel.name}. Ubicado en {hotel.location}, este {hotel.type.toLowerCase()} ofrece comodidad, estilo y una ubicacion privilegiada para explorar la ciudad.
+            {t('propertyDetail.description')}
           </Text>
 
           {/* Amenities */}
@@ -158,7 +158,7 @@ export default function PropertyDetailScreen() {
         <View style={styles.actionBarContent}>
           <View>
             <Text style={styles.actionPrice}>{formatPrice(hotel.pricePerNight)}</Text>
-            <Text style={styles.actionPriceLabel}>/noche</Text>
+            <Text style={styles.actionPriceLabel}>{t('propertyDetail.perNight')}</Text>
           </View>
           <Pressable
             style={styles.reserveButton}

@@ -184,7 +184,7 @@ export default function SearchScreen() {
         options={checkInOptions}
         selected={checkIn}
         onSelect={setCheckIn}
-        title="Check-in"
+        title={t('search.checkIn')}
       />
       <DatePickerModal
         visible={checkOutModal}
@@ -192,7 +192,7 @@ export default function SearchScreen() {
         options={checkOutOptions}
         selected={checkOut}
         onSelect={setCheckOut}
-        title="Check-out"
+        title={t('search.checkOut')}
       />
       <GuestPickerModal
         visible={guestModal}
@@ -200,6 +200,7 @@ export default function SearchScreen() {
         value={guests}
         onChange={setGuests}
         title={t('search.guests', { count: guests })}
+        doneLabel="OK"
       />
     </ScrollView>
   );

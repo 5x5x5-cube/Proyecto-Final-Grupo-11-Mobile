@@ -9,9 +9,10 @@ interface GuestPickerModalProps {
   value: number;
   onChange: (count: number) => void;
   title?: string;
+  doneLabel?: string;
 }
 
-export default function GuestPickerModal({ visible, onClose, value, onChange, title }: GuestPickerModalProps) {
+export default function GuestPickerModal({ visible, onClose, value, onChange, title, doneLabel = 'OK' }: GuestPickerModalProps) {
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose}>
@@ -35,7 +36,7 @@ export default function GuestPickerModal({ visible, onClose, value, onChange, ti
             </Pressable>
           </View>
           <Pressable style={styles.doneButton} onPress={onClose}>
-            <Text style={styles.doneText}>OK</Text>
+            <Text style={styles.doneText}>{doneLabel}</Text>
           </Pressable>
         </View>
       </Pressable>

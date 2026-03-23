@@ -102,7 +102,7 @@ export default function LoginScreen() {
                 value={email}
                 onChangeText={handleEmailChange}
                 onBlur={handleEmailBlur}
-                placeholder="correo@ejemplo.com"
+                placeholder={t('login.emailPlaceholder')}
                 placeholderTextColor={palette.onSurfaceVariant}
                 keyboardType="email-address"
                 autoCapitalize="none"
@@ -112,7 +112,7 @@ export default function LoginScreen() {
               />
             </View>
             {emailError && (
-              <Text style={styles.errorText}>Email invalido</Text>
+              <Text style={styles.errorText}>{t('login.invalidEmail')}</Text>
             )}
           </View>
 
@@ -129,7 +129,7 @@ export default function LoginScreen() {
                 style={styles.input}
                 value={password}
                 onChangeText={setPassword}
-                placeholder="••••••••"
+                placeholder={t('login.passwordPlaceholder')}
                 placeholderTextColor={palette.onSurfaceVariant}
                 secureTextEntry
                 returnKeyType="done"
