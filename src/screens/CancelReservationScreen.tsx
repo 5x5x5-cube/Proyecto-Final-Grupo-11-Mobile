@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -13,6 +14,7 @@ import TopBar from '../components/TopBar';
 const allReservations = [...mockReservations, ...pastReservations, ...cancelledReservations];
 
 export default function CancelReservationScreen() {
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<NativeStackScreenProps<RootStackParamList, 'CancelReservation'>['route']>();
   const { t } = useTranslation('mobile');
@@ -23,7 +25,7 @@ export default function CancelReservationScreen() {
   return (
     <View style={styles.container}>
       <TopBar title={t('cancelReservation.title')} onBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 24 + insets.bottom }]}>
         {/* Warning icon */}
         <View style={styles.iconCircle}>
           <MaterialCommunityIcons name="alert" size={32} color={palette.error} />
