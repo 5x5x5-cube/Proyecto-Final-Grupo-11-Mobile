@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -17,13 +17,49 @@ import { palette } from '../theme/palette';
 import { useLocale } from '../contexts/LocaleContext';
 import { mockDestinations } from '../data/mockDestinations';
 import Brand from '../components/Brand';
+import PickerModal from '../components/PickerModal';
+import DatePickerModal from '../components/DatePickerModal';
+import GuestPickerModal from '../components/GuestPickerModal';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
+
+const destinationOptions = mockDestinations.map((d) => ({
+  key: d.name,
+  label: `${d.name}, ${d.country}`,
+}));
+
+const checkInOptions = [
+  { key: 'ci1', label: '15 Mar 2026', date: '2026-03-15' },
+  { key: 'ci2', label: '20 Mar 2026', date: '2026-03-20' },
+  { key: 'ci3', label: '1 Abr 2026', date: '2026-04-01' },
+  { key: 'ci4', label: '10 Abr 2026', date: '2026-04-10' },
+  { key: 'ci5', label: '1 May 2026', date: '2026-05-01' },
+];
+
+const checkOutOptions = [
+  { key: 'co1', label: '20 Mar 2026', date: '2026-03-20' },
+  { key: 'co2', label: '25 Mar 2026', date: '2026-03-25' },
+  { key: 'co3', label: '5 Abr 2026', date: '2026-04-05' },
+  { key: 'co4', label: '15 Abr 2026', date: '2026-04-15' },
+  { key: 'co5', label: '7 May 2026', date: '2026-05-07' },
+];
 
 export default function SearchScreen() {
   const navigation = useNavigation<Nav>();
   const { t } = useTranslation('mobile');
   const { formatDate } = useLocale();
+
+  const [destination, setDestination] = useState('Cartagena');
+  const [checkIn, setCheckIn] = useState('2026-03-15');
+  const [checkOut, setCheckOut] = useState('2026-03-20');
+  const [guests, setGuests] = useState(2);
+
+  const [destModal, setDestModal] = useState(false);
+  const [checkInModal, setCheckInModal] = useState(false);
+  const [checkOutModal, setCheckOutModal] = useState(false);
+  const [guestModal, setGuestModal] = useState(false);
+
+  const selectedCountry = mockDestinations.find((d) => d.name === destination)?.country ?? '';
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.scrollContent}>
@@ -42,48 +78,50 @@ export default function SearchScreen() {
         <Text style={styles.heroSubtitle}>{t('search.heroSubtitle')}</Text>
 
         <View style={styles.form}>
-          <View style={styles.field}>
+          <Pressable style={styles.field} onPress={() => setDestModal(true)}>
             <MaterialCommunityIcons
               name="map-marker-outline"
               size={18}
               color={palette.onSurfaceVariant}
             />
-            <Text style={styles.fieldText}>Cartagena, Colombia</Text>
-          </View>
+            <Text style={styles.fieldText}>{destination}, {selectedCountry}</Text>
+            <MaterialCommunityIcons name="chevron-down" size={18} color={palette.onSurfaceVariant} />
+          </Pressable>
 
           <View style={styles.dateRow}>
-            <View style={[styles.field, styles.dateField]}>
+            <Pressable style={[styles.field, styles.dateField]} onPress={() => setCheckInModal(true)}>
               <MaterialCommunityIcons
                 name="calendar-outline"
                 size={18}
                 color={palette.onSurfaceVariant}
               />
               <Text style={styles.fieldText}>
-                {formatDate('2026-03-15', 'short')}
+                {formatDate(checkIn, 'short')}
               </Text>
-            </View>
-            <View style={[styles.field, styles.dateField]}>
+            </Pressable>
+            <Pressable style={[styles.field, styles.dateField]} onPress={() => setCheckOutModal(true)}>
               <MaterialCommunityIcons
                 name="calendar-outline"
                 size={18}
                 color={palette.onSurfaceVariant}
               />
               <Text style={styles.fieldText}>
-                {formatDate('2026-03-20', 'short')}
+                {formatDate(checkOut, 'short')}
               </Text>
-            </View>
+            </Pressable>
           </View>
 
-          <View style={styles.field}>
+          <Pressable style={styles.field} onPress={() => setGuestModal(true)}>
             <MaterialCommunityIcons
               name="account-outline"
               size={18}
               color={palette.onSurfaceVariant}
             />
             <Text style={styles.fieldText}>
-              {t('search.guests', { count: 2 })}
+              {t('search.guests', { count: guests })}
             </Text>
-          </View>
+            <MaterialCommunityIcons name="chevron-down" size={18} color={palette.onSurfaceVariant} />
+          </Pressable>
 
           <Pressable
             style={styles.searchButton}
@@ -110,21 +148,59 @@ export default function SearchScreen() {
           keyExtractor={(item) => item.name}
           contentContainerStyle={styles.destinationsList}
           renderItem={({ item }) => (
-            <LinearGradient
-              colors={[...item.gradient]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.destCard}
-            >
-              <Text style={styles.destName}>{item.name}</Text>
-              <Text style={styles.destCountry}>{item.country}</Text>
-              <Text style={styles.destCount}>
-                {t('search.hotels', { count: item.hotelCount })}
-              </Text>
-            </LinearGradient>
+            <Pressable onPress={() => setDestination(item.name)}>
+              <LinearGradient
+                colors={[...item.gradient]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={[
+                  styles.destCard,
+                  item.name === destination && styles.destCardSelected,
+                ]}
+              >
+                <Text style={styles.destName}>{item.name}</Text>
+                <Text style={styles.destCountry}>{item.country}</Text>
+                <Text style={styles.destCount}>
+                  {t('search.hotels', { count: item.hotelCount })}
+                </Text>
+              </LinearGradient>
+            </Pressable>
           )}
         />
       </View>
+
+      {/* Modals */}
+      <PickerModal
+        visible={destModal}
+        onClose={() => setDestModal(false)}
+        options={destinationOptions}
+        selected={destination}
+        onSelect={setDestination}
+        title={t('search.heroSubtitle')}
+      />
+      <DatePickerModal
+        visible={checkInModal}
+        onClose={() => setCheckInModal(false)}
+        options={checkInOptions}
+        selected={checkIn}
+        onSelect={setCheckIn}
+        title="Check-in"
+      />
+      <DatePickerModal
+        visible={checkOutModal}
+        onClose={() => setCheckOutModal(false)}
+        options={checkOutOptions}
+        selected={checkOut}
+        onSelect={setCheckOut}
+        title="Check-out"
+      />
+      <GuestPickerModal
+        visible={guestModal}
+        onClose={() => setGuestModal(false)}
+        value={guests}
+        onChange={setGuests}
+        title={t('search.guests', { count: guests })}
+      />
     </ScrollView>
   );
 }
@@ -223,6 +299,10 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     padding: 14,
     justifyContent: 'flex-end',
+  },
+  destCardSelected: {
+    borderWidth: 2,
+    borderColor: '#fff',
   },
   destName: {
     fontSize: 15,
