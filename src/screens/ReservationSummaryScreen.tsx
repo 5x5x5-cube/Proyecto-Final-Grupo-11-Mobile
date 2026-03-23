@@ -54,12 +54,12 @@ export default function ReservationSummaryScreen() {
           <InfoGrid
             items={[
               {
-                label: 'Check-in',
+                label: t('summary.checkIn'),
                 value: formatDate(checkIn, 'shortWithDay'),
                 sub: '3:00 PM',
               },
               {
-                label: 'Check-out',
+                label: t('summary.checkOut'),
                 value: formatDate(checkOut, 'shortWithDay'),
                 sub: '12:00 PM',
               },
@@ -80,7 +80,7 @@ export default function ReservationSummaryScreen() {
           <Text style={styles.priceTitle}>{t('summary.priceDetail')}</Text>
           <PriceBreakdown
             rows={[
-              { label: `${nights} noches x ${formatPrice(hotel.pricePerNight)}`, value: formatPrice(nightsTotal) },
+              { label: t('summary.nightsBreakdown', { count: nights, price: formatPrice(hotel.pricePerNight) }), value: formatPrice(nightsTotal) },
               { label: t('summary.taxes', { percent: 19 }), value: formatPrice(taxes) },
             ]}
             totalLabel={t('summary.total')}
