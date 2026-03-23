@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -18,6 +19,7 @@ import PriceBreakdown from '../components/PriceBreakdown';
 const allReservations = [...mockReservations, ...pastReservations, ...cancelledReservations];
 
 export default function ReservationDetailScreen() {
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<NativeStackScreenProps<RootStackParamList, 'ReservationDetail'>['route']>();
   const { t } = useTranslation('mobile');
@@ -32,7 +34,7 @@ export default function ReservationDetailScreen() {
     <View style={styles.container}>
       <OfflineBanner />
       <TopBar title={t('reservationDetail.title')} onBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 24 + insets.bottom }]}>
         {/* Status row */}
         <View style={styles.statusRow}>
           <StatusChip status={reservation.status} />
@@ -134,7 +136,7 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 16,
     paddingTop: 16,
-    paddingBottom: 24,
+    paddingBottom: 24, // base padding; insets.bottom added dynamically
   },
   statusRow: {
     flexDirection: 'row',
