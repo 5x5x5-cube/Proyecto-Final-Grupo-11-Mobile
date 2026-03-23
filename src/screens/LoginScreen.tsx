@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -19,10 +20,49 @@ import LanguagePill from '../components/LanguagePill';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function LoginScreen() {
   const navigation = useNavigation<Nav>();
   const { t } = useTranslation('mobile');
   const passwordRef = useRef<TextInput>(null);
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [emailError, setEmailError] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const isValid = email.trim().length > 0 && password.trim().length > 0;
+
+  function handleEmailChange(value: string) {
+    setEmail(value);
+    if (emailError && EMAIL_REGEX.test(value.trim())) {
+      setEmailError(false);
+    }
+  }
+
+  function handleEmailBlur() {
+    if (email.trim().length > 0 && !EMAIL_REGEX.test(email.trim())) {
+      setEmailError(true);
+    } else {
+      setEmailError(false);
+    }
+  }
+
+  function handleLogin() {
+    if (!isValid) return;
+
+    if (!EMAIL_REGEX.test(email.trim())) {
+      setEmailError(true);
+      return;
+    }
+
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      navigation.navigate('MainTabs');
+    }, 1500);
+  }
 
   return (
     <KeyboardAvoidingView
@@ -51,15 +91,19 @@ export default function LoginScreen() {
 
           <View style={styles.fieldGroup}>
             <Text style={styles.label}>{t('login.email')}</Text>
-            <View style={styles.inputRow}>
+            <View style={[styles.inputRow, emailError && styles.inputRowError]}>
               <MaterialCommunityIcons
                 name="email-outline"
                 size={18}
-                color={palette.onSurfaceVariant}
+                color={emailError ? palette.error : palette.onSurfaceVariant}
               />
               <TextInput
                 style={styles.input}
-                defaultValue="viajero@email.com"
+                value={email}
+                onChangeText={handleEmailChange}
+                onBlur={handleEmailBlur}
+                placeholder="correo@ejemplo.com"
+                placeholderTextColor={palette.onSurfaceVariant}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 returnKeyType="next"
@@ -67,6 +111,9 @@ export default function LoginScreen() {
                 blurOnSubmit={false}
               />
             </View>
+            {emailError && (
+              <Text style={styles.errorText}>Email invalido</Text>
+            )}
           </View>
 
           <View style={styles.fieldGroup}>
@@ -80,18 +127,31 @@ export default function LoginScreen() {
               <TextInput
                 ref={passwordRef}
                 style={styles.input}
-                defaultValue="••••••••"
+                value={password}
+                onChangeText={setPassword}
+                placeholder="••••••••"
+                placeholderTextColor={palette.onSurfaceVariant}
                 secureTextEntry
                 returnKeyType="done"
+                onSubmitEditing={handleLogin}
               />
             </View>
           </View>
 
           <Pressable
-            style={styles.primaryButton}
-            onPress={() => navigation.navigate('MainTabs')}
+            style={({ pressed }) => [
+              styles.primaryButton,
+              !isValid && styles.primaryButtonDisabled,
+              pressed && isValid && { opacity: 0.8 },
+            ]}
+            onPress={handleLogin}
+            disabled={!isValid || loading}
           >
-            <Text style={styles.primaryButtonText}>{t('login.button')}</Text>
+            {loading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.primaryButtonText}>{t('login.button')}</Text>
+            )}
           </Pressable>
 
           <Pressable
@@ -166,6 +226,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 12,
   },
+  inputRowError: {
+    borderColor: palette.error,
+  },
   input: {
     fontSize: 14,
     color: palette.onSurface,
@@ -173,12 +236,22 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 0,
   },
+  errorText: {
+    fontSize: 11,
+    color: palette.error,
+    fontFamily: 'Roboto_400Regular',
+    marginTop: 4,
+  },
   primaryButton: {
     backgroundColor: palette.primary,
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
     marginTop: 8,
+  },
+  primaryButtonDisabled: {
+    backgroundColor: palette.onSurfaceVariant,
+    opacity: 0.4,
   },
   primaryButtonText: {
     fontSize: 15,
