@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -13,6 +13,7 @@ import TopBar from '../components/TopBar';
 import ActionBar from '../components/ActionBar';
 import InfoGrid from '../components/InfoGrid';
 import PriceBreakdown from '../components/PriceBreakdown';
+import ReservationSummaryScreenSkeleton from './ReservationSummaryScreen.skeleton';
 
 export default function ReservationSummaryScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -26,11 +27,22 @@ export default function ReservationSummaryScreen() {
   const nightsTotal = hotel.pricePerNight * nights;
   const taxes = Math.round(nightsTotal * 0.19);
   const total = nightsTotal + taxes;
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <View style={styles.container}>
       <TopBar title={t('summary.title')} onBack={() => navigation.goBack()} />
 
+      {loading ? (
+        <ScrollView style={styles.scroll}>
+          <ReservationSummaryScreenSkeleton />
+        </ScrollView>
+      ) : (
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         {/* Hotel card */}
         <View style={styles.card}>
@@ -99,7 +111,9 @@ export default function ReservationSummaryScreen() {
           </Text>
         </View>
       </ScrollView>
+      )}
 
+      {!loading && (
       <ActionBar>
         <Pressable
           style={styles.continueButton}
@@ -108,6 +122,7 @@ export default function ReservationSummaryScreen() {
           <Text style={styles.continueButtonText}>{t('summary.continueToPayment')}</Text>
         </Pressable>
       </ActionBar>
+      )}
     </View>
   );
 }

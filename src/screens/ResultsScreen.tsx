@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -17,6 +17,7 @@ import { palette } from '../theme/palette';
 import { useLocale } from '../contexts/LocaleContext';
 import { mockHotels } from '../data/mockHotels';
 import FilterChip from '../components/FilterChip';
+import ResultsScreenSkeleton from './ResultsScreen.skeleton';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -24,6 +25,12 @@ export default function ResultsScreen() {
   const navigation = useNavigation<Nav>();
   const { t } = useTranslation('mobile');
   const { formatDate, formatPrice } = useLocale();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 1200);
+    return () => clearTimeout(timer);
+  }, []);
 
   const dateRange = `${formatDate('2026-03-15', 'short')}-${formatDate('2026-03-20', 'short')}`;
 
@@ -70,6 +77,7 @@ export default function ResultsScreen() {
       </Text>
 
       {/* Hotel list */}
+      {loading ? <ResultsScreenSkeleton /> : (
       <FlatList
         data={mockHotels}
         keyExtractor={(item) => String(item.id)}
@@ -128,6 +136,7 @@ export default function ResultsScreen() {
           </Pressable>
         )}
       />
+      )}
     </View>
   );
 }
