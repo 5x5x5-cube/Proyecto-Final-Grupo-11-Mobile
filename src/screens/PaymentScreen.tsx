@@ -13,7 +13,8 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '../navigation/types';
-import { mockHotels } from '../data/mockHotels';
+import { useHotelDetail } from '../api/hooks/useSearch';
+import { useInitiatePayment } from '../api/hooks/usePayments';
 import { useLocale } from '../contexts/LocaleContext';
 import { palette } from '../theme/palette';
 import TopBar from '../components/TopBar';
@@ -56,17 +57,19 @@ export default function PaymentScreen() {
   const [cardHolder, setCardHolder] = useState('');
   const [expiry, setExpiry] = useState('');
   const [cvv, setCvv] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const nameRef = useRef<TextInput>(null);
   const expiryRef = useRef<TextInput>(null);
   const cvvRef = useRef<TextInput>(null);
 
-  const hotel = mockHotels[0];
+  const { data: hotelData } = useHotelDetail(1);
+  const initiatePayment = useInitiatePayment();
+  const hotel = (hotelData as any) ?? { name: '', pricePerNight: 480000 };
   const nights = 5;
   const nightsTotal = hotel.pricePerNight * nights;
   const taxes = Math.round(nightsTotal * 0.19);
   const total = nightsTotal + taxes;
+  const loading = initiatePayment.isPending;
 
   const showCardForm = selected === 'credit' || selected === 'debit';
 
@@ -102,11 +105,10 @@ export default function PaymentScreen() {
 
   function handlePay() {
     if (isPayDisabled) return;
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      navigation.navigate('Success');
-    }, 2000);
+    initiatePayment.mutate(
+      { cardNumber, cardHolder, expiry, cvv, method: selected, total },
+      { onSuccess: () => navigation.navigate('Success') },
+    );
   }
 
   return (
