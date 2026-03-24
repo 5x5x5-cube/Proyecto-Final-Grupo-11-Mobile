@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, FlatList, Pressable, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '../navigation/types';
 import { palette } from '../theme/palette';
 import { useLocale } from '../contexts/LocaleContext';
-import { mockReservations, pastReservations, cancelledReservations } from '../data/mockReservations';
+import { useBookings, usePastBookings, useCancelledBookings } from '../api/hooks/useBookings';
 import OfflineBanner from '../components/OfflineBanner';
 import StatusChip from '../components/StatusChip';
 import MyReservationsScreenSkeleton from './MyReservationsScreen.skeleton';
@@ -36,23 +36,25 @@ export default function MyReservationsScreen() {
   const { t } = useTranslation('mobile');
   const { formatPrice, formatDate } = useLocale();
   const [tab, setTab] = useState<Tab>('active');
-  const [loading, setLoading] = useState(true);
+  const { data: activeData, isLoading: loadingActive } = useBookings();
+  const { data: pastData, isLoading: loadingPast } = usePastBookings();
+  const { data: cancelledData, isLoading: loadingCancelled } = useCancelledBookings();
 
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
+  const activeReservations = (activeData as Reservation[]) ?? [];
+  const pastReservations = (pastData as Reservation[]) ?? [];
+  const cancelledReservations = (cancelledData as Reservation[]) ?? [];
+  const isLoading = loadingActive || loadingPast || loadingCancelled;
 
   const tabs: { key: Tab; label: string; count: number }[] = [
-    { key: 'active', label: t('myReservations.active'), count: mockReservations.length },
+    { key: 'active', label: t('myReservations.active'), count: activeReservations.length },
     { key: 'past', label: t('myReservations.past'), count: pastReservations.length },
     { key: 'cancelled', label: t('myReservations.cancelled'), count: cancelledReservations.length },
   ];
 
   const dataMap: Record<Tab, Reservation[]> = {
-    active: mockReservations as Reservation[],
-    past: pastReservations as Reservation[],
-    cancelled: cancelledReservations as Reservation[],
+    active: activeReservations,
+    past: pastReservations,
+    cancelled: cancelledReservations,
   };
 
   const renderCard = ({ item }: { item: Reservation }) => (
@@ -104,7 +106,7 @@ export default function MyReservationsScreen() {
           </Pressable>
         ))}
       </View>
-      {loading ? <MyReservationsScreenSkeleton /> : (
+      {isLoading ? <MyReservationsScreenSkeleton /> : (
         <FlatList
           data={dataMap[tab]}
           keyExtractor={(item) => String(item.id)}
