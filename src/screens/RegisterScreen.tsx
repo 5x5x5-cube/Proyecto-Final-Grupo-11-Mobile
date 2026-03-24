@@ -15,6 +15,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '../navigation/types';
 import { palette } from '../theme/palette';
+import { useRegister } from '../api/hooks/useAuth';
 import Brand from '../components/Brand';
 import LanguagePill from '../components/LanguagePill';
 
@@ -82,7 +83,8 @@ export default function RegisterScreen() {
   });
 
   const [touched, setTouched] = useState<TouchedFields>({});
-  const [loading, setLoading] = useState(false);
+  const register = useRegister();
+  const loading = register.isPending;
 
   const focusNext = (index: number) => {
     if (index < fields.length - 1) {
@@ -104,11 +106,10 @@ export default function RegisterScreen() {
 
   const handleRegister = () => {
     if (!isFormValid || loading) return;
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      navigation.navigate('Login');
-    }, 1500);
+    register.mutate(
+      { name: values.fullName, email: values.email, password: values.password, phone: values.phone },
+      { onSuccess: () => navigation.navigate('Login') },
+    );
   };
 
   return (
