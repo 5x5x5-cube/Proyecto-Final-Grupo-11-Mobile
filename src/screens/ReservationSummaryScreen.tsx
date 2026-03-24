@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '../navigation/types';
-import { mockHotels } from '../data/mockHotels';
+import { useHotelDetail } from '../api/hooks/useSearch';
 import { useLocale } from '../contexts/LocaleContext';
 import { palette } from '../theme/palette';
 import TopBar from '../components/TopBar';
@@ -19,31 +19,29 @@ export default function ReservationSummaryScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { t } = useTranslation('mobile');
   const { formatPrice, formatDate } = useLocale();
+  const { data: hotelData, isLoading } = useHotelDetail(1);
 
-  const hotel = mockHotels[0];
   const checkIn = new Date('2026-03-20');
   const checkOut = new Date('2026-03-25');
   const nights = 5;
-  const nightsTotal = hotel.pricePerNight * nights;
-  const taxes = Math.round(nightsTotal * 0.19);
-  const total = nightsTotal + taxes;
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
 
   return (
     <View style={styles.container}>
       <TopBar title={t('summary.title')} onBack={() => navigation.goBack()} />
 
-      {loading ? (
+      {isLoading || !hotelData ? (
         <ScrollView style={styles.scroll}>
           <ReservationSummaryScreenSkeleton />
         </ScrollView>
       ) : (
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+        {(() => {
+          const hotel = hotelData as any;
+          const nightsTotal = hotel.pricePerNight * nights;
+          const taxes = Math.round(nightsTotal * 0.19);
+          const total = nightsTotal + taxes;
+          return (
+        <>
         {/* Hotel card */}
         <View style={styles.card}>
           <View style={styles.hotelRow}>
@@ -110,10 +108,13 @@ export default function ReservationSummaryScreen() {
             {t('summary.cancellationPolicy')}
           </Text>
         </View>
+        </>
+          );
+        })()}
       </ScrollView>
       )}
 
-      {!loading && (
+      {!isLoading && !!hotelData && (
       <ActionBar>
         <Pressable
           style={styles.continueButton}

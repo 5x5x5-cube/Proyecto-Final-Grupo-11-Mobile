@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -9,15 +9,13 @@ import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '../navigation/types';
 import { palette } from '../theme/palette';
 import { useLocale } from '../contexts/LocaleContext';
-import { mockReservations, pastReservations, cancelledReservations } from '../data/mockReservations';
+import { useBookingDetail } from '../api/hooks/useBookings';
 import TopBar from '../components/TopBar';
 import OfflineBanner from '../components/OfflineBanner';
 import StatusChip from '../components/StatusChip';
 import InfoGrid from '../components/InfoGrid';
 import PriceBreakdown from '../components/PriceBreakdown';
 import ReservationDetailScreenSkeleton from './ReservationDetailScreen.skeleton';
-
-const allReservations = [...mockReservations, ...pastReservations, ...cancelledReservations];
 
 export default function ReservationDetailScreen() {
   const insets = useSafeAreaInsets();
@@ -26,22 +24,26 @@ export default function ReservationDetailScreen() {
   const { t } = useTranslation('mobile');
   const { formatPrice, formatDate } = useLocale();
 
-  const reservation = allReservations.find((r) => r.id === route.params.id) || allReservations[0];
+  const { data: reservationData, isLoading } = useBookingDetail(route.params.id ?? 1);
+  const reservation = reservationData as any;
+
+  if (isLoading || !reservation) {
+    return (
+      <View style={styles.container}>
+        <OfflineBanner />
+        <TopBar title={t('reservationDetail.title')} onBack={() => navigation.goBack()} />
+        <ReservationDetailScreenSkeleton />
+      </View>
+    );
+  }
 
   const accommodationCop = Math.round(reservation.totalPriceCop * 0.81);
   const taxesCop = reservation.totalPriceCop - accommodationCop;
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1200);
-    return () => clearTimeout(timer);
-  }, []);
 
   return (
     <View style={styles.container}>
       <OfflineBanner />
       <TopBar title={t('reservationDetail.title')} onBack={() => navigation.goBack()} />
-      {loading ? <ReservationDetailScreenSkeleton /> : (
       <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 24 + insets.bottom }]}>
         {/* Status row */}
         <View style={styles.statusRow}>
@@ -132,7 +134,6 @@ export default function ReservationDetailScreen() {
           </Pressable>
         </View>
       </ScrollView>
-      )}
     </View>
   );
 }
