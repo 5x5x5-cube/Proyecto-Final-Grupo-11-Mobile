@@ -2,9 +2,27 @@ name: PR Checks
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, develop]
 
 jobs:
+  detect-changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      src_changed: ${{ steps.filter.outputs.src }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            src:
+              - '**/*.ts'
+              - '**/*.tsx'
+              - '**/*.js'
+              - 'package.json'
+              - 'yarn.lock'
+
   lint-and-format:
     name: Lint & Format
     runs-on: ubuntu-latest
@@ -50,6 +68,8 @@ jobs:
 
   test:
     name: Tests
+    needs: detect-changes
+    if: needs.detect-changes.outputs.src_changed == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
