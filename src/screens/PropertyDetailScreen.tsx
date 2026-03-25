@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -18,6 +18,7 @@ import { useLocale } from '../contexts/LocaleContext';
 import { palette } from '../theme/palette';
 import AmenityTag from '../components/AmenityTag';
 import ActionBar from '../components/ActionBar';
+import PropertyDetailScreenSkeleton from './PropertyDetailScreen.skeleton';
 
 const rooms = [
   { name: 'Superior', beds: '1 cama king', price: 480000 },
@@ -53,6 +54,22 @@ export default function PropertyDetailScreen() {
   const { formatPrice } = useLocale();
 
   const hotel = mockHotels.find((h) => h.id === route.params.id) || mockHotels[0];
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ScrollView style={styles.scroll} bounces={false}>
+          <PropertyDetailScreenSkeleton />
+        </ScrollView>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>

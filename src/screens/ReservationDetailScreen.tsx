@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -15,6 +15,7 @@ import OfflineBanner from '../components/OfflineBanner';
 import StatusChip from '../components/StatusChip';
 import InfoGrid from '../components/InfoGrid';
 import PriceBreakdown from '../components/PriceBreakdown';
+import ReservationDetailScreenSkeleton from './ReservationDetailScreen.skeleton';
 
 const allReservations = [...mockReservations, ...pastReservations, ...cancelledReservations];
 
@@ -29,11 +30,18 @@ export default function ReservationDetailScreen() {
 
   const accommodationCop = Math.round(reservation.totalPriceCop * 0.81);
   const taxesCop = reservation.totalPriceCop - accommodationCop;
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 1200);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <View style={styles.container}>
       <OfflineBanner />
       <TopBar title={t('reservationDetail.title')} onBack={() => navigation.goBack()} />
+      {loading ? <ReservationDetailScreenSkeleton /> : (
       <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 24 + insets.bottom }]}>
         {/* Status row */}
         <View style={styles.statusRow}>
@@ -124,6 +132,7 @@ export default function ReservationDetailScreen() {
           </Pressable>
         </View>
       </ScrollView>
+      )}
     </View>
   );
 }
