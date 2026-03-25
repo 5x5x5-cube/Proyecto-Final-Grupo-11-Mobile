@@ -1,12 +1,11 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import Skeleton from '../components/Skeleton';
-import { palette } from '../theme/palette';
 
 export default function ResultsScreenSkeleton() {
   return (
     <View style={styles.container}>
-      {[0, 1, 2].map((i) => (
+      {[0, 1, 2].map(i => (
         <View key={i} style={styles.card}>
           <Skeleton width="100%" height={140} borderRadius={0} style={styles.image} />
           <View style={styles.body}>
