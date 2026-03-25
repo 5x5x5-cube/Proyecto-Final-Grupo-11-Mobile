@@ -34,3 +34,13 @@ When adding new text, add the key to both ES and EN locale files first, then ref
 - Loading state pattern: `useState(true)` + `useEffect` with `setTimeout` to simulate API delay.
 - Always-visible elements (TopBar, tabs, OfflineBanner) render immediately; only data-dependent content shows skeletons.
 - Hide ActionBar while loading on screens that have one (PropertyDetail, ReservationSummary).
+
+## Pull Requests
+
+- All PRs must follow the template in `.github/PULL_REQUEST_TEMPLATE.md`
+- Every PR must include:
+  - **Ticket**: link to the related ticket/issue
+  - **Descripción**: brief description of the changes
+  - **Cambios realizados**: bullet list of specific changes made
+- Write PR descriptions in Spanish
+- Use conventional commit format for PR titles in English: `type(scope): description`
