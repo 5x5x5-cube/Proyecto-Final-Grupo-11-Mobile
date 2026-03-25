@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -13,6 +14,7 @@ import TopBar from '../components/TopBar';
 const allReservations = [...mockReservations, ...pastReservations, ...cancelledReservations];
 
 export default function CancelReservationScreen() {
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<NativeStackScreenProps<RootStackParamList, 'CancelReservation'>['route']>();
   const { t } = useTranslation('mobile');
@@ -23,40 +25,38 @@ export default function CancelReservationScreen() {
   return (
     <View style={styles.container}>
       <TopBar title={t('cancelReservation.title')} onBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 24 + insets.bottom }]}>
         {/* Warning icon */}
         <View style={styles.iconCircle}>
           <MaterialCommunityIcons name="alert" size={32} color={palette.error} />
         </View>
 
         {/* Title and code */}
-        <Text style={styles.title}>Cancelar reserva</Text>
+        <Text style={styles.title}>{t('cancelReservation.title')}</Text>
         <Text style={styles.codeText}>{reservation.code}</Text>
 
         {/* Cancellation policy */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Politica de cancelacion</Text>
+          <Text style={styles.cardTitle}>{t('cancelReservation.cancellationPolicy')}</Text>
           <Text style={styles.policyText}>
-            La cancelacion es gratuita hasta 48 horas antes de la fecha de check-in. Pasado ese
-            plazo, se aplicara un cargo equivalente a la primera noche de estadia. Al confirmar,
-            aceptas los terminos de cancelacion del establecimiento.
+            {t('cancelReservation.cancellationPolicyText')}
           </Text>
         </View>
 
         {/* Refund detail */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Detalle del reembolso</Text>
+          <Text style={styles.cardTitle}>{t('cancelReservation.refundDetail')}</Text>
           <View style={styles.refundRow}>
-            <Text style={styles.refundLabel}>Monto pagado</Text>
+            <Text style={styles.refundLabel}>{t('cancelReservation.amountPaid')}</Text>
             <Text style={styles.refundValue}>{formatPrice(reservation.totalPriceCop)}</Text>
           </View>
           <View style={styles.refundRow}>
-            <Text style={styles.refundLabel}>Reembolso (100%)</Text>
+            <Text style={styles.refundLabel}>{t('cancelReservation.refund', { percent: 100 })}</Text>
             <Text style={styles.refundValue}>{formatPrice(reservation.totalPriceCop)}</Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.refundRow}>
-            <Text style={styles.totalLabel}>Total reembolso</Text>
+            <Text style={styles.totalLabel}>{t('cancelReservation.totalRefund')}</Text>
             <Text style={styles.totalValue}>{formatPrice(reservation.totalPriceCop)}</Text>
           </View>
         </View>
@@ -67,7 +67,7 @@ export default function CancelReservationScreen() {
             <MaterialCommunityIcons name="credit-card-outline" size={20} color={palette.onSurfaceVariant} />
             <View style={styles.methodInfo}>
               <Text style={styles.methodCard}>VISA ****4242</Text>
-              <Text style={styles.methodTime}>El reembolso se reflejara en 5-10 dias habiles</Text>
+              <Text style={styles.methodTime}>{t('cancelReservation.refundTime')}</Text>
             </View>
           </View>
         </View>
@@ -75,13 +75,13 @@ export default function CancelReservationScreen() {
         {/* Buttons */}
         <View style={styles.buttonsRow}>
           <Pressable style={styles.outlinedButton} onPress={() => navigation.goBack()}>
-            <Text style={styles.outlinedButtonText}>Volver</Text>
+            <Text style={styles.outlinedButtonText}>{t('cancelReservation.back')}</Text>
           </Pressable>
           <Pressable
             style={styles.errorFilledButton}
             onPress={() => navigation.navigate('MainTabs')}
           >
-            <Text style={styles.errorFilledButtonText}>Confirmar</Text>
+            <Text style={styles.errorFilledButtonText}>{t('cancelReservation.confirm')}</Text>
           </Pressable>
         </View>
       </ScrollView>

@@ -83,7 +83,7 @@ export default function MyReservationsScreen() {
   return (
     <View style={styles.container}>
       <OfflineBanner />
-      <Text style={styles.title}>Mis reservas</Text>
+      <Text style={styles.title}>{t('myReservations.title')}</Text>
       <View style={styles.tabBar}>
         {tabs.map((t) => (
           <Pressable

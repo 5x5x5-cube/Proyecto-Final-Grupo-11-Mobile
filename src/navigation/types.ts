@@ -1,7 +1,9 @@
+import { NavigatorScreenParams } from '@react-navigation/native';
+
 export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
-  MainTabs: undefined;
+  MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
   Results: undefined;
   PropertyDetail: { id: number };
   ReservationSummary: undefined;

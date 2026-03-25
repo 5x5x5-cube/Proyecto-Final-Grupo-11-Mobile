@@ -7,7 +7,6 @@ import {
   FlatList,
   StyleSheet,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -48,7 +47,6 @@ const reviews = [
 ];
 
 export default function PropertyDetailScreen() {
-  const insets = useSafeAreaInsets();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<NativeStackScreenProps<RootStackParamList, 'PropertyDetail'>['route']>();
   const { t } = useTranslation('mobile');
@@ -68,7 +66,7 @@ export default function PropertyDetailScreen() {
         >
           <Pressable
             onPress={() => navigation.goBack()}
-            style={[styles.backButton, { top: insets.top + 8 }]}
+            style={[styles.backButton, { top: 8 }]}
           >
             <MaterialCommunityIcons name="arrow-left" size={18} color="#fff" />
           </Pressable>
@@ -99,7 +97,7 @@ export default function PropertyDetailScreen() {
           </Text>
 
           {/* Amenities */}
-          <Text style={styles.sectionTitle}>Servicios incluidos</Text>
+          <Text style={styles.sectionTitle}>{t('propertyDetail.includedServices')}</Text>
           <View style={styles.amenitiesRow}>
             {hotel.amenities.map((amenity, index) => (
               <AmenityTag key={index} icon={amenity.icon} label={amenity.label} />
@@ -107,7 +105,7 @@ export default function PropertyDetailScreen() {
           </View>
 
           {/* Rooms */}
-          <Text style={styles.sectionTitle}>Habitaciones disponibles</Text>
+          <Text style={styles.sectionTitle}>{t('propertyDetail.availableRooms')}</Text>
           {rooms.map((room, index) => (
             <View key={index} style={styles.roomCard}>
               <LinearGradient
@@ -125,7 +123,7 @@ export default function PropertyDetailScreen() {
           ))}
 
           {/* Reviews */}
-          <Text style={styles.sectionTitle}>Resenas de huespedes</Text>
+          <Text style={styles.sectionTitle}>{t('propertyDetail.guestReviews')}</Text>
         </View>
 
         <FlatList
@@ -166,7 +164,7 @@ export default function PropertyDetailScreen() {
             style={styles.reserveButton}
             onPress={() => navigation.navigate('ReservationSummary')}
           >
-            <Text style={styles.reserveButtonText}>Reservar ahora</Text>
+            <Text style={styles.reserveButtonText}>{t('propertyDetail.bookNow')}</Text>
           </Pressable>
         </View>
       </ActionBar>

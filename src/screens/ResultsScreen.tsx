@@ -7,7 +7,6 @@ import {
   FlatList,
   ScrollView,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -22,7 +21,6 @@ import FilterChip from '../components/FilterChip';
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export default function ResultsScreen() {
-  const insets = useSafeAreaInsets();
   const navigation = useNavigation<Nav>();
   const { t } = useTranslation('mobile');
   const { formatDate, formatPrice } = useLocale();
@@ -30,7 +28,7 @@ export default function ResultsScreen() {
   const dateRange = `${formatDate('2026-03-15', 'short')}-${formatDate('2026-03-20', 'short')}`;
 
   return (
-    <View style={[styles.screen, { paddingTop: insets.top }]}>
+    <View style={styles.screen}>
       {/* Custom top bar */}
       <View style={styles.topBar}>
         <Pressable onPress={() => navigation.goBack()} style={styles.backBtn}>

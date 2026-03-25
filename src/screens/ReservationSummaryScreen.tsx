@@ -44,7 +44,7 @@ export default function ReservationSummaryScreen() {
             <View style={styles.hotelInfo}>
               <Text style={styles.hotelName}>{hotel.name}</Text>
               <Text style={styles.hotelLocation}>{hotel.location}</Text>
-              <Text style={styles.hotelRoom}>Habitacion Superior</Text>
+              <Text style={styles.hotelRoom}>{t('summary.roomInfo')}</Text>
             </View>
           </View>
         </View>
@@ -64,12 +64,12 @@ export default function ReservationSummaryScreen() {
                 sub: '12:00 PM',
               },
               {
-                label: 'Duracion',
-                value: `${nights} noches`,
+                label: t('summary.duration'),
+                value: t('summary.nights', { count: nights }),
               },
               {
-                label: 'Huespedes',
-                value: '2 adultos',
+                label: t('summary.guests'),
+                value: t('summary.guestsValue', { count: 2 }),
               },
             ]}
           />
@@ -77,13 +77,13 @@ export default function ReservationSummaryScreen() {
 
         {/* Price Breakdown */}
         <View style={styles.card}>
-          <Text style={styles.priceTitle}>Detalle del precio</Text>
+          <Text style={styles.priceTitle}>{t('summary.priceDetail')}</Text>
           <PriceBreakdown
             rows={[
               { label: `${nights} noches x ${formatPrice(hotel.pricePerNight)}`, value: formatPrice(nightsTotal) },
-              { label: 'Impuestos y cargos', value: formatPrice(taxes) },
+              { label: t('summary.taxes', { percent: 19 }), value: formatPrice(taxes) },
             ]}
-            totalLabel="Total"
+            totalLabel={t('summary.total')}
             totalValue={formatPrice(total)}
           />
         </View>
@@ -92,10 +92,10 @@ export default function ReservationSummaryScreen() {
         <View style={styles.cancellationCard}>
           <View style={styles.cancellationHeader}>
             <MaterialCommunityIcons name="shield-check" size={18} color={palette.success} />
-            <Text style={styles.cancellationTitle}>Cancelacion gratuita</Text>
+            <Text style={styles.cancellationTitle}>{t('summary.freeCancellation')}</Text>
           </View>
           <Text style={styles.cancellationText}>
-            Puedes cancelar sin costo hasta 48 horas antes del check-in. Despues de ese plazo se cobrara el 50% de la primera noche.
+            {t('summary.cancellationPolicy')}
           </Text>
         </View>
       </ScrollView>
@@ -105,7 +105,7 @@ export default function ReservationSummaryScreen() {
           style={styles.continueButton}
           onPress={() => navigation.navigate('Payment')}
         >
-          <Text style={styles.continueButtonText}>Continuar al pago</Text>
+          <Text style={styles.continueButtonText}>{t('summary.continueToPayment')}</Text>
         </Pressable>
       </ActionBar>
     </View>

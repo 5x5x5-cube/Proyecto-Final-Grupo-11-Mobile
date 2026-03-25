@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -14,6 +15,7 @@ import TopBar from '../components/TopBar';
 const allReservations = [...mockReservations, ...pastReservations, ...cancelledReservations];
 
 export default function QRCheckInScreen() {
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<NativeStackScreenProps<RootStackParamList, 'QRCheckIn'>['route']>();
   const { t } = useTranslation('mobile');
@@ -24,7 +26,7 @@ export default function QRCheckInScreen() {
   return (
     <View style={styles.container}>
       <TopBar title={t('qrCheckIn.title')} onBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 24 + insets.bottom }]}>
         {/* QR Code card */}
         <View style={styles.qrCard}>
           <QRCode value={reservation.code} size={240} />
@@ -51,14 +53,14 @@ export default function QRCheckInScreen() {
         {/* Instruction card */}
         <View style={styles.instructionCard}>
           <Text style={styles.instructionText}>
-            Presenta este codigo QR en la recepcion del hotel para realizar tu check-in de forma rapida.
+            {t('qrCheckIn.instruction')}
           </Text>
         </View>
 
         {/* Download button */}
         <Pressable style={styles.downloadButton}>
           <MaterialCommunityIcons name="download" size={20} color={palette.primary} />
-          <Text style={styles.downloadText}>Descargar QR</Text>
+          <Text style={styles.downloadText}>{t('qrCheckIn.downloadQR')}</Text>
         </Pressable>
       </ScrollView>
     </View>

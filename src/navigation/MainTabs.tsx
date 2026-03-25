@@ -11,10 +11,11 @@ import ProfileScreen from '../screens/ProfileScreen';
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 export default function MainTabs() {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
 
   return (
     <Tab.Navigator
+      key={i18n.language}
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: palette.primary,

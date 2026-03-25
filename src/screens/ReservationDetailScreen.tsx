@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -18,6 +19,7 @@ import PriceBreakdown from '../components/PriceBreakdown';
 const allReservations = [...mockReservations, ...pastReservations, ...cancelledReservations];
 
 export default function ReservationDetailScreen() {
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<NativeStackScreenProps<RootStackParamList, 'ReservationDetail'>['route']>();
   const { t } = useTranslation('mobile');
@@ -32,7 +34,7 @@ export default function ReservationDetailScreen() {
     <View style={styles.container}>
       <OfflineBanner />
       <TopBar title={t('reservationDetail.title')} onBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 24 + insets.bottom }]}>
         {/* Status row */}
         <View style={styles.statusRow}>
           <StatusChip status={reservation.status} />
@@ -70,11 +72,11 @@ export default function ReservationDetailScreen() {
                   sub: '12:00 PM',
                 },
                 {
-                  label: 'Duracion',
-                  value: `${reservation.nights} noches`,
+                  label: t('reservationDetail.duration'),
+                  value: t('reservationDetail.nights', { count: reservation.nights }),
                 },
                 {
-                  label: 'Huespedes',
+                  label: t('reservationDetail.guests'),
                   value: reservation.guests,
                 },
               ]}
@@ -85,7 +87,7 @@ export default function ReservationDetailScreen() {
         {/* Room card */}
         <View style={styles.card}>
           <View style={styles.cardInner}>
-            <Text style={styles.roomLabel}>Habitacion</Text>
+            <Text style={styles.roomLabel}>{t('reservationDetail.room')}</Text>
             <Text style={styles.roomValue}>{reservation.room}</Text>
           </View>
         </View>
@@ -93,13 +95,13 @@ export default function ReservationDetailScreen() {
         {/* Price breakdown */}
         <View style={styles.card}>
           <View style={styles.cardInner}>
-            <Text style={styles.priceTitle}>Resumen de pago</Text>
+            <Text style={styles.priceTitle}>{t('reservationDetail.paymentSummary')}</Text>
             <PriceBreakdown
               rows={[
-                { label: 'Alojamiento', value: formatPrice(accommodationCop) },
-                { label: 'Impuestos y tasas', value: formatPrice(taxesCop) },
+                { label: t('reservationDetail.accommodation', { count: reservation.nights }), value: formatPrice(accommodationCop) },
+                { label: t('reservationDetail.taxes'), value: formatPrice(taxesCop) },
               ]}
-              totalLabel="Total"
+              totalLabel={t('reservationDetail.totalPaid')}
               totalValue={formatPrice(reservation.totalPriceCop)}
             />
           </View>
@@ -112,13 +114,13 @@ export default function ReservationDetailScreen() {
             onPress={() => navigation.navigate('QRCheckIn', { id: reservation.id })}
           >
             <MaterialCommunityIcons name="qrcode" size={20} color={palette.onPrimary} />
-            <Text style={styles.primaryButtonText}>Mostrar QR</Text>
+            <Text style={styles.primaryButtonText}>{t('reservationDetail.showQR')}</Text>
           </Pressable>
           <Pressable
             style={styles.errorButton}
             onPress={() => navigation.navigate('CancelReservation', { id: reservation.id })}
           >
-            <Text style={styles.errorButtonText}>Cancelar reserva</Text>
+            <Text style={styles.errorButtonText}>{t('reservationDetail.cancelReservation')}</Text>
           </Pressable>
         </View>
       </ScrollView>
@@ -134,7 +136,7 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 16,
     paddingTop: 16,
-    paddingBottom: 24,
+    paddingBottom: 24, // base padding; insets.bottom added dynamically
   },
   statusRow: {
     flexDirection: 'row',

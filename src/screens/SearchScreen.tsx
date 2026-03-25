@@ -102,7 +102,7 @@ export default function SearchScreen() {
       </LinearGradient>
 
       <View style={styles.destinationsSection}>
-        <Text style={styles.sectionTitle}>{t('search.popularTitle')}</Text>
+        <Text style={styles.sectionTitle}>{t('search.popularDestinations')}</Text>
         <FlatList
           data={mockDestinations}
           horizontal
@@ -119,7 +119,7 @@ export default function SearchScreen() {
               <Text style={styles.destName}>{item.name}</Text>
               <Text style={styles.destCountry}>{item.country}</Text>
               <Text style={styles.destCount}>
-                {item.hotelCount} {t('search.hotels')}
+                {t('search.hotels', { count: item.hotelCount })}
               </Text>
             </LinearGradient>
           )}
@@ -204,7 +204,6 @@ const styles = StyleSheet.create({
   },
   destinationsSection: {
     marginTop: 24,
-    paddingHorizontal: 20,
   },
   sectionTitle: {
     fontSize: 17,
@@ -212,9 +211,11 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto_700Bold',
     color: palette.onSurface,
     marginBottom: 14,
+    paddingHorizontal: 20,
   },
   destinationsList: {
     gap: 10,
+    paddingHorizontal: 20,
   },
   destCard: {
     minWidth: 130,
