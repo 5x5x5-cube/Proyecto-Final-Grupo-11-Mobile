@@ -1,14 +1,13 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   View,
   Text,
+  TextInput,
   Pressable,
   StyleSheet,
-  Platform,
   KeyboardAvoidingView,
   ScrollView,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -21,20 +20,20 @@ import LanguagePill from '../components/LanguagePill';
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export default function LoginScreen() {
-  const insets = useSafeAreaInsets();
   const navigation = useNavigation<Nav>();
   const { t } = useTranslation('mobile');
+  const passwordRef = useRef<TextInput>(null);
 
   return (
     <KeyboardAvoidingView
       style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior="padding"
     >
       <ScrollView
         style={styles.flex}
         contentContainerStyle={[
           styles.container,
-          { paddingTop: 48 + insets.top },
+          { paddingTop: 48 },
         ]}
         keyboardShouldPersistTaps="handled"
       >
@@ -58,7 +57,15 @@ export default function LoginScreen() {
                 size={18}
                 color={palette.onSurfaceVariant}
               />
-              <Text style={styles.placeholder}>viajero@email.com</Text>
+              <TextInput
+                style={styles.input}
+                defaultValue="viajero@email.com"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                returnKeyType="next"
+                onSubmitEditing={() => passwordRef.current?.focus()}
+                blurOnSubmit={false}
+              />
             </View>
           </View>
 
@@ -70,7 +77,13 @@ export default function LoginScreen() {
                 size={18}
                 color={palette.onSurfaceVariant}
               />
-              <Text style={styles.placeholder}>••••••••</Text>
+              <TextInput
+                ref={passwordRef}
+                style={styles.input}
+                defaultValue="••••••••"
+                secureTextEntry
+                returnKeyType="done"
+              />
             </View>
           </View>
 
@@ -153,11 +166,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 12,
   },
-  placeholder: {
+  input: {
     fontSize: 14,
-    color: palette.outline,
+    color: palette.onSurface,
     fontFamily: 'Roboto_400Regular',
     flex: 1,
+    padding: 0,
   },
   primaryButton: {
     backgroundColor: palette.primary,

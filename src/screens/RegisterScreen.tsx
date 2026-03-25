@@ -1,14 +1,13 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   View,
   Text,
+  TextInput,
   Pressable,
   StyleSheet,
-  Platform,
   KeyboardAvoidingView,
   ScrollView,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -24,31 +23,40 @@ type FieldDef = {
   key: string;
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
   placeholder: string;
+  keyboardType?: 'default' | 'email-address' | 'phone-pad';
+  autoCapitalize?: 'none' | 'sentences' | 'words';
+  secure?: boolean;
 };
 
 const fields: FieldDef[] = [
-  { key: 'fullName', icon: 'account-outline', placeholder: 'Juan Perez' },
-  { key: 'email', icon: 'email-outline', placeholder: 'viajero@email.com' },
-  { key: 'phone', icon: 'phone-outline', placeholder: '+57 300 123 4567' },
-  { key: 'password', icon: 'lock-outline', placeholder: '••••••••' },
-  { key: 'confirmPassword', icon: 'lock-outline', placeholder: '••••••••' },
+  { key: 'fullName', icon: 'account-outline', placeholder: 'Juan Perez', autoCapitalize: 'words' },
+  { key: 'email', icon: 'email-outline', placeholder: 'viajero@email.com', keyboardType: 'email-address', autoCapitalize: 'none' },
+  { key: 'phone', icon: 'phone-outline', placeholder: '+57 300 123 4567', keyboardType: 'phone-pad' },
+  { key: 'password', icon: 'lock-outline', placeholder: '••••••••', secure: true },
+  { key: 'confirmPassword', icon: 'lock-outline', placeholder: '••••••••', secure: true },
 ];
 
 export default function RegisterScreen() {
-  const insets = useSafeAreaInsets();
   const navigation = useNavigation<Nav>();
   const { t } = useTranslation('mobile');
+  const inputRefs = useRef<(TextInput | null)[]>([]);
+
+  const focusNext = (index: number) => {
+    if (index < fields.length - 1) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
 
   return (
     <KeyboardAvoidingView
       style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior="padding"
     >
       <ScrollView
         style={styles.flex}
         contentContainerStyle={[
           styles.container,
-          { paddingTop: 36 + insets.top },
+          { paddingTop: 36 },
         ]}
         keyboardShouldPersistTaps="handled"
       >
@@ -64,7 +72,7 @@ export default function RegisterScreen() {
         <View style={styles.card}>
           <Text style={styles.cardTitle}>{t('register.title')}</Text>
 
-          {fields.map((field) => (
+          {fields.map((field, index) => (
             <View key={field.key} style={styles.fieldGroup}>
               <Text style={styles.label}>
                 {t(`register.${field.key}` as any)}
@@ -75,7 +83,17 @@ export default function RegisterScreen() {
                   size={18}
                   color={palette.onSurfaceVariant}
                 />
-                <Text style={styles.placeholder}>{field.placeholder}</Text>
+                <TextInput
+                  ref={(ref) => { inputRefs.current[index] = ref; }}
+                  style={styles.input}
+                  defaultValue={field.placeholder}
+                  secureTextEntry={field.secure}
+                  keyboardType={field.keyboardType ?? 'default'}
+                  autoCapitalize={field.autoCapitalize}
+                  returnKeyType={index < fields.length - 1 ? 'next' : 'done'}
+                  onSubmitEditing={() => focusNext(index)}
+                  blurOnSubmit={index === fields.length - 1}
+                />
               </View>
             </View>
           ))}
@@ -161,11 +179,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 12,
   },
-  placeholder: {
+  input: {
     fontSize: 14,
-    color: palette.outline,
+    color: palette.onSurface,
     fontFamily: 'Roboto_400Regular',
     flex: 1,
+    padding: 0,
   },
   primaryButton: {
     backgroundColor: palette.primary,
