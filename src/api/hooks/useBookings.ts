@@ -32,15 +32,15 @@ export function useBookingDetail(bookingId: number) {
 export function useBookingQR(bookingId: number) {
   return useQuery({
     queryKey: ['bookings', bookingId, 'qr'],
-    queryFn: () => httpClient.get<{ qrCode: string; bookingId: number }>(`/bookings/${bookingId}/qr`),
+    queryFn: () =>
+      httpClient.get<{ qrCode: string; bookingId: number }>(`/bookings/${bookingId}/qr`),
   });
 }
 
 export function useCancelBooking() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (bookingId: number) =>
-      httpClient.post(`/bookings/${bookingId}/cancel`),
+    mutationFn: (bookingId: number) => httpClient.post(`/bookings/${bookingId}/cancel`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bookings'] });
     },
