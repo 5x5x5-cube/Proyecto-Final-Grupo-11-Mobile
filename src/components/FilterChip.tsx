@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { palette } from '../theme/palette';
 
 interface FilterChipProps {

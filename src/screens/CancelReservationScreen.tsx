@@ -14,8 +14,7 @@ import TopBar from '../components/TopBar';
 export default function CancelReservationScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const route =
-    useRoute<NativeStackScreenProps<RootStackParamList, 'CancelReservation'>['route']>();
+  const route = useRoute<NativeStackScreenProps<RootStackParamList, 'CancelReservation'>['route']>();
   const { t } = useTranslation('mobile');
   const { formatPrice } = useLocale();
 
@@ -39,7 +38,9 @@ export default function CancelReservationScreen() {
         {/* Cancellation policy */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>{t('cancelReservation.cancellationPolicy')}</Text>
-          <Text style={styles.policyText}>{t('cancelReservation.cancellationPolicyText')}</Text>
+          <Text style={styles.policyText}>
+            {t('cancelReservation.cancellationPolicyText')}
+          </Text>
         </View>
 
         {/* Refund detail */}
@@ -50,9 +51,7 @@ export default function CancelReservationScreen() {
             <Text style={styles.refundValue}>{formatPrice(reservation.totalPriceCop)}</Text>
           </View>
           <View style={styles.refundRow}>
-            <Text style={styles.refundLabel}>
-              {t('cancelReservation.refund', { percent: 100 })}
-            </Text>
+            <Text style={styles.refundLabel}>{t('cancelReservation.refund', { percent: 100 })}</Text>
             <Text style={styles.refundValue}>{formatPrice(reservation.totalPriceCop)}</Text>
           </View>
           <View style={styles.divider} />
@@ -65,11 +64,7 @@ export default function CancelReservationScreen() {
         {/* Refund method */}
         <View style={styles.card}>
           <View style={styles.methodRow}>
-            <MaterialCommunityIcons
-              name="credit-card-outline"
-              size={20}
-              color={palette.onSurfaceVariant}
-            />
+            <MaterialCommunityIcons name="credit-card-outline" size={20} color={palette.onSurfaceVariant} />
             <View style={styles.methodInfo}>
               <Text style={styles.methodCard}>VISA ****4242</Text>
               <Text style={styles.methodTime}>{t('cancelReservation.refundTime')}</Text>
