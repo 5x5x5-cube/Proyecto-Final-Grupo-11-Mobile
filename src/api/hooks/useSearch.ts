@@ -5,7 +5,14 @@ export function useDestinations() {
   return useQuery({
     queryKey: ['destinations'],
     queryFn: () =>
-      httpClient.get<Array<{ name: string; country: string; hotelCount: number; gradient: readonly [string, string] }>>('/search/destinations'),
+      httpClient.get<
+        Array<{
+          name: string;
+          country: string;
+          hotelCount: number;
+          gradient: readonly [string, string];
+        }>
+      >('/search/destinations'),
   });
 }
 

@@ -25,7 +25,7 @@ export default function ReservationDetailScreenSkeleton() {
       {/* Info Grid */}
       <View style={styles.gridCard}>
         <View style={styles.grid}>
-          {[0, 1, 2, 3].map((i) => (
+          {[0, 1, 2, 3].map(i => (
             <View key={i} style={styles.gridCell}>
               <Skeleton width={60} height={12} />
               <Skeleton width={80} height={14} style={styles.mt4} />

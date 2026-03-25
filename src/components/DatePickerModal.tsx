@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, Pressable, Modal, FlatList, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { palette } from '../theme/palette';
@@ -18,7 +18,14 @@ interface DatePickerModalProps {
   title?: string;
 }
 
-export default function DatePickerModal({ visible, onClose, options, selected, onSelect, title }: DatePickerModalProps) {
+export default function DatePickerModal({
+  visible,
+  onClose,
+  options,
+  selected,
+  onSelect,
+  title,
+}: DatePickerModalProps) {
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose}>
@@ -26,7 +33,7 @@ export default function DatePickerModal({ visible, onClose, options, selected, o
           {title && <Text style={styles.title}>{title}</Text>}
           <FlatList
             data={options}
-            keyExtractor={(item) => item.key}
+            keyExtractor={item => item.key}
             renderItem={({ item }) => {
               const isSelected = item.date === selected;
               return (

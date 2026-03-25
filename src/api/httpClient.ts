@@ -10,10 +10,16 @@ export interface RequestConfig {
 interface MockHandler {
   method: Method;
   pattern: RegExp;
-  handler: (config: RequestConfig | undefined, match: RegExpMatchArray) => { status: number; data: unknown };
+  handler: (
+    config: RequestConfig | undefined,
+    match: RegExpMatchArray
+  ) => { status: number; data: unknown };
 }
 
-function findMockHandler(method: Method, path: string): { handler: MockHandler['handler']; match: RegExpMatchArray } | null {
+function findMockHandler(
+  method: Method,
+  path: string
+): { handler: MockHandler['handler']; match: RegExpMatchArray } | null {
   for (const route of mockHandlers) {
     if (route.method !== method) continue;
     const match = path.match(route.pattern);
