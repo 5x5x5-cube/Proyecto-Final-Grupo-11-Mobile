@@ -6,7 +6,10 @@
     "password": "Contrasena",
     "button": "Iniciar sesion",
     "noAccount": "¿No tienes cuenta?",
-    "register": "Registrate"
+    "register": "Registrate",
+    "emailPlaceholder": "correo@ejemplo.com",
+    "passwordPlaceholder": "••••••••",
+    "invalidEmail": "Email invalido"
   },
   "register": {
     "subtitle": "Crea tu cuenta para comenzar a reservar",
@@ -18,7 +21,12 @@
     "confirmPassword": "Confirmar contrasena",
     "button": "Crear cuenta",
     "hasAccount": "¿Ya tienes cuenta?",
-    "login": "Inicia sesion"
+    "login": "Inicia sesion",
+    "nameRequired": "El nombre es obligatorio",
+    "invalidEmail": "Email invalido",
+    "phoneRequired": "El telefono es obligatorio",
+    "passwordMinLength": "Minimo 6 caracteres",
+    "passwordMismatch": "Las contrasenas no coinciden"
   },
   "search": {
     "heroLine1": "Tu proxima",
@@ -27,7 +35,9 @@
     "guests": "{{count}} adultos",
     "searchButton": "Buscar",
     "popularDestinations": "Destinos populares",
-    "hotels": "{{count}} hoteles"
+    "hotels": "{{count}} hoteles",
+    "checkIn": "Check-in",
+    "checkOut": "Check-out"
   },
   "results": {
     "filterPrice": "Precio",
@@ -71,7 +81,7 @@
     "guests": "Huespedes",
     "guestsValue": "{{count}} adultos",
     "priceDetail": "Detalle del precio",
-    "nightsBreakdown": "COP 480k × {{count}} noches",
+    "nightsBreakdown": "{{count}} noches x {{price}}",
     "taxes": "Impuestos ({{percent}}%)",
     "total": "Total",
     "freeCancellation": "Cancelacion gratuita",

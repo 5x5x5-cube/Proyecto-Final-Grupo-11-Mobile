@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -36,15 +37,78 @@ const fields: FieldDef[] = [
   { key: 'confirmPassword', icon: 'lock-outline', placeholder: '••••••••', secure: true },
 ];
 
+type FormValues = {
+  fullName: string;
+  email: string;
+  phone: string;
+  password: string;
+  confirmPassword: string;
+};
+
+type TouchedFields = {
+  [K in keyof FormValues]?: boolean;
+};
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function getErrorKey(key: keyof FormValues, values: FormValues): string | null {
+  switch (key) {
+    case 'fullName':
+      return values.fullName.trim() === '' ? 'register.nameRequired' : null;
+    case 'email':
+      return !emailRegex.test(values.email) ? 'register.invalidEmail' : null;
+    case 'phone':
+      return values.phone.trim() === '' ? 'register.phoneRequired' : null;
+    case 'password':
+      return values.password.length < 6 ? 'register.passwordMinLength' : null;
+    case 'confirmPassword':
+      return values.confirmPassword !== values.password ? 'register.passwordMismatch' : null;
+    default:
+      return null;
+  }
+}
+
 export default function RegisterScreen() {
   const navigation = useNavigation<Nav>();
   const { t } = useTranslation('mobile');
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
+  const [values, setValues] = useState<FormValues>({
+    fullName: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: '',
+  });
+
+  const [touched, setTouched] = useState<TouchedFields>({});
+  const [loading, setLoading] = useState(false);
+
   const focusNext = (index: number) => {
     if (index < fields.length - 1) {
       inputRefs.current[index + 1]?.focus();
     }
+  };
+
+  const handleChangeText = (key: keyof FormValues, text: string) => {
+    setValues((prev) => ({ ...prev, [key]: text }));
+  };
+
+  const handleBlur = (key: keyof FormValues) => {
+    setTouched((prev) => ({ ...prev, [key]: true }));
+  };
+
+  const isFormValid = fields.every(
+    (field) => getErrorKey(field.key as keyof FormValues, values) === null
+  );
+
+  const handleRegister = () => {
+    if (!isFormValid || loading) return;
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      navigation.navigate('Login');
+    }, 1500);
   };
 
   return (
@@ -72,39 +136,61 @@ export default function RegisterScreen() {
         <View style={styles.card}>
           <Text style={styles.cardTitle}>{t('register.title')}</Text>
 
-          {fields.map((field, index) => (
-            <View key={field.key} style={styles.fieldGroup}>
-              <Text style={styles.label}>
-                {t(`register.${field.key}` as any)}
-              </Text>
-              <View style={styles.inputRow}>
-                <MaterialCommunityIcons
-                  name={field.icon}
-                  size={18}
-                  color={palette.onSurfaceVariant}
-                />
-                <TextInput
-                  ref={(ref) => { inputRefs.current[index] = ref; }}
-                  style={styles.input}
-                  defaultValue={field.placeholder}
-                  secureTextEntry={field.secure}
-                  keyboardType={field.keyboardType ?? 'default'}
-                  autoCapitalize={field.autoCapitalize}
-                  returnKeyType={index < fields.length - 1 ? 'next' : 'done'}
-                  onSubmitEditing={() => focusNext(index)}
-                  blurOnSubmit={index === fields.length - 1}
-                />
+          {fields.map((field, index) => {
+            const fieldKey = field.key as keyof FormValues;
+            const errorKey = getErrorKey(fieldKey, values);
+            const showError = touched[fieldKey] && errorKey !== null;
+
+            return (
+              <View key={field.key} style={styles.fieldGroup}>
+                <Text style={styles.label}>
+                  {t(`register.${field.key}` as any)}
+                </Text>
+                <View style={[styles.inputRow, showError && styles.inputRowError]}>
+                  <MaterialCommunityIcons
+                    name={field.icon}
+                    size={18}
+                    color={showError ? palette.error : palette.onSurfaceVariant}
+                  />
+                  <TextInput
+                    ref={(ref) => { inputRefs.current[index] = ref; }}
+                    style={styles.input}
+                    placeholder={field.placeholder}
+                    placeholderTextColor={palette.onSurfaceVariant}
+                    value={values[fieldKey]}
+                    onChangeText={(text) => handleChangeText(fieldKey, text)}
+                    onBlur={() => handleBlur(fieldKey)}
+                    secureTextEntry={field.secure}
+                    keyboardType={field.keyboardType ?? 'default'}
+                    autoCapitalize={field.autoCapitalize}
+                    returnKeyType={index < fields.length - 1 ? 'next' : 'done'}
+                    onSubmitEditing={() => focusNext(index)}
+                    blurOnSubmit={index === fields.length - 1}
+                  />
+                </View>
+                {showError && errorKey && (
+                  <Text style={styles.errorText}>{t(errorKey)}</Text>
+                )}
               </View>
-            </View>
-          ))}
+            );
+          })}
 
           <Pressable
-            style={styles.primaryButton}
-            onPress={() => navigation.navigate('Login')}
+            style={({ pressed }) => [
+              styles.primaryButton,
+              !isFormValid && styles.primaryButtonDisabled,
+              pressed && isFormValid && { opacity: 0.8 },
+            ]}
+            onPress={handleRegister}
+            disabled={!isFormValid || loading}
           >
-            <Text style={styles.primaryButtonText}>
-              {t('register.button')}
-            </Text>
+            {loading ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <Text style={styles.primaryButtonText}>
+                {t('register.button')}
+              </Text>
+            )}
           </Pressable>
 
           <Pressable
@@ -179,6 +265,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 12,
   },
+  inputRowError: {
+    borderColor: palette.error,
+  },
   input: {
     fontSize: 14,
     color: palette.onSurface,
@@ -186,12 +275,22 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 0,
   },
+  errorText: {
+    fontSize: 11,
+    color: palette.error,
+    fontFamily: 'Roboto_400Regular',
+    marginTop: 4,
+  },
   primaryButton: {
     backgroundColor: palette.primary,
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
     marginTop: 8,
+  },
+  primaryButtonDisabled: {
+    backgroundColor: palette.onSurfaceVariant,
+    opacity: 0.5,
   },
   primaryButtonText: {
     fontSize: 15,
