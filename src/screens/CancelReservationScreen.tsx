@@ -8,10 +8,8 @@ import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '../navigation/types';
 import { palette } from '../theme/palette';
 import { useLocale } from '../contexts/LocaleContext';
-import { mockReservations, pastReservations, cancelledReservations } from '../data/mockReservations';
+import { useBookingDetail, useCancelBooking } from '../api/hooks/useBookings';
 import TopBar from '../components/TopBar';
-
-const allReservations = [...mockReservations, ...pastReservations, ...cancelledReservations];
 
 export default function CancelReservationScreen() {
   const insets = useSafeAreaInsets();
@@ -20,7 +18,9 @@ export default function CancelReservationScreen() {
   const { t } = useTranslation('mobile');
   const { formatPrice } = useLocale();
 
-  const reservation = allReservations.find((r) => r.id === route.params.id) || allReservations[0];
+  const { data: reservationData } = useBookingDetail(route.params.id ?? 1);
+  const cancelBooking = useCancelBooking();
+  const reservation = (reservationData as any) ?? { code: '', totalPriceCop: 0 };
 
   return (
     <View style={styles.container}>
@@ -78,8 +78,13 @@ export default function CancelReservationScreen() {
             <Text style={styles.outlinedButtonText}>{t('cancelReservation.back')}</Text>
           </Pressable>
           <Pressable
-            style={styles.errorFilledButton}
-            onPress={() => navigation.navigate('MainTabs')}
+            style={[styles.errorFilledButton, cancelBooking.isPending && { opacity: 0.6 }]}
+            onPress={() => {
+              cancelBooking.mutate(route.params.id ?? 1, {
+                onSuccess: () => navigation.navigate('MainTabs'),
+              });
+            }}
+            disabled={cancelBooking.isPending}
           >
             <Text style={styles.errorFilledButtonText}>{t('cancelReservation.confirm')}</Text>
           </Pressable>

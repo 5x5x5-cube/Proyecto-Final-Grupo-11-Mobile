@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -13,7 +13,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '../navigation/types';
-import { mockHotels } from '../data/mockHotels';
+import { useHotelDetail } from '../api/hooks/useSearch';
 import { useLocale } from '../contexts/LocaleContext';
 import { palette } from '../theme/palette';
 import AmenityTag from '../components/AmenityTag';
@@ -53,15 +53,10 @@ export default function PropertyDetailScreen() {
   const { t } = useTranslation('mobile');
   const { formatPrice } = useLocale();
 
-  const hotel = mockHotels.find((h) => h.id === route.params.id) || mockHotels[0];
-  const [loading, setLoading] = useState(true);
+  const { data: hotelData, isLoading } = useHotelDetail(route.params.id ?? 1);
+  const hotel = (hotelData as any) ?? null;
 
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1200);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (loading) {
+  if (isLoading || !hotel) {
     return (
       <View style={styles.container}>
         <ScrollView style={styles.scroll} bounces={false}>
@@ -116,7 +111,7 @@ export default function PropertyDetailScreen() {
           {/* Amenities */}
           <Text style={styles.sectionTitle}>{t('propertyDetail.includedServices')}</Text>
           <View style={styles.amenitiesRow}>
-            {hotel.amenities.map((amenity, index) => (
+            {hotel.amenities.map((amenity: any, index: number) => (
               <AmenityTag key={index} icon={amenity.icon} label={amenity.label} />
             ))}
           </View>

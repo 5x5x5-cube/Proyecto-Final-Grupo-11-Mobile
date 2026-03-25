@@ -9,10 +9,8 @@ import QRCode from 'react-native-qrcode-svg';
 import { RootStackParamList } from '../navigation/types';
 import { palette } from '../theme/palette';
 import { useLocale } from '../contexts/LocaleContext';
-import { mockReservations, pastReservations, cancelledReservations } from '../data/mockReservations';
+import { useBookingDetail, useBookingQR } from '../api/hooks/useBookings';
 import TopBar from '../components/TopBar';
-
-const allReservations = [...mockReservations, ...pastReservations, ...cancelledReservations];
 
 export default function QRCheckInScreen() {
   const insets = useSafeAreaInsets();
@@ -21,7 +19,11 @@ export default function QRCheckInScreen() {
   const { t } = useTranslation('mobile');
   const { formatDate } = useLocale();
 
-  const reservation = allReservations.find((r) => r.id === route.params.id) || allReservations[0];
+  const bookingId = route.params.id ?? 1;
+  const { data: reservationData } = useBookingDetail(bookingId);
+  const { data: qrData } = useBookingQR(bookingId);
+  const reservation = (reservationData as any) ?? {};
+  const qrCode = qrData?.qrCode ?? reservation.code ?? '';
 
   return (
     <View style={styles.container}>
@@ -29,7 +31,7 @@ export default function QRCheckInScreen() {
       <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 24 + insets.bottom }]}>
         {/* QR Code card */}
         <View style={styles.qrCard}>
-          <QRCode value={reservation.code} size={240} />
+          <QRCode value={qrCode || 'TH-2026-48291'} size={240} />
         </View>
 
         {/* Reservation code badge */}

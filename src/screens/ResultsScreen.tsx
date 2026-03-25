@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '../navigation/types';
 import { palette } from '../theme/palette';
 import { useLocale } from '../contexts/LocaleContext';
-import { mockHotels } from '../data/mockHotels';
+import { useSearchHotels } from '../api/hooks/useSearch';
 import FilterChip from '../components/FilterChip';
 import ResultsScreenSkeleton from './ResultsScreen.skeleton';
 
@@ -25,12 +25,8 @@ export default function ResultsScreen() {
   const navigation = useNavigation<Nav>();
   const { t } = useTranslation('mobile');
   const { formatDate, formatPrice } = useLocale();
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1200);
-    return () => clearTimeout(timer);
-  }, []);
+  const { data: hotelsData, isLoading } = useSearchHotels();
+  const hotels = (hotelsData as any[]) ?? [];
 
   const dateRange = `${formatDate('2026-03-15', 'short')}-${formatDate('2026-03-20', 'short')}`;
 
@@ -73,13 +69,13 @@ export default function ResultsScreen() {
 
       {/* Results count */}
       <Text style={styles.resultsCount}>
-        {t('results.count', { count: mockHotels.length })}
+        {t('results.count', { count: hotels.length })}
       </Text>
 
       {/* Hotel list */}
-      {loading ? <ResultsScreenSkeleton /> : (
+      {isLoading ? <ResultsScreenSkeleton /> : (
       <FlatList
-        data={mockHotels}
+        data={hotels}
         keyExtractor={(item) => String(item.id)}
         contentContainerStyle={styles.listContent}
         renderItem={({ item }) => (
@@ -88,7 +84,7 @@ export default function ResultsScreen() {
             onPress={() => navigation.navigate('PropertyDetail', { id: item.id })}
           >
             <LinearGradient
-              colors={[...item.gradient]}
+              colors={item.gradient as [string, string]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.cardImage}

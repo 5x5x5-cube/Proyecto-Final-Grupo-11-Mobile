@@ -15,6 +15,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '../navigation/types';
 import { palette } from '../theme/palette';
+import { useLogin } from '../api/hooks/useAuth';
 import Brand from '../components/Brand';
 import LanguagePill from '../components/LanguagePill';
 
@@ -30,7 +31,8 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const login = useLogin();
+  const loading = login.isPending;
 
   const isValid = email.trim().length > 0 && password.trim().length > 0;
 
@@ -57,11 +59,10 @@ export default function LoginScreen() {
       return;
     }
 
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      navigation.navigate('MainTabs');
-    }, 1500);
+    login.mutate(
+      { email: email.trim(), password },
+      { onSuccess: () => navigation.navigate('MainTabs') },
+    );
   }
 
   return (
