@@ -6,6 +6,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '../navigation/types';
 import { palette } from '../theme/palette';
+import { useCurrentUser } from '../api/hooks/useAuth';
 import { useLocale, currencyNames, languageNames } from '../contexts/LocaleContext';
 import type { Language, Currency } from '../contexts/LocaleContext';
 import ProfileMenuRow from '../components/ProfileMenuRow';
@@ -29,6 +30,10 @@ export default function ProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { t } = useTranslation('mobile');
   const { language, currency, setLanguage, setCurrency } = useLocale();
+  const { data: currentUser } = useCurrentUser();
+  const userName = currentUser?.name ?? 'Carlos Martinez';
+  const userEmail = currentUser?.email ?? 'carlos.martinez@email.com';
+  const userInitials = currentUser?.initials ? `${currentUser.initials}M` : 'CM';
 
   const [langModalVisible, setLangModalVisible] = useState(false);
   const [currModalVisible, setCurrModalVisible] = useState(false);
@@ -41,11 +46,11 @@ export default function ProfileScreen() {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.avatar}>
-          <Text style={styles.avatarText}>CM</Text>
+          <Text style={styles.avatarText}>{userInitials}</Text>
         </View>
         <View style={styles.headerInfo}>
-          <Text style={styles.name}>Carlos Martinez</Text>
-          <Text style={styles.email}>carlos.martinez@email.com</Text>
+          <Text style={styles.name}>{userName}</Text>
+          <Text style={styles.email}>{userEmail}</Text>
         </View>
       </View>
 
@@ -55,13 +60,13 @@ export default function ProfileScreen() {
         <ProfileMenuRow
           icon={<MaterialCommunityIcons name="account-outline" size={20} color={palette.onSurfaceVariant} />}
           label={t('profile.name')}
-          value="Carlos Martinez"
+          value={userName}
         />
         <View style={styles.separator} />
         <ProfileMenuRow
           icon={<MaterialCommunityIcons name="email-outline" size={20} color={palette.onSurfaceVariant} />}
           label={t('profile.email')}
-          value="carlos.martinez@email.com"
+          value={userEmail}
         />
         <View style={styles.separator} />
         <ProfileMenuRow

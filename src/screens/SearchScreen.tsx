@@ -15,18 +15,13 @@ import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '../navigation/types';
 import { palette } from '../theme/palette';
 import { useLocale } from '../contexts/LocaleContext';
-import { mockDestinations } from '../data/mockDestinations';
+import { useDestinations } from '../api/hooks/useSearch';
 import Brand from '../components/Brand';
 import PickerModal from '../components/PickerModal';
 import DatePickerModal from '../components/DatePickerModal';
 import GuestPickerModal from '../components/GuestPickerModal';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
-
-const destinationOptions = mockDestinations.map((d) => ({
-  key: d.name,
-  label: `${d.name}, ${d.country}`,
-}));
 
 const checkInOptions = [
   { key: 'ci1', label: '15 Mar 2026', date: '2026-03-15' },
@@ -48,6 +43,8 @@ export default function SearchScreen() {
   const navigation = useNavigation<Nav>();
   const { t } = useTranslation('mobile');
   const { formatDate } = useLocale();
+  const { data: destinationsData } = useDestinations();
+  const destinations = destinationsData ?? [];
 
   const [destination, setDestination] = useState('Cartagena');
   const [checkIn, setCheckIn] = useState('2026-03-15');
@@ -59,7 +56,12 @@ export default function SearchScreen() {
   const [checkOutModal, setCheckOutModal] = useState(false);
   const [guestModal, setGuestModal] = useState(false);
 
-  const selectedCountry = mockDestinations.find((d) => d.name === destination)?.country ?? '';
+  const destinationOptions = destinations.map((d) => ({
+    key: d.name,
+    label: `${d.name}, ${d.country}`,
+  }));
+
+  const selectedCountry = destinations.find((d) => d.name === destination)?.country ?? '';
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.scrollContent}>
@@ -142,7 +144,7 @@ export default function SearchScreen() {
       <View style={styles.destinationsSection}>
         <Text style={styles.sectionTitle}>{t('search.popularDestinations')}</Text>
         <FlatList
-          data={mockDestinations}
+          data={destinations}
           horizontal
           showsHorizontalScrollIndicator={false}
           keyExtractor={(item) => item.name}
