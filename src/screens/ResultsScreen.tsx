@@ -1,5 +1,12 @@
 import React from 'react';
-import { View, Text, Pressable, StyleSheet, FlatList, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  FlatList,
+  ScrollView,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -28,7 +35,11 @@ export default function ResultsScreen() {
       {/* Custom top bar */}
       <View style={styles.topBar}>
         <Pressable onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <MaterialCommunityIcons name="arrow-left" size={22} color={palette.onSurface} />
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={22}
+            color={palette.onSurface}
+          />
         </Pressable>
         <Text style={styles.topBarText} numberOfLines={1}>
           Cartagena · {dateRange} · 2
@@ -57,60 +68,70 @@ export default function ResultsScreen() {
       </View>
 
       {/* Results count */}
-      <Text style={styles.resultsCount}>{t('results.count', { count: hotels.length })}</Text>
+      <Text style={styles.resultsCount}>
+        {t('results.count', { count: hotels.length })}
+      </Text>
 
       {/* Hotel list */}
-      {isLoading ? (
-        <ResultsScreenSkeleton />
-      ) : (
-        <FlatList
-          data={hotels}
-          keyExtractor={item => String(item.id)}
-          contentContainerStyle={styles.listContent}
-          renderItem={({ item }) => (
-            <Pressable
-              style={styles.card}
-              onPress={() => navigation.navigate('PropertyDetail', { id: item.id })}
+      {isLoading ? <ResultsScreenSkeleton /> : (
+      <FlatList
+        data={hotels}
+        keyExtractor={(item) => String(item.id)}
+        contentContainerStyle={styles.listContent}
+        renderItem={({ item }) => (
+          <Pressable
+            style={styles.card}
+            onPress={() => navigation.navigate('PropertyDetail', { id: item.id })}
+          >
+            <LinearGradient
+              colors={item.gradient as [string, string]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.cardImage}
             >
-              <LinearGradient
-                colors={item.gradient as [string, string]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.cardImage}
-              >
-                <View style={styles.badgeRow}>
-                  <View style={styles.typeBadge}>
-                    <Text style={styles.typeBadgeText}>{item.type}</Text>
-                  </View>
-                  <View style={styles.photoBadge}>
-                    <MaterialCommunityIcons name="camera-outline" size={12} color="#fff" />
-                    <Text style={styles.photoBadgeText}>{item.photoCount}</Text>
-                  </View>
+              <View style={styles.badgeRow}>
+                <View style={styles.typeBadge}>
+                  <Text style={styles.typeBadgeText}>{item.type}</Text>
                 </View>
-              </LinearGradient>
-
-              <View style={styles.cardBody}>
-                <Text style={styles.hotelName}>{item.name}</Text>
-                <Text style={styles.hotelLocation}>{item.location}</Text>
-
-                <View style={styles.bottomRow}>
-                  <View style={styles.ratingRow}>
-                    <MaterialCommunityIcons name="star" size={14} color={palette.star} />
-                    <Text style={styles.ratingText}>{item.rating}</Text>
-                    <Text style={styles.reviewText}>
-                      ({item.reviewCount} {t('results.reviews')})
-                    </Text>
-                  </View>
-
-                  <View style={styles.priceBlock}>
-                    <Text style={styles.priceText}>{formatPrice(item.pricePerNight)}</Text>
-                    <Text style={styles.perNight}>/{t('results.perNight')}</Text>
-                  </View>
+                <View style={styles.photoBadge}>
+                  <MaterialCommunityIcons
+                    name="camera-outline"
+                    size={12}
+                    color="#fff"
+                  />
+                  <Text style={styles.photoBadgeText}>{item.photoCount}</Text>
                 </View>
               </View>
-            </Pressable>
-          )}
-        />
+            </LinearGradient>
+
+            <View style={styles.cardBody}>
+              <Text style={styles.hotelName}>{item.name}</Text>
+              <Text style={styles.hotelLocation}>{item.location}</Text>
+
+              <View style={styles.bottomRow}>
+                <View style={styles.ratingRow}>
+                  <MaterialCommunityIcons
+                    name="star"
+                    size={14}
+                    color={palette.star}
+                  />
+                  <Text style={styles.ratingText}>{item.rating}</Text>
+                  <Text style={styles.reviewText}>
+                    ({item.reviewCount} {t('results.reviews')})
+                  </Text>
+                </View>
+
+                <View style={styles.priceBlock}>
+                  <Text style={styles.priceText}>
+                    {formatPrice(item.pricePerNight)}
+                  </Text>
+                  <Text style={styles.perNight}>/{t('results.perNight')}</Text>
+                </View>
+              </View>
+            </View>
+          </Pressable>
+        )}
+      />
       )}
     </View>
   );

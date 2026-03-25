@@ -20,8 +20,7 @@ import ReservationDetailScreenSkeleton from './ReservationDetailScreen.skeleton'
 export default function ReservationDetailScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const route =
-    useRoute<NativeStackScreenProps<RootStackParamList, 'ReservationDetail'>['route']>();
+  const route = useRoute<NativeStackScreenProps<RootStackParamList, 'ReservationDetail'>['route']>();
   const { t } = useTranslation('mobile');
   const { formatPrice, formatDate } = useLocale();
 
@@ -109,10 +108,7 @@ export default function ReservationDetailScreen() {
             <Text style={styles.priceTitle}>{t('reservationDetail.paymentSummary')}</Text>
             <PriceBreakdown
               rows={[
-                {
-                  label: t('reservationDetail.accommodation', { count: reservation.nights }),
-                  value: formatPrice(accommodationCop),
-                },
+                { label: t('reservationDetail.accommodation', { count: reservation.nights }), value: formatPrice(accommodationCop) },
                 { label: t('reservationDetail.taxes'), value: formatPrice(taxesCop) },
               ]}
               totalLabel={t('reservationDetail.totalPaid')}

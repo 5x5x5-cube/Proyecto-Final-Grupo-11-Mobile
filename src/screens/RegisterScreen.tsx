@@ -32,19 +32,8 @@ type FieldDef = {
 
 const fields: FieldDef[] = [
   { key: 'fullName', icon: 'account-outline', placeholder: 'Juan Perez', autoCapitalize: 'words' },
-  {
-    key: 'email',
-    icon: 'email-outline',
-    placeholder: 'viajero@email.com',
-    keyboardType: 'email-address',
-    autoCapitalize: 'none',
-  },
-  {
-    key: 'phone',
-    icon: 'phone-outline',
-    placeholder: '+57 300 123 4567',
-    keyboardType: 'phone-pad',
-  },
+  { key: 'email', icon: 'email-outline', placeholder: 'viajero@email.com', keyboardType: 'email-address', autoCapitalize: 'none' },
+  { key: 'phone', icon: 'phone-outline', placeholder: '+57 300 123 4567', keyboardType: 'phone-pad' },
   { key: 'password', icon: 'lock-outline', placeholder: '••••••••', secure: true },
   { key: 'confirmPassword', icon: 'lock-outline', placeholder: '••••••••', secure: true },
 ];
@@ -104,35 +93,36 @@ export default function RegisterScreen() {
   };
 
   const handleChangeText = (key: keyof FormValues, text: string) => {
-    setValues(prev => ({ ...prev, [key]: text }));
+    setValues((prev) => ({ ...prev, [key]: text }));
   };
 
   const handleBlur = (key: keyof FormValues) => {
-    setTouched(prev => ({ ...prev, [key]: true }));
+    setTouched((prev) => ({ ...prev, [key]: true }));
   };
 
   const isFormValid = fields.every(
-    field => getErrorKey(field.key as keyof FormValues, values) === null
+    (field) => getErrorKey(field.key as keyof FormValues, values) === null
   );
 
   const handleRegister = () => {
     if (!isFormValid || loading) return;
     register.mutate(
-      {
-        name: values.fullName,
-        email: values.email,
-        password: values.password,
-        phone: values.phone,
-      },
-      { onSuccess: () => navigation.navigate('Login') }
+      { name: values.fullName, email: values.email, password: values.password, phone: values.phone },
+      { onSuccess: () => navigation.navigate('Login') },
     );
   };
 
   return (
-    <KeyboardAvoidingView style={styles.flex} behavior="padding">
+    <KeyboardAvoidingView
+      style={styles.flex}
+      behavior="padding"
+    >
       <ScrollView
         style={styles.flex}
-        contentContainerStyle={[styles.container, { paddingTop: 36 }]}
+        contentContainerStyle={[
+          styles.container,
+          { paddingTop: 36 },
+        ]}
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.languageRow}>
@@ -154,7 +144,9 @@ export default function RegisterScreen() {
 
             return (
               <View key={field.key} style={styles.fieldGroup}>
-                <Text style={styles.label}>{t(`register.${field.key}` as any)}</Text>
+                <Text style={styles.label}>
+                  {t(`register.${field.key}` as any)}
+                </Text>
                 <View style={[styles.inputRow, showError && styles.inputRowError]}>
                   <MaterialCommunityIcons
                     name={field.icon}
@@ -162,14 +154,12 @@ export default function RegisterScreen() {
                     color={showError ? palette.error : palette.onSurfaceVariant}
                   />
                   <TextInput
-                    ref={ref => {
-                      inputRefs.current[index] = ref;
-                    }}
+                    ref={(ref) => { inputRefs.current[index] = ref; }}
                     style={styles.input}
                     placeholder={field.placeholder}
                     placeholderTextColor={palette.onSurfaceVariant}
                     value={values[fieldKey]}
-                    onChangeText={text => handleChangeText(fieldKey, text)}
+                    onChangeText={(text) => handleChangeText(fieldKey, text)}
                     onBlur={() => handleBlur(fieldKey)}
                     secureTextEntry={field.secure}
                     keyboardType={field.keyboardType ?? 'default'}
@@ -179,7 +169,9 @@ export default function RegisterScreen() {
                     blurOnSubmit={index === fields.length - 1}
                   />
                 </View>
-                {showError && errorKey && <Text style={styles.errorText}>{t(errorKey)}</Text>}
+                {showError && errorKey && (
+                  <Text style={styles.errorText}>{t(errorKey)}</Text>
+                )}
               </View>
             );
           })}
@@ -196,13 +188,19 @@ export default function RegisterScreen() {
             {loading ? (
               <ActivityIndicator color="#fff" size="small" />
             ) : (
-              <Text style={styles.primaryButtonText}>{t('register.button')}</Text>
+              <Text style={styles.primaryButtonText}>
+                {t('register.button')}
+              </Text>
             )}
           </Pressable>
 
-          <Pressable style={styles.linkRow} onPress={() => navigation.navigate('Login')}>
+          <Pressable
+            style={styles.linkRow}
+            onPress={() => navigation.navigate('Login')}
+          >
             <Text style={styles.linkText}>
-              {t('register.hasAccount')} <Text style={styles.linkBold}>{t('register.login')}</Text>
+              {t('register.hasAccount')}{' '}
+              <Text style={styles.linkBold}>{t('register.login')}</Text>
             </Text>
           </Pressable>
         </View>

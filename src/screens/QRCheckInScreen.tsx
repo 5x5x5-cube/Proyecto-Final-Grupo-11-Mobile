@@ -44,8 +44,7 @@ export default function QRCheckInScreen() {
 
         {/* Dates */}
         <Text style={styles.dates}>
-          {formatDate(reservation.checkIn, 'mediumWithDay')} —{' '}
-          {formatDate(reservation.checkOut, 'mediumWithDay')}
+          {formatDate(reservation.checkIn, 'mediumWithDay')} — {formatDate(reservation.checkOut, 'mediumWithDay')}
         </Text>
 
         {/* Room + guests */}
@@ -55,7 +54,9 @@ export default function QRCheckInScreen() {
 
         {/* Instruction card */}
         <View style={styles.instructionCard}>
-          <Text style={styles.instructionText}>{t('qrCheckIn.instruction')}</Text>
+          <Text style={styles.instructionText}>
+            {t('qrCheckIn.instruction')}
+          </Text>
         </View>
 
         {/* Download button */}

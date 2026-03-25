@@ -54,13 +54,13 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
   const [currency, setCurrencyState] = useState<Currency>('COP');
 
   useEffect(() => {
-    AsyncStorage.getItem('language').then(val => {
+    AsyncStorage.getItem('language').then((val) => {
       if (val === 'EN' || val === 'ES') {
         setLanguageState(val);
         i18n.changeLanguage(val);
       }
     });
-    AsyncStorage.getItem('currency').then(val => {
+    AsyncStorage.getItem('currency').then((val) => {
       if (val && val in exchangeRates) setCurrencyState(val as Currency);
     });
   }, []);
@@ -93,9 +93,7 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <LocaleContext.Provider
-      value={{ language, currency, setLanguage, setCurrency, formatPrice, formatDate }}
-    >
+    <LocaleContext.Provider value={{ language, currency, setLanguage, setCurrency, formatPrice, formatDate }}>
       {children}
     </LocaleContext.Provider>
   );
