@@ -17,7 +17,7 @@ export default function Skeleton({ width, height = 16, borderRadius = 4, style }
       Animated.sequence([
         Animated.timing(opacity, { toValue: 1, duration: 800, useNativeDriver: true }),
         Animated.timing(opacity, { toValue: 0.3, duration: 800, useNativeDriver: true }),
-      ]),
+      ])
     );
     animation.start();
     return () => animation.stop();
@@ -25,11 +25,7 @@ export default function Skeleton({ width, height = 16, borderRadius = 4, style }
 
   return (
     <Animated.View
-      style={[
-        styles.base,
-        { width: width as any, height, borderRadius, opacity },
-        style,
-      ]}
+      style={[styles.base, { width: width as any, height, borderRadius, opacity }, style]}
     />
   );
 }

@@ -12,7 +12,14 @@ interface GuestPickerModalProps {
   doneLabel?: string;
 }
 
-export default function GuestPickerModal({ visible, onClose, value, onChange, title, doneLabel = 'OK' }: GuestPickerModalProps) {
+export default function GuestPickerModal({
+  visible,
+  onClose,
+  value,
+  onChange,
+  title,
+  doneLabel = 'OK',
+}: GuestPickerModalProps) {
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose}>
@@ -24,7 +31,11 @@ export default function GuestPickerModal({ visible, onClose, value, onChange, ti
               onPress={() => value > 1 && onChange(value - 1)}
               disabled={value <= 1}
             >
-              <MaterialCommunityIcons name="minus" size={20} color={value <= 1 ? palette.outlineVariant : palette.onSurface} />
+              <MaterialCommunityIcons
+                name="minus"
+                size={20}
+                color={value <= 1 ? palette.outlineVariant : palette.onSurface}
+              />
             </Pressable>
             <Text style={styles.counterValue}>{value}</Text>
             <Pressable
@@ -32,7 +43,11 @@ export default function GuestPickerModal({ visible, onClose, value, onChange, ti
               onPress={() => value < 10 && onChange(value + 1)}
               disabled={value >= 10}
             >
-              <MaterialCommunityIcons name="plus" size={20} color={value >= 10 ? palette.outlineVariant : palette.onSurface} />
+              <MaterialCommunityIcons
+                name="plus"
+                size={20}
+                color={value >= 10 ? palette.outlineVariant : palette.onSurface}
+              />
             </Pressable>
           </View>
           <Pressable style={styles.doneButton} onPress={onClose}>

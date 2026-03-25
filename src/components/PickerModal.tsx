@@ -12,7 +12,14 @@ interface PickerModalProps<T extends string> {
   title?: string;
 }
 
-export default function PickerModal<T extends string>({ visible, onClose, options, selected, onSelect, title }: PickerModalProps<T>) {
+export default function PickerModal<T extends string>({
+  visible,
+  onClose,
+  options,
+  selected,
+  onSelect,
+  title,
+}: PickerModalProps<T>) {
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose}>
@@ -20,7 +27,7 @@ export default function PickerModal<T extends string>({ visible, onClose, option
           {title && <Text style={styles.title}>{title}</Text>}
           <FlatList
             data={options}
-            keyExtractor={(item) => item.key}
+            keyExtractor={item => item.key}
             renderItem={({ item }) => {
               const isSelected = item.key === selected;
               return (
