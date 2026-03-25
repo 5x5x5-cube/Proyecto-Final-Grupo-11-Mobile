@@ -27,5 +27,6 @@
   },
   "offline": {
     "banner": "No connection — Saved data"
-  }
+  },
+  "ok": "OK"
 }
