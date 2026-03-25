@@ -39,7 +39,10 @@ export default function ProfileScreen() {
   const [currModalVisible, setCurrModalVisible] = useState(false);
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+    >
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.avatar}>
@@ -55,37 +58,19 @@ export default function ProfileScreen() {
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>{t('profile.personalInfo')}</Text>
         <ProfileMenuRow
-          icon={
-            <MaterialCommunityIcons
-              name="account-outline"
-              size={20}
-              color={palette.onSurfaceVariant}
-            />
-          }
+          icon={<MaterialCommunityIcons name="account-outline" size={20} color={palette.onSurfaceVariant} />}
           label={t('profile.name')}
           value={userName}
         />
         <View style={styles.separator} />
         <ProfileMenuRow
-          icon={
-            <MaterialCommunityIcons
-              name="email-outline"
-              size={20}
-              color={palette.onSurfaceVariant}
-            />
-          }
+          icon={<MaterialCommunityIcons name="email-outline" size={20} color={palette.onSurfaceVariant} />}
           label={t('profile.email')}
           value={userEmail}
         />
         <View style={styles.separator} />
         <ProfileMenuRow
-          icon={
-            <MaterialCommunityIcons
-              name="phone-outline"
-              size={20}
-              color={palette.onSurfaceVariant}
-            />
-          }
+          icon={<MaterialCommunityIcons name="phone-outline" size={20} color={palette.onSurfaceVariant} />}
           label={t('profile.phone')}
           value="+57 300 123 4567"
         />
@@ -102,26 +87,14 @@ export default function ProfileScreen() {
         />
         <View style={styles.separator} />
         <ProfileMenuRow
-          icon={
-            <MaterialCommunityIcons
-              name="currency-usd"
-              size={20}
-              color={palette.onSurfaceVariant}
-            />
-          }
+          icon={<MaterialCommunityIcons name="currency-usd" size={20} color={palette.onSurfaceVariant} />}
           label={t('profile.currency')}
           value={`${currency} \u2014 ${currencyNames[currency]}`}
           onPress={() => setCurrModalVisible(true)}
         />
         <View style={styles.separator} />
         <ProfileMenuRow
-          icon={
-            <MaterialCommunityIcons
-              name="bell-outline"
-              size={20}
-              color={palette.onSurfaceVariant}
-            />
-          }
+          icon={<MaterialCommunityIcons name="bell-outline" size={20} color={palette.onSurfaceVariant} />}
           label={t('profile.notifications')}
         />
       </View>
