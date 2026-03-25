@@ -14,15 +14,15 @@ React Native mobile app prototype for the TravelHub hotel booking platform, buil
 
 ```bash
 # Install dependencies
-npm install
+yarn install
 
 # Start Expo dev server
-npm start
+yarn start
 
 # Run on specific platform
-npm run ios
-npm run android
-npm run web
+yarn ios
+yarn android
+yarn web
 ```
 
 ## Project Structure
