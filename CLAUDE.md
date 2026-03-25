@@ -25,3 +25,12 @@ When adding new text, add the key to both ES and EN locale files first, then ref
 - Use `useSafeAreaInsets()` only for bottom padding on stack screens with scrollable content. Top safe area is handled by root `SafeAreaView` in `App.tsx`.
 - Reuse existing components: `TopBar`, `ActionBar`, `PickerModal`, `DatePickerModal`, `GuestPickerModal`, `StatusChip`, `InfoGrid`, `PriceBreakdown`.
 - Use `palette` tokens from `src/theme/palette.ts` — never hardcode colors.
+
+## Loading States (Skeletons)
+
+- Use the `Skeleton` component from `src/components/Skeleton.tsx` (animated pulse, no extra deps).
+- Skeleton files use the `.skeleton.tsx` suffix and live next to their screen (e.g., `ResultsScreen.skeleton.tsx` next to `ResultsScreen.tsx`).
+- Skeleton layouts must match the real content layout to avoid layout shifts.
+- Loading state pattern: `useState(true)` + `useEffect` with `setTimeout` to simulate API delay.
+- Always-visible elements (TopBar, tabs, OfflineBanner) render immediately; only data-dependent content shows skeletons.
+- Hide ActionBar while loading on screens that have one (PropertyDetail, ReservationSummary).

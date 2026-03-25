@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, Pressable, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
@@ -10,6 +10,7 @@ import { useLocale } from '../contexts/LocaleContext';
 import { mockReservations, pastReservations, cancelledReservations } from '../data/mockReservations';
 import OfflineBanner from '../components/OfflineBanner';
 import StatusChip from '../components/StatusChip';
+import MyReservationsScreenSkeleton from './MyReservationsScreen.skeleton';
 
 type Tab = 'active' | 'past' | 'cancelled';
 
@@ -35,6 +36,12 @@ export default function MyReservationsScreen() {
   const { t } = useTranslation('mobile');
   const { formatPrice, formatDate } = useLocale();
   const [tab, setTab] = useState<Tab>('active');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const tabs: { key: Tab; label: string; count: number }[] = [
     { key: 'active', label: t('myReservations.active'), count: mockReservations.length },
@@ -97,12 +104,14 @@ export default function MyReservationsScreen() {
           </Pressable>
         ))}
       </View>
-      <FlatList
-        data={dataMap[tab]}
-        keyExtractor={(item) => String(item.id)}
-        renderItem={renderCard}
-        contentContainerStyle={styles.list}
-      />
+      {loading ? <MyReservationsScreenSkeleton /> : (
+        <FlatList
+          data={dataMap[tab]}
+          keyExtractor={(item) => String(item.id)}
+          renderItem={renderCard}
+          contentContainerStyle={styles.list}
+        />
+      )}
     </View>
   );
 }
