@@ -26,14 +26,14 @@ export default function PropertyDetailScreenSkeleton() {
         {/* Amenities title + pills */}
         <Skeleton width={140} height={16} style={styles.mt20} />
         <View style={styles.pillsRow}>
-          {[0, 1, 2, 3].map((i) => (
+          {[0, 1, 2, 3].map(i => (
             <Skeleton key={i} width={70} height={28} borderRadius={8} />
           ))}
         </View>
 
         {/* Rooms title + cards */}
         <Skeleton width={150} height={16} style={styles.mt20} />
-        {[0, 1, 2].map((i) => (
+        {[0, 1, 2].map(i => (
           <View key={i} style={styles.roomCard}>
             <Skeleton width={56} height={56} borderRadius={8} />
             <View style={styles.roomInfo}>
@@ -47,7 +47,7 @@ export default function PropertyDetailScreenSkeleton() {
         {/* Reviews title + cards */}
         <Skeleton width={140} height={16} style={styles.mt20} />
         <View style={styles.reviewsRow}>
-          {[0, 1, 2].map((i) => (
+          {[0, 1, 2].map(i => (
             <Skeleton key={i} width={220} height={100} borderRadius={12} />
           ))}
         </View>

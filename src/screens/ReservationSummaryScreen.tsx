@@ -34,95 +34,96 @@ export default function ReservationSummaryScreen() {
           <ReservationSummaryScreenSkeleton />
         </ScrollView>
       ) : (
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        {(() => {
-          const hotel = hotelData as any;
-          const nightsTotal = hotel.pricePerNight * nights;
-          const taxes = Math.round(nightsTotal * 0.19);
-          const total = nightsTotal + taxes;
-          return (
-        <>
-        {/* Hotel card */}
-        <View style={styles.card}>
-          <View style={styles.hotelRow}>
-            <LinearGradient
-              colors={hotel.gradient as unknown as [string, string]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.hotelGradient}
-            />
-            <View style={styles.hotelInfo}>
-              <Text style={styles.hotelName}>{hotel.name}</Text>
-              <Text style={styles.hotelLocation}>{hotel.location}</Text>
-              <Text style={styles.hotelRoom}>{t('summary.roomInfo')}</Text>
-            </View>
-          </View>
-        </View>
+        <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+          {(() => {
+            const hotel = hotelData as any;
+            const nightsTotal = hotel.pricePerNight * nights;
+            const taxes = Math.round(nightsTotal * 0.19);
+            const total = nightsTotal + taxes;
+            return (
+              <>
+                {/* Hotel card */}
+                <View style={styles.card}>
+                  <View style={styles.hotelRow}>
+                    <LinearGradient
+                      colors={hotel.gradient as unknown as [string, string]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.hotelGradient}
+                    />
+                    <View style={styles.hotelInfo}>
+                      <Text style={styles.hotelName}>{hotel.name}</Text>
+                      <Text style={styles.hotelLocation}>{hotel.location}</Text>
+                      <Text style={styles.hotelRoom}>{t('summary.roomInfo')}</Text>
+                    </View>
+                  </View>
+                </View>
 
-        {/* Info Grid */}
-        <View style={styles.card}>
-          <InfoGrid
-            items={[
-              {
-                label: t('summary.checkIn'),
-                value: formatDate(checkIn, 'shortWithDay'),
-                sub: '3:00 PM',
-              },
-              {
-                label: t('summary.checkOut'),
-                value: formatDate(checkOut, 'shortWithDay'),
-                sub: '12:00 PM',
-              },
-              {
-                label: t('summary.duration'),
-                value: t('summary.nights', { count: nights }),
-              },
-              {
-                label: t('summary.guests'),
-                value: t('summary.guestsValue', { count: 2 }),
-              },
-            ]}
-          />
-        </View>
+                {/* Info Grid */}
+                <View style={styles.card}>
+                  <InfoGrid
+                    items={[
+                      {
+                        label: t('summary.checkIn'),
+                        value: formatDate(checkIn, 'shortWithDay'),
+                        sub: '3:00 PM',
+                      },
+                      {
+                        label: t('summary.checkOut'),
+                        value: formatDate(checkOut, 'shortWithDay'),
+                        sub: '12:00 PM',
+                      },
+                      {
+                        label: t('summary.duration'),
+                        value: t('summary.nights', { count: nights }),
+                      },
+                      {
+                        label: t('summary.guests'),
+                        value: t('summary.guestsValue', { count: 2 }),
+                      },
+                    ]}
+                  />
+                </View>
 
-        {/* Price Breakdown */}
-        <View style={styles.card}>
-          <Text style={styles.priceTitle}>{t('summary.priceDetail')}</Text>
-          <PriceBreakdown
-            rows={[
-              { label: t('summary.nightsBreakdown', { count: nights, price: formatPrice(hotel.pricePerNight) }), value: formatPrice(nightsTotal) },
-              { label: t('summary.taxes', { percent: 19 }), value: formatPrice(taxes) },
-            ]}
-            totalLabel={t('summary.total')}
-            totalValue={formatPrice(total)}
-          />
-        </View>
+                {/* Price Breakdown */}
+                <View style={styles.card}>
+                  <Text style={styles.priceTitle}>{t('summary.priceDetail')}</Text>
+                  <PriceBreakdown
+                    rows={[
+                      {
+                        label: t('summary.nightsBreakdown', {
+                          count: nights,
+                          price: formatPrice(hotel.pricePerNight),
+                        }),
+                        value: formatPrice(nightsTotal),
+                      },
+                      { label: t('summary.taxes', { percent: 19 }), value: formatPrice(taxes) },
+                    ]}
+                    totalLabel={t('summary.total')}
+                    totalValue={formatPrice(total)}
+                  />
+                </View>
 
-        {/* Cancellation policy */}
-        <View style={styles.cancellationCard}>
-          <View style={styles.cancellationHeader}>
-            <MaterialCommunityIcons name="shield-check" size={18} color={palette.success} />
-            <Text style={styles.cancellationTitle}>{t('summary.freeCancellation')}</Text>
-          </View>
-          <Text style={styles.cancellationText}>
-            {t('summary.cancellationPolicy')}
-          </Text>
-        </View>
-        </>
-          );
-        })()}
-      </ScrollView>
+                {/* Cancellation policy */}
+                <View style={styles.cancellationCard}>
+                  <View style={styles.cancellationHeader}>
+                    <MaterialCommunityIcons name="shield-check" size={18} color={palette.success} />
+                    <Text style={styles.cancellationTitle}>{t('summary.freeCancellation')}</Text>
+                  </View>
+                  <Text style={styles.cancellationText}>{t('summary.cancellationPolicy')}</Text>
+                </View>
+              </>
+            );
+          })()}
+        </ScrollView>
       )}
 
       {!isLoading && !!hotelData && (
-      <ActionBar>
-        <Pressable
-          style={styles.continueButton}
-          onPress={() => navigation.navigate('Payment')}
-        >
-          <Text style={styles.continueButtonText}>{t('summary.continueToPayment')}</Text>
-        </Pressable>
-      </ActionBar>
+        <ActionBar>
+          <Pressable style={styles.continueButton} onPress={() => navigation.navigate('Payment')}>
+            <Text style={styles.continueButtonText}>{t('summary.continueToPayment')}</Text>
+          </Pressable>
+        </ActionBar>
       )}
     </View>
   );

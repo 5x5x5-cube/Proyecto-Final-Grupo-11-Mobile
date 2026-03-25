@@ -6,7 +6,7 @@ import { palette } from '../theme/palette';
 export default function MyReservationsScreenSkeleton() {
   return (
     <View style={styles.container}>
-      {[0, 1, 2].map((i) => (
+      {[0, 1, 2].map(i => (
         <View key={i} style={styles.card}>
           <Skeleton width="100%" height={100} borderRadius={0} style={styles.gradient} />
           <View style={styles.body}>
