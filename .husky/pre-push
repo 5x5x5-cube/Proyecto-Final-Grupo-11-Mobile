@@ -1,1 +1,1 @@
-npx jest --passWithNoTests --changedSince=HEAD~1
+yarn jest --passWithNoTests --changedSince=HEAD~1
