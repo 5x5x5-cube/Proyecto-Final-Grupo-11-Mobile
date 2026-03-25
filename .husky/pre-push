@@ -1,0 +1,1 @@
+npx jest --passWithNoTests --changedSince=HEAD~1

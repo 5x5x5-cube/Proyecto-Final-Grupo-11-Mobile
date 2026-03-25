@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  ScrollView,
-  FlatList,
-} from 'react-native';
+import { View, Text, Pressable, StyleSheet, ScrollView, FlatList } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -56,12 +49,12 @@ export default function SearchScreen() {
   const [checkOutModal, setCheckOutModal] = useState(false);
   const [guestModal, setGuestModal] = useState(false);
 
-  const destinationOptions = destinations.map((d) => ({
+  const destinationOptions = destinations.map(d => ({
     key: d.name,
     label: `${d.name}, ${d.country}`,
   }));
 
-  const selectedCountry = destinations.find((d) => d.name === destination)?.country ?? '';
+  const selectedCountry = destinations.find(d => d.name === destination)?.country ?? '';
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.scrollContent}>
@@ -86,30 +79,38 @@ export default function SearchScreen() {
               size={18}
               color={palette.onSurfaceVariant}
             />
-            <Text style={styles.fieldText}>{destination}, {selectedCountry}</Text>
-            <MaterialCommunityIcons name="chevron-down" size={18} color={palette.onSurfaceVariant} />
+            <Text style={styles.fieldText}>
+              {destination}, {selectedCountry}
+            </Text>
+            <MaterialCommunityIcons
+              name="chevron-down"
+              size={18}
+              color={palette.onSurfaceVariant}
+            />
           </Pressable>
 
           <View style={styles.dateRow}>
-            <Pressable style={[styles.field, styles.dateField]} onPress={() => setCheckInModal(true)}>
+            <Pressable
+              style={[styles.field, styles.dateField]}
+              onPress={() => setCheckInModal(true)}
+            >
               <MaterialCommunityIcons
                 name="calendar-outline"
                 size={18}
                 color={palette.onSurfaceVariant}
               />
-              <Text style={styles.fieldText}>
-                {formatDate(checkIn, 'short')}
-              </Text>
+              <Text style={styles.fieldText}>{formatDate(checkIn, 'short')}</Text>
             </Pressable>
-            <Pressable style={[styles.field, styles.dateField]} onPress={() => setCheckOutModal(true)}>
+            <Pressable
+              style={[styles.field, styles.dateField]}
+              onPress={() => setCheckOutModal(true)}
+            >
               <MaterialCommunityIcons
                 name="calendar-outline"
                 size={18}
                 color={palette.onSurfaceVariant}
               />
-              <Text style={styles.fieldText}>
-                {formatDate(checkOut, 'short')}
-              </Text>
+              <Text style={styles.fieldText}>{formatDate(checkOut, 'short')}</Text>
             </Pressable>
           </View>
 
@@ -119,24 +120,17 @@ export default function SearchScreen() {
               size={18}
               color={palette.onSurfaceVariant}
             />
-            <Text style={styles.fieldText}>
-              {t('search.guests', { count: guests })}
-            </Text>
-            <MaterialCommunityIcons name="chevron-down" size={18} color={palette.onSurfaceVariant} />
+            <Text style={styles.fieldText}>{t('search.guests', { count: guests })}</Text>
+            <MaterialCommunityIcons
+              name="chevron-down"
+              size={18}
+              color={palette.onSurfaceVariant}
+            />
           </Pressable>
 
-          <Pressable
-            style={styles.searchButton}
-            onPress={() => navigation.navigate('Results')}
-          >
-            <MaterialCommunityIcons
-              name="magnify"
-              size={18}
-              color={palette.onPrimaryContainer}
-            />
-            <Text style={styles.searchButtonText}>
-              {t('search.searchButton')}
-            </Text>
+          <Pressable style={styles.searchButton} onPress={() => navigation.navigate('Results')}>
+            <MaterialCommunityIcons name="magnify" size={18} color={palette.onPrimaryContainer} />
+            <Text style={styles.searchButtonText}>{t('search.searchButton')}</Text>
           </Pressable>
         </View>
       </LinearGradient>
@@ -147,7 +141,7 @@ export default function SearchScreen() {
           data={destinations}
           horizontal
           showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.name}
+          keyExtractor={item => item.name}
           contentContainerStyle={styles.destinationsList}
           renderItem={({ item }) => (
             <Pressable onPress={() => setDestination(item.name)}>
@@ -155,10 +149,7 @@ export default function SearchScreen() {
                 colors={[...item.gradient]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
-                style={[
-                  styles.destCard,
-                  item.name === destination && styles.destCardSelected,
-                ]}
+                style={[styles.destCard, item.name === destination && styles.destCardSelected]}
               >
                 <Text style={styles.destName}>{item.name}</Text>
                 <Text style={styles.destCountry}>{item.country}</Text>
