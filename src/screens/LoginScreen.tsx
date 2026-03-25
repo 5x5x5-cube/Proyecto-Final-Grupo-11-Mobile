@@ -61,15 +61,21 @@ export default function LoginScreen() {
 
     login.mutate(
       { email: email.trim(), password },
-      { onSuccess: () => navigation.navigate('MainTabs') }
+      { onSuccess: () => navigation.navigate('MainTabs') },
     );
   }
 
   return (
-    <KeyboardAvoidingView style={styles.flex} behavior="padding">
+    <KeyboardAvoidingView
+      style={styles.flex}
+      behavior="padding"
+    >
       <ScrollView
         style={styles.flex}
-        contentContainerStyle={[styles.container, { paddingTop: 48 }]}
+        contentContainerStyle={[
+          styles.container,
+          { paddingTop: 48 },
+        ]}
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.languageRow}>
@@ -106,7 +112,9 @@ export default function LoginScreen() {
                 blurOnSubmit={false}
               />
             </View>
-            {emailError && <Text style={styles.errorText}>{t('login.invalidEmail')}</Text>}
+            {emailError && (
+              <Text style={styles.errorText}>{t('login.invalidEmail')}</Text>
+            )}
           </View>
 
           <View style={styles.fieldGroup}>
@@ -147,9 +155,13 @@ export default function LoginScreen() {
             )}
           </Pressable>
 
-          <Pressable style={styles.linkRow} onPress={() => navigation.navigate('Register')}>
+          <Pressable
+            style={styles.linkRow}
+            onPress={() => navigation.navigate('Register')}
+          >
             <Text style={styles.linkText}>
-              {t('login.noAccount')} <Text style={styles.linkBold}>{t('login.register')}</Text>
+              {t('login.noAccount')}{' '}
+              <Text style={styles.linkBold}>{t('login.register')}</Text>
             </Text>
           </Pressable>
         </View>

@@ -1,15 +1,11 @@
 import type { RequestConfig } from './httpClient';
 import { mockDestinations } from '../data/mockDestinations';
 import { mockHotels } from '../data/mockHotels';
-import {
-  mockReservations,
-  pastReservations,
-  cancelledReservations,
-} from '../data/mockReservations';
+import { mockReservations, pastReservations, cancelledReservations } from '../data/mockReservations';
 
 type Handler = (
   config: RequestConfig | undefined,
-  match: RegExpMatchArray
+  match: RegExpMatchArray,
 ) => { status: number; data: unknown };
 
 interface MockRoute {
@@ -81,8 +77,7 @@ export const mockHandlers: MockRoute[] = [
   {
     method: 'GET',
     pattern: /^\/auth\/me$/,
-    handler: () =>
-      ok({ id: 1, name: 'Carlos Martinez', email: 'carlos.m@email.com', initials: 'C' }),
+    handler: () => ok({ id: 1, name: 'Carlos Martinez', email: 'carlos.m@email.com', initials: 'C' }),
   },
 
   // ─── Search ───

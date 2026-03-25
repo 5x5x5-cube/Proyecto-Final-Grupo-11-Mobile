@@ -3,6 +3,7 @@ import { httpClient } from '../httpClient';
 
 export function useInitiatePayment() {
   return useMutation({
-    mutationFn: (data: unknown) => httpClient.post('/payments/initiate', { body: data }),
+    mutationFn: (data: unknown) =>
+      httpClient.post('/payments/initiate', { body: data }),
   });
 }

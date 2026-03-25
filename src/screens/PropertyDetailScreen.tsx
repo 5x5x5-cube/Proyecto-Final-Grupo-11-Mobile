@@ -1,5 +1,12 @@
 import React from 'react';
-import { View, Text, ScrollView, Pressable, FlatList, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  Pressable,
+  FlatList,
+  StyleSheet,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -69,14 +76,15 @@ export default function PropertyDetailScreen() {
           end={{ x: 1, y: 1 }}
           style={styles.hero}
         >
-          <Pressable onPress={() => navigation.goBack()} style={[styles.backButton, { top: 8 }]}>
+          <Pressable
+            onPress={() => navigation.goBack()}
+            style={[styles.backButton, { top: 8 }]}
+          >
             <MaterialCommunityIcons name="arrow-left" size={18} color="#fff" />
           </Pressable>
           <View style={styles.photoBadge}>
             <MaterialCommunityIcons name="camera" size={14} color="#fff" />
-            <Text style={styles.photoBadgeText}>
-              {t('propertyDetail.photos', { count: hotel.photoCount })}
-            </Text>
+            <Text style={styles.photoBadgeText}>{t('propertyDetail.photos', { count: hotel.photoCount })}</Text>
           </View>
         </LinearGradient>
 
@@ -92,13 +100,13 @@ export default function PropertyDetailScreen() {
               <Text style={styles.ratingBadgeText}>{hotel.rating}</Text>
             </View>
             <MaterialCommunityIcons name="star" size={16} color={palette.star} />
-            <Text style={styles.reviewCount}>
-              {t('propertyDetail.reviews', { count: hotel.reviewCount })}
-            </Text>
+            <Text style={styles.reviewCount}>{t('propertyDetail.reviews', { count: hotel.reviewCount })}</Text>
           </View>
 
           {/* Description */}
-          <Text style={styles.description}>{t('propertyDetail.description')}</Text>
+          <Text style={styles.description}>
+            {t('propertyDetail.description')}
+          </Text>
 
           {/* Amenities */}
           <Text style={styles.sectionTitle}>{t('propertyDetail.includedServices')}</Text>
