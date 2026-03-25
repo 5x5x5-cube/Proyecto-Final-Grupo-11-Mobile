@@ -23,10 +23,7 @@ export default function SuccessScreen() {
   return (
     <ScrollView
       style={styles.scroll}
-      contentContainerStyle={[
-        styles.container,
-        { paddingTop: 48 },
-      ]}
+      contentContainerStyle={[styles.container, { paddingTop: 48 }]}
     >
       {/* Success icon */}
       <View style={styles.iconCircle}>
@@ -51,7 +48,8 @@ export default function SuccessScreen() {
         <View style={styles.summaryRow}>
           <Text style={styles.summaryLabel}>{t('success.dates')}</Text>
           <Text style={styles.summaryValue}>
-            {formatDate(new Date('2026-03-20'), 'short')} - {formatDate(new Date('2026-03-25'), 'short')}
+            {formatDate(new Date('2026-03-20'), 'short')} -{' '}
+            {formatDate(new Date('2026-03-25'), 'short')}
           </Text>
         </View>
         <View style={styles.summaryRow}>

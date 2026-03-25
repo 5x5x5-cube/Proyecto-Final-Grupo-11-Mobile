@@ -107,7 +107,7 @@ export default function PaymentScreen() {
     if (isPayDisabled) return;
     initiatePayment.mutate(
       { cardNumber, cardHolder, expiry, cvv, method: selected, total },
-      { onSuccess: () => navigation.navigate('Success') },
+      { onSuccess: () => navigation.navigate('Success') }
     );
   }
 
@@ -120,7 +120,7 @@ export default function PaymentScreen() {
 
         {/* Payment methods grid */}
         <View style={styles.methodGrid}>
-          {paymentMethods.map((method) => {
+          {paymentMethods.map(method => {
             const isSelected = selected === method.key;
             return (
               <Pressable
@@ -137,12 +137,7 @@ export default function PaymentScreen() {
                   size={24}
                   color={isSelected ? palette.primary : palette.onSurfaceVariant}
                 />
-                <Text
-                  style={[
-                    styles.methodText,
-                    isSelected && styles.methodTextSelected,
-                  ]}
-                >
+                <Text style={[styles.methodText, isSelected && styles.methodTextSelected]}>
                   {t(method.labelKey)}
                 </Text>
               </Pressable>
@@ -154,7 +149,11 @@ export default function PaymentScreen() {
         {showCardForm && (
           <View style={styles.cardForm}>
             <View style={styles.fieldRow}>
-              <MaterialCommunityIcons name="credit-card" size={20} color={palette.onSurfaceVariant} />
+              <MaterialCommunityIcons
+                name="credit-card"
+                size={20}
+                color={palette.onSurfaceVariant}
+              />
               <TextInput
                 style={styles.fieldInput}
                 value={cardNumber}
@@ -187,7 +186,11 @@ export default function PaymentScreen() {
             <View style={styles.fieldDivider} />
             <View style={styles.fieldRowSplit}>
               <View style={styles.fieldHalf}>
-                <MaterialCommunityIcons name="calendar" size={20} color={palette.onSurfaceVariant} />
+                <MaterialCommunityIcons
+                  name="calendar"
+                  size={20}
+                  color={palette.onSurfaceVariant}
+                />
                 <TextInput
                   ref={expiryRef}
                   style={styles.fieldInput}
@@ -209,7 +212,7 @@ export default function PaymentScreen() {
                   ref={cvvRef}
                   style={styles.fieldInput}
                   value={cvv}
-                  onChangeText={(text) => setCvv(text.replace(/\D/g, '').slice(0, 3))}
+                  onChangeText={text => setCvv(text.replace(/\D/g, '').slice(0, 3))}
                   placeholder={t('payment.cvv')}
                   placeholderTextColor={palette.onSurfaceVariant}
                   keyboardType="number-pad"
@@ -228,7 +231,8 @@ export default function PaymentScreen() {
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>{t('success.dates')}</Text>
             <Text style={styles.summaryValue}>
-              {formatDate(new Date('2026-03-20'), 'short')} - {formatDate(new Date('2026-03-25'), 'short')}
+              {formatDate(new Date('2026-03-20'), 'short')} -{' '}
+              {formatDate(new Date('2026-03-25'), 'short')}
             </Text>
           </View>
           <View style={styles.summaryDivider} />

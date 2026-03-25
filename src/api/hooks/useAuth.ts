@@ -18,6 +18,7 @@ export function useRegister() {
 export function useCurrentUser() {
   return useQuery({
     queryKey: ['auth', 'me'],
-    queryFn: () => httpClient.get<{ id: number; name: string; email: string; initials: string }>('/auth/me'),
+    queryFn: () =>
+      httpClient.get<{ id: number; name: string; email: string; initials: string }>('/auth/me'),
   });
 }

@@ -80,7 +80,8 @@ export default function MyReservationsScreen() {
         </Text>
         <View style={styles.cardFooterRow}>
           <Text style={styles.dates}>
-            {formatDate(item.checkIn, 'mediumWithDay')} — {formatDate(item.checkOut, 'mediumWithDay')}
+            {formatDate(item.checkIn, 'mediumWithDay')} —{' '}
+            {formatDate(item.checkOut, 'mediumWithDay')}
           </Text>
           <Text style={styles.price}>{formatPrice(item.totalPriceCop)}</Text>
         </View>
@@ -94,7 +95,7 @@ export default function MyReservationsScreen() {
       <OfflineBanner />
       <Text style={styles.title}>{t('myReservations.title')}</Text>
       <View style={styles.tabBar}>
-        {tabs.map((t) => (
+        {tabs.map(t => (
           <Pressable
             key={t.key}
             style={[styles.tab, tab === t.key && styles.tabActive]}
@@ -106,10 +107,12 @@ export default function MyReservationsScreen() {
           </Pressable>
         ))}
       </View>
-      {isLoading ? <MyReservationsScreenSkeleton /> : (
+      {isLoading ? (
+        <MyReservationsScreenSkeleton />
+      ) : (
         <FlatList
           data={dataMap[tab]}
-          keyExtractor={(item) => String(item.id)}
+          keyExtractor={item => String(item.id)}
           renderItem={renderCard}
           contentContainerStyle={styles.list}
         />

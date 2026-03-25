@@ -11,10 +11,14 @@ export default function LanguagePill() {
 
   return (
     <View style={styles.container}>
-      {languages.map((lang) => {
+      {languages.map(lang => {
         const isActive = lang === language;
         return (
-          <Pressable key={lang} onPress={() => setLanguage(lang)} style={[styles.pill, isActive && styles.pillActive]}>
+          <Pressable
+            key={lang}
+            onPress={() => setLanguage(lang)}
+            style={[styles.pill, isActive && styles.pillActive]}
+          >
             <Text style={[styles.text, isActive && styles.textActive]}>{lang}</Text>
           </Pressable>
         );
