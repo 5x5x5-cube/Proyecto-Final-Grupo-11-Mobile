@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text as RNText, TextProps as RNTextProps, StyleSheet } from 'react-native';
+import { Text as RNText, TextProps as RNTextProps } from 'react-native';
 import { typography } from '../theme/typography';
 import { palette } from '../theme/palette';
 
@@ -22,11 +22,5 @@ export default function Text({
   style,
   ...props
 }: TextProps) {
-  return <RNText style={[styles.base, typography[variant], { color }, style]} {...props} />;
+  return <RNText style={[typography[variant], { color }, style]} {...props} />;
 }
-
-const styles = StyleSheet.create({
-  base: {
-    // Intentionally empty — typography[variant] provides all text styles
-  },
-});
