@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { httpClient } from '../httpClient';
-import type { Cart, SetCartRequest } from '../../types/cart';
-import { clearCartSelection } from '../../storage/cartStorage';
+import type { Cart, SetCartRequest } from '@/types/cart';
+import { clearCartSelection } from '@/storage/cartStorage';
 
 export function useCart() {
   return useQuery<Cart>({

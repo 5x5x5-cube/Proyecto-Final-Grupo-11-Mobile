@@ -2,11 +2,11 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { palette } from '../theme/palette';
+import { palette } from '@/theme/palette';
 import { MainTabParamList } from './types';
-import SearchScreen from '../screens/SearchScreen';
-import MyReservationsScreen from '../screens/MyReservationsScreen';
-import ProfileScreen from '../screens/ProfileScreen';
+import SearchScreen from '@/screens/SearchScreen';
+import MyReservationsScreen from '@/screens/MyReservationsScreen';
+import ProfileScreen from '@/screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 

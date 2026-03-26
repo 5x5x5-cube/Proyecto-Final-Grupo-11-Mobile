@@ -17,6 +17,7 @@ module.exports = {
   ],
   moduleNameMapper: {
     '@expo/vector-icons': '<rootDir>/__mocks__/@expo/vector-icons.js',
+    '^@/(.*)$': '<rootDir>/src/$1',
   },
   collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.skeleton.tsx', '!src/**/*.d.ts'],
 };

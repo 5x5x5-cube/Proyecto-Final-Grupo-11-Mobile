@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { palette } from '../theme/palette';
+import { View, StyleSheet } from 'react-native';
+import { palette } from '@/theme/palette';
+import Text from './Text';
 
 interface PriceRow {
   label: string;
@@ -18,14 +19,22 @@ export default function PriceBreakdown({ rows, totalLabel, totalValue }: PriceBr
     <View>
       {rows.map((row, index) => (
         <View key={index} style={styles.row}>
-          <Text style={styles.rowLabel}>{row.label}</Text>
-          <Text style={styles.rowValue}>{row.value}</Text>
+          <Text variant="body" color={palette.onSurfaceVariant}>
+            {row.label}
+          </Text>
+          <Text variant="body" color={palette.onSurface}>
+            {row.value}
+          </Text>
         </View>
       ))}
       <View style={styles.divider} />
       <View style={styles.row}>
-        <Text style={styles.totalLabel}>{totalLabel}</Text>
-        <Text style={styles.totalValue}>{totalValue}</Text>
+        <Text variant="button" color={palette.onSurface}>
+          {totalLabel}
+        </Text>
+        <Text variant="button" color={palette.onSurface}>
+          {totalValue}
+        </Text>
       </View>
     </View>
   );
@@ -38,29 +47,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
-  rowLabel: {
-    fontSize: 14,
-    fontFamily: 'Roboto_400Regular',
-    color: palette.onSurfaceVariant,
-  },
-  rowValue: {
-    fontSize: 14,
-    fontFamily: 'Roboto_400Regular',
-    color: palette.onSurface,
-  },
   divider: {
     height: 1,
     backgroundColor: palette.outlineVariant,
     marginVertical: 12,
-  },
-  totalLabel: {
-    fontSize: 15,
-    fontFamily: 'Roboto_700Bold',
-    color: palette.onSurface,
-  },
-  totalValue: {
-    fontSize: 15,
-    fontFamily: 'Roboto_700Bold',
-    color: palette.onSurface,
   },
 });

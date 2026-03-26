@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Pressable, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { palette } from '../theme/palette';
+import { palette } from '@/theme/palette';
+import Text from './Text';
 
 interface TopBarProps {
   title: string;
@@ -11,17 +12,19 @@ interface TopBarProps {
 export default function TopBar({ title, onBack }: TopBarProps) {
   return (
     <View style={styles.container}>
-      <Pressable onPress={onBack} style={styles.backButton}>
+      <Pressable onPress={onBack} style={styles.backButton} testID="topbar-back-button">
         <MaterialCommunityIcons name="arrow-left" size={22} color={palette.onSurface} />
       </Pressable>
-      <Text style={styles.title}>{title}</Text>
+      <Text variant="subtitle" color={palette.onSurface}>
+        {title}
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
+    backgroundColor: palette.surface,
     borderBottomWidth: 1,
     borderBottomColor: palette.outlineVariant,
     flexDirection: 'row',
@@ -32,11 +35,5 @@ const styles = StyleSheet.create({
   },
   backButton: {
     padding: 2,
-  },
-  title: {
-    fontSize: 16,
-    fontFamily: 'Roboto_500Medium',
-    fontWeight: '600',
-    color: palette.onSurface,
   },
 });

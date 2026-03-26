@@ -1,7 +1,9 @@
 import React from 'react';
-import { View, Text, Pressable, Modal, FlatList, StyleSheet } from 'react-native';
+import { View, Pressable, Modal, FlatList } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { palette } from '../theme/palette';
+import { palette } from '@/theme/palette';
+import Text from './Text';
+import { styles } from './DatePickerModal.styles';
 
 interface DateOption {
   key: string;
@@ -30,7 +32,11 @@ export default function DatePickerModal({
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose}>
         <View style={styles.sheet}>
-          {title && <Text style={styles.title}>{title}</Text>}
+          {title && (
+            <Text variant="subtitle" color={palette.onSurface} style={styles.title}>
+              {title}
+            </Text>
+          )}
           <FlatList
             data={options}
             keyExtractor={item => item.key}
@@ -44,7 +50,10 @@ export default function DatePickerModal({
                   }}
                   style={[styles.option, isSelected && styles.optionSelected]}
                 >
-                  <Text style={[styles.optionText, isSelected && styles.optionTextSelected]}>
+                  <Text
+                    variant={isSelected ? 'label' : 'body'}
+                    color={isSelected ? palette.primary : palette.onSurface}
+                  >
                     {item.label}
                   </Text>
                   {isSelected && (
@@ -59,47 +68,3 @@ export default function DatePickerModal({
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'flex-end',
-  },
-  sheet: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    paddingTop: 16,
-    paddingBottom: 32,
-    maxHeight: '60%',
-  },
-  title: {
-    fontSize: 16,
-    fontFamily: 'Roboto_500Medium',
-    fontWeight: '600',
-    color: palette.onSurface,
-    paddingHorizontal: 20,
-    marginBottom: 12,
-  },
-  option: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-  },
-  optionSelected: {
-    backgroundColor: palette.primaryContainer,
-  },
-  optionText: {
-    fontSize: 14,
-    fontFamily: 'Roboto_400Regular',
-    color: palette.onSurface,
-  },
-  optionTextSelected: {
-    fontFamily: 'Roboto_500Medium',
-    fontWeight: '600',
-    color: palette.primary,
-  },
-});
