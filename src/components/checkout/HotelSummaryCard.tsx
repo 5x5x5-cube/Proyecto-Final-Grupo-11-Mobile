@@ -1,7 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { styles } from './HotelSummaryCard.styles';
+import Text from '../Text';
 import { palette } from '../../theme/palette';
+import { fontFamily } from '../../theme/typography';
 
 interface HotelSummaryCardProps {
   hotelName: string;
@@ -26,53 +29,21 @@ export default function HotelSummaryCard({
           style={styles.hotelGradient}
         />
         <View style={styles.hotelInfo}>
-          <Text style={styles.hotelName}>{hotelName}</Text>
-          <Text style={styles.hotelLocation}>{location}</Text>
-          <Text style={styles.hotelRoom}>{roomName}</Text>
+          <Text
+            variant="button"
+            color={palette.onSurface}
+            style={[{ fontFamily: fontFamily.bold }, styles.hotelName]}
+          >
+            {hotelName}
+          </Text>
+          <Text variant="caption" color={palette.onSurfaceVariant} style={styles.hotelLocation}>
+            {location}
+          </Text>
+          <Text variant="label" color={palette.primary} style={styles.hotelRoom}>
+            {roomName}
+          </Text>
         </View>
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: palette.outlineVariant,
-    padding: 16,
-    marginBottom: 12,
-  },
-  hotelRow: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  hotelGradient: {
-    width: 64,
-    height: 64,
-    borderRadius: 10,
-  },
-  hotelInfo: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  hotelName: {
-    fontSize: 15,
-    fontFamily: 'Roboto_700Bold',
-    fontWeight: 'bold',
-    color: palette.onSurface,
-    marginBottom: 2,
-  },
-  hotelLocation: {
-    fontSize: 12,
-    fontFamily: 'Roboto_400Regular',
-    color: palette.onSurfaceVariant,
-    marginBottom: 2,
-  },
-  hotelRoom: {
-    fontSize: 12,
-    fontFamily: 'Roboto_500Medium',
-    color: palette.primary,
-  },
-});

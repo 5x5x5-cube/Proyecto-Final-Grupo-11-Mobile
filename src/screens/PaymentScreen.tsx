@@ -64,20 +64,27 @@ export default function PaymentScreen() {
   const expiryRef = useRef<TextInput>(null);
   const cvvRef = useRef<TextInput>(null);
 
-  const { data: cart } = useCart();
+  const { data: cart, isLoading: isCartLoading } = useCart();
   const initiatePayment = useInitiatePayment();
-
-  const hotelName = cart?.hotelName ?? '';
-  const total = cart?.priceBreakdown?.total ?? 0;
-  const checkIn = cart?.checkIn ?? '2026-03-20';
-  const checkOut = cart?.checkOut ?? '2026-03-25';
   const loading = initiatePayment.isPending;
 
   const handleExpired = () => {
     Alert.alert(t('summary.holdExpired'), t('summary.holdExpiredMessage'), [
-      { text: 'OK', onPress: () => navigation.navigate('MainTabs') },
+      { text: t('common.ok'), onPress: () => navigation.navigate('MainTabs') },
     ]);
   };
+
+  if (isCartLoading || !cart) {
+    return (
+      <View style={styles.container}>
+        <TopBar title={t('payment.title')} onBack={() => navigation.goBack()} />
+        <ActivityIndicator style={{ marginTop: 32 }} color={palette.primary} />
+      </View>
+    );
+  }
+
+  const { hotelName, checkIn, checkOut, priceBreakdown } = cart;
+  const total = priceBreakdown?.total ?? 0;
 
   const showCardForm = selected === 'credit' || selected === 'debit';
 
@@ -116,9 +123,9 @@ export default function PaymentScreen() {
     initiatePayment.mutate(
       { cardNumber, cardHolder, expiry, cvv, method: selected, total },
       {
-        onSuccess: (data: any) =>
+        onSuccess: data =>
           navigation.navigate('Success', {
-            bookingCode: data?.bookingCode ?? 'TH-2026-48291',
+            bookingCode: data?.bookingCode ?? 'TH-2026-00000',
             hotelName,
             checkIn,
             checkOut,

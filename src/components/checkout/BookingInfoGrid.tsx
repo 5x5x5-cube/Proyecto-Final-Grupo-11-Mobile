@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useLocale } from '../../contexts/LocaleContext';
-import { palette } from '../../theme/palette';
 import InfoGrid from '../InfoGrid';
+import { styles } from './BookingInfoGrid.styles';
 
 interface BookingInfoGridProps {
   checkIn: string;
@@ -28,12 +28,12 @@ export default function BookingInfoGrid({
           {
             label: t('summary.checkIn'),
             value: formatDate(checkIn, 'shortWithDay'),
-            sub: '3:00 PM',
+            sub: t('summary.checkInTime'),
           },
           {
             label: t('summary.checkOut'),
             value: formatDate(checkOut, 'shortWithDay'),
-            sub: '12:00 PM',
+            sub: t('summary.checkOutTime'),
           },
           {
             label: t('summary.duration'),
@@ -48,14 +48,3 @@ export default function BookingInfoGrid({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: palette.outlineVariant,
-    padding: 16,
-    marginBottom: 12,
-  },
-});

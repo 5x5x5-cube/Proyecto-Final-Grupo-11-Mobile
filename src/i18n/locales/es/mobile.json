@@ -1,4 +1,7 @@
 {
+  "common": {
+    "ok": "OK"
+  },
   "login": {
     "subtitle": "Inicia sesion para gestionar tus reservas",
     "title": "Iniciar sesion",
@@ -76,7 +79,9 @@
     "title": "Resumen de reserva",
     "roomInfo": "Habitacion Superior · 1 cama King",
     "checkIn": "Check-in",
+    "checkInTime": "3:00 PM",
     "checkOut": "Check-out",
+    "checkOutTime": "12:00 PM",
     "duration": "Duracion",
     "nights": "{{count}} noches",
     "guests": "Huespedes",

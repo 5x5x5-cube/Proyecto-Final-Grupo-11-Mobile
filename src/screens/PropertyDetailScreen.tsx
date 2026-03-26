@@ -18,20 +18,20 @@ import PropertyDetailScreenSkeleton from './PropertyDetailScreen.skeleton';
 const rooms = [
   {
     id: 'b1000000-0000-0000-0000-000000000001',
-    name: 'Superior',
-    beds: '1 cama king',
+    nameKey: 'propertyDetail.rooms.superior',
+    bedsKey: 'propertyDetail.rooms.bedKing',
     price: 480000,
   },
   {
     id: 'b1000000-0000-0000-0000-000000000002',
-    name: 'Doble',
-    beds: '2 camas dobles',
+    nameKey: 'propertyDetail.rooms.double',
+    bedsKey: 'propertyDetail.rooms.bedDouble',
     price: 520000,
   },
   {
     id: 'b1000000-0000-0000-0000-000000000003',
-    name: 'Suite Junior',
-    beds: '1 cama king + sala',
+    nameKey: 'propertyDetail.rooms.juniorSuite',
+    bedsKey: 'propertyDetail.rooms.bedKingSuite',
     price: 720000,
   },
 ];
@@ -41,19 +41,19 @@ const reviews = [
     name: 'Maria G.',
     initials: 'MG',
     rating: 5,
-    text: 'Excelente hotel, ubicacion privilegiada y servicio impecable. Totalmente recomendado.',
+    textKey: 'propertyDetail.reviewTexts.review1',
   },
   {
     name: 'Carlos M.',
     initials: 'CM',
     rating: 4,
-    text: 'Muy buena experiencia. Las habitaciones son amplias y limpias. El desayuno podria mejorar.',
+    textKey: 'propertyDetail.reviewTexts.review2',
   },
   {
     name: 'Ana L.',
     initials: 'AL',
     rating: 5,
-    text: 'Hermoso lugar, el personal muy atento y la piscina es espectacular. Volveria sin duda.',
+    textKey: 'propertyDetail.reviewTexts.review3',
   },
 ];
 
@@ -171,8 +171,8 @@ export default function PropertyDetailScreen() {
                   style={styles.roomGradient}
                 />
                 <View style={styles.roomInfo}>
-                  <Text style={styles.roomName}>{room.name}</Text>
-                  <Text style={styles.roomBeds}>{room.beds}</Text>
+                  <Text style={styles.roomName}>{t(room.nameKey)}</Text>
+                  <Text style={styles.roomBeds}>{t(room.bedsKey)}</Text>
                 </View>
                 <Text style={styles.roomPrice}>{formatPrice(room.price)}</Text>
               </Pressable>
@@ -202,7 +202,7 @@ export default function PropertyDetailScreen() {
                   <MaterialCommunityIcons key={i} name="star" size={14} color={palette.star} />
                 ))}
               </View>
-              <Text style={styles.reviewText}>{item.text}</Text>
+              <Text style={styles.reviewText}>{t(item.textKey)}</Text>
             </View>
           )}
         />

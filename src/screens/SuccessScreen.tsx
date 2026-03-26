@@ -14,10 +14,7 @@ export default function SuccessScreen() {
   const { t } = useTranslation('mobile');
   const { formatDate } = useLocale();
 
-  const bookingCode = route.params?.bookingCode ?? 'TH-2026-48291';
-  const hotelName = route.params?.hotelName ?? 'Hotel Santa Clara Sofitel';
-  const checkIn = route.params?.checkIn ?? '2026-03-20';
-  const checkOut = route.params?.checkOut ?? '2026-03-25';
+  const { bookingCode, hotelName, checkIn, checkOut } = route.params;
 
   return (
     <ScrollView

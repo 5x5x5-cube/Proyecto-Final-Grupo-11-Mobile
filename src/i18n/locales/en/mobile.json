@@ -1,4 +1,7 @@
 {
+  "common": {
+    "ok": "OK"
+  },
   "login": {
     "subtitle": "Sign in to manage your reservations",
     "title": "Sign in",
@@ -76,7 +79,9 @@
     "title": "Reservation summary",
     "roomInfo": "Superior Room · 1 King bed",
     "checkIn": "Check-in",
+    "checkInTime": "3:00 PM",
     "checkOut": "Check-out",
+    "checkOutTime": "12:00 PM",
     "duration": "Duration",
     "nights": "{{count}} nights",
     "guests": "Guests",

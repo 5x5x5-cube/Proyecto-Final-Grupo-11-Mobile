@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { palette } from '../../theme/palette';
+import Text from '../Text';
+import { fontFamily } from '../../theme/typography';
 
 interface HoldCountdownProps {
   expiresAt: string;
@@ -44,7 +46,11 @@ export default function HoldCountdown({ expiresAt, onExpired }: HoldCountdownPro
   return (
     <View style={[styles.container, { backgroundColor: bgColor }]}>
       <MaterialCommunityIcons name="clock-outline" size={18} color={textColor} />
-      <Text style={[styles.text, { color: textColor }]}>
+      <Text
+        variant="bodySmall"
+        color={textColor}
+        style={[{ fontFamily: fontFamily.medium }, styles.text]}
+      >
         {t('summary.holdCountdown', { time: formatTime(remaining) })}
       </Text>
     </View>
@@ -61,9 +67,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   text: {
-    fontSize: 13,
-    fontFamily: 'Roboto_500Medium',
-    fontWeight: '600',
     flex: 1,
   },
 });

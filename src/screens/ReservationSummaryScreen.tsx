@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, Pressable, Alert, StyleSheet } from 'react-native';
+import { View, ScrollView, Pressable, Alert, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,7 @@ import { useCart } from '../api/hooks/useCart';
 import { useLocale } from '../contexts/LocaleContext';
 import { getCartSelection, CartSelection } from '../storage/cartStorage';
 import { palette } from '../theme/palette';
+import Text from '../components/Text';
 import TopBar from '../components/TopBar';
 import ActionBar from '../components/ActionBar';
 import PriceBreakdown from '../components/PriceBreakdown';
@@ -32,7 +33,7 @@ export default function ReservationSummaryScreen() {
 
   const handleExpired = () => {
     Alert.alert(t('summary.holdExpired'), t('summary.holdExpiredMessage'), [
-      { text: 'OK', onPress: () => navigation.navigate('MainTabs') },
+      { text: t('common.ok'), onPress: () => navigation.navigate('MainTabs') },
     ]);
   };
 
@@ -40,7 +41,7 @@ export default function ReservationSummaryScreen() {
   useEffect(() => {
     if (isError) {
       Alert.alert(t('summary.syncError'), t('summary.syncErrorMessage'), [
-        { text: 'OK', onPress: () => navigation.goBack() },
+        { text: t('common.ok'), onPress: () => navigation.goBack() },
       ]);
     }
   }, [isError, navigation, t]);
@@ -68,23 +69,27 @@ export default function ReservationSummaryScreen() {
       {hasServerCart && <HoldCountdown expiresAt={cart.holdExpiresAt} onExpired={handleExpired} />}
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        <HotelSummaryCard
-          hotelName={cart?.hotelName ?? ''}
-          location={cart?.location ?? ''}
-          roomName={cart?.roomName ?? ''}
-        />
+        {hasServerCart && (
+          <HotelSummaryCard
+            hotelName={cart.hotelName}
+            location={cart.location}
+            roomName={cart.roomName}
+          />
+        )}
 
         <BookingInfoGrid
           checkIn={cart?.checkIn ?? localSelection?.checkIn ?? ''}
           checkOut={cart?.checkOut ?? localSelection?.checkOut ?? ''}
-          nights={cart?.priceBreakdown.nights ?? 0}
+          nights={cart?.priceBreakdown?.nights ?? 0}
           guests={cart?.guests ?? localSelection?.guests ?? 0}
         />
 
         {/* Price Breakdown — only when we have the full server cart */}
         {hasServerCart && (
           <View style={styles.card}>
-            <Text style={styles.priceTitle}>{t('summary.priceDetail')}</Text>
+            <Text variant="button" color={palette.onSurface} style={styles.priceTitle}>
+              {t('summary.priceDetail')}
+            </Text>
             <PriceBreakdown
               rows={[
                 {
@@ -110,7 +115,9 @@ export default function ReservationSummaryScreen() {
 
       <ActionBar>
         <Pressable style={styles.continueButton} onPress={() => navigation.navigate('Payment')}>
-          <Text style={styles.continueButtonText}>{t('summary.continueToPayment')}</Text>
+          <Text variant="button" color={palette.onPrimary}>
+            {t('summary.continueToPayment')}
+          </Text>
         </Pressable>
       </ActionBar>
     </View>
@@ -131,7 +138,7 @@ const styles = StyleSheet.create({
     paddingBottom: 90,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: palette.surface,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: palette.outlineVariant,
@@ -139,10 +146,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   priceTitle: {
-    fontSize: 15,
-    fontFamily: 'Roboto_500Medium',
-    fontWeight: '600',
-    color: palette.onSurface,
     marginBottom: 12,
   },
   continueButton: {
@@ -150,11 +153,5 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
-  },
-  continueButtonText: {
-    fontSize: 15,
-    fontFamily: 'Roboto_500Medium',
-    fontWeight: '600',
-    color: '#fff',
   },
 });
