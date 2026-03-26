@@ -65,6 +65,7 @@
       "bedDouble": "2 camas dobles",
       "bedKingSuite": "1 cama King + sala"
     },
+    "roomUnavailable": "Esta habitacion ya no esta disponible. Selecciona otra opcion.",
     "reviewTexts": {
       "review1": "Excelente ubicacion y servicio. Volveria sin dudarlo.",
       "review2": "Muy buen hotel, desayuno variado. La piscina es hermosa.",
@@ -86,7 +87,12 @@
     "total": "Total",
     "freeCancellation": "Cancelacion gratuita",
     "cancellationPolicy": "Cancelacion gratuita hasta 48 horas antes del check-in. Despues se cobra el 50% de la primera noche.",
-    "continueToPayment": "Continuar al pago"
+    "continueToPayment": "Continuar al pago",
+    "holdCountdown": "Tu habitacion esta reservada por {{time}}",
+    "holdExpired": "Reserva expirada",
+    "holdExpiredMessage": "El tiempo de reserva ha expirado. Por favor, selecciona nuevamente tu habitacion.",
+    "syncError": "Error de sincronizacion",
+    "syncErrorMessage": "No pudimos confirmar tu reserva con el servidor. Por favor, intentalo de nuevo."
   },
   "payment": {
     "title": "Metodo de pago",

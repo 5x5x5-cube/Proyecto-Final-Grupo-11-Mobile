@@ -65,6 +65,7 @@
       "bedDouble": "2 double beds",
       "bedKingSuite": "1 King bed + living room"
     },
+    "roomUnavailable": "This room is no longer available. Please select another option.",
     "reviewTexts": {
       "review1": "Excellent location and service. Would come back without hesitation.",
       "review2": "Very good hotel, varied breakfast. The pool is beautiful.",
@@ -86,7 +87,12 @@
     "total": "Total",
     "freeCancellation": "Free cancellation",
     "cancellationPolicy": "Free cancellation up to 48 hours before check-in. After that, 50% of the first night is charged.",
-    "continueToPayment": "Continue to payment"
+    "continueToPayment": "Continue to payment",
+    "holdCountdown": "Your room is reserved for {{time}}",
+    "holdExpired": "Reservation expired",
+    "holdExpiredMessage": "The reservation time has expired. Please select your room again.",
+    "syncError": "Sync error",
+    "syncErrorMessage": "We could not confirm your reservation with the server. Please try again."
   },
   "payment": {
     "title": "Payment method",

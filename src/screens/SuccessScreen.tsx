@@ -1,24 +1,23 @@
 import React from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '../navigation/types';
-import { mockHotels } from '../data/mockHotels';
 import { useLocale } from '../contexts/LocaleContext';
 import { palette } from '../theme/palette';
 
 export default function SuccessScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const route = useRoute<NativeStackScreenProps<RootStackParamList, 'Success'>['route']>();
   const { t } = useTranslation('mobile');
-  const { formatPrice, formatDate } = useLocale();
+  const { formatDate } = useLocale();
 
-  const hotel = mockHotels[0];
-  const nights = 5;
-  const nightsTotal = hotel.pricePerNight * nights;
-  const taxes = Math.round(nightsTotal * 0.19);
-  const total = nightsTotal + taxes;
+  const bookingCode = route.params?.bookingCode ?? 'TH-2026-48291';
+  const hotelName = route.params?.hotelName ?? 'Hotel Santa Clara Sofitel';
+  const checkIn = route.params?.checkIn ?? '2026-03-20';
+  const checkOut = route.params?.checkOut ?? '2026-03-25';
 
   return (
     <ScrollView
@@ -36,20 +35,19 @@ export default function SuccessScreen() {
       {/* Reservation code */}
       <View style={styles.codeBadge}>
         <Text style={styles.codeLabel}>{t('success.reservationCode')}</Text>
-        <Text style={styles.codeValue}>TH-2026-48291</Text>
+        <Text style={styles.codeValue}>{bookingCode}</Text>
       </View>
 
       {/* Summary card */}
       <View style={styles.summaryCard}>
         <View style={styles.summaryRow}>
           <Text style={styles.summaryLabel}>{t('success.hotel')}</Text>
-          <Text style={styles.summaryValue}>{hotel.name}</Text>
+          <Text style={styles.summaryValue}>{hotelName}</Text>
         </View>
         <View style={styles.summaryRow}>
           <Text style={styles.summaryLabel}>{t('success.dates')}</Text>
           <Text style={styles.summaryValue}>
-            {formatDate(new Date('2026-03-20'), 'short')} -{' '}
-            {formatDate(new Date('2026-03-25'), 'short')}
+            {formatDate(new Date(checkIn), 'short')} - {formatDate(new Date(checkOut), 'short')}
           </Text>
         </View>
         <View style={styles.summaryRow}>
@@ -59,11 +57,6 @@ export default function SuccessScreen() {
         <View style={styles.summaryRow}>
           <Text style={styles.summaryLabel}>{t('success.guests')}</Text>
           <Text style={styles.summaryValue}>{t('success.guestsValue', { count: 2 })}</Text>
-        </View>
-        <View style={styles.divider} />
-        <View style={styles.summaryRow}>
-          <Text style={styles.totalLabel}>{t('success.total')}</Text>
-          <Text style={styles.totalValue}>{formatPrice(total)}</Text>
         </View>
       </View>
 
@@ -166,23 +159,6 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     flexShrink: 1,
     marginLeft: 16,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: palette.outlineVariant,
-    marginVertical: 8,
-  },
-  totalLabel: {
-    fontSize: 14,
-    fontFamily: 'Roboto_700Bold',
-    fontWeight: 'bold',
-    color: palette.onSurface,
-  },
-  totalValue: {
-    fontSize: 14,
-    fontFamily: 'Roboto_700Bold',
-    fontWeight: 'bold',
-    color: palette.onSurface,
   },
   primaryButton: {
     width: '100%',

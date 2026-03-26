@@ -1,3 +1,6 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { mockHandlers } from './mockHandlers';
+
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 export interface RequestConfig {
@@ -22,6 +25,20 @@ function buildUrl(path: string, params?: Record<string, unknown>): string {
   return url;
 }
 
+async function tryMockFallback<T>(
+  method: Method,
+  path: string,
+  config?: RequestConfig
+): Promise<T> {
+  const route = mockHandlers.find(r => r.method === method && r.pattern.test(path));
+  if (!route) throw { status: 503, data: { message: 'Service unavailable' } };
+  await new Promise(r => setTimeout(r, 300 + Math.random() * 200));
+  const match = path.match(route.pattern)!;
+  const result = route.handler(config, match);
+  if (result.status >= 400) throw { status: result.status, data: result.data };
+  return result.data as T;
+}
+
 async function request<T>(method: Method, path: string, config?: RequestConfig): Promise<T> {
   const url = buildUrl(path, config?.params);
 
@@ -29,7 +46,11 @@ async function request<T>(method: Method, path: string, config?: RequestConfig):
     'Content-Type': 'application/json',
   };
 
-  // TODO: Attach JWT token from secure storage (AsyncStorage / SecureStore)
+  const token = await AsyncStorage.getItem('auth_token');
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  const userId = await AsyncStorage.getItem('user_id');
+  if (userId) headers['X-User-Id'] = userId;
 
   const fetchOptions: RequestInit = {
     method,
@@ -40,18 +61,31 @@ async function request<T>(method: Method, path: string, config?: RequestConfig):
     fetchOptions.body = JSON.stringify(config.body);
   }
 
-  const response = await fetch(url, fetchOptions);
+  try {
+    const response = await fetch(url, fetchOptions);
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ message: response.statusText }));
-    throw { status: response.status, data: errorData, ...errorData };
+    if (response.status === 501) {
+      return tryMockFallback(method, path, config);
+    }
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: response.statusText }));
+      throw { status: response.status, data: errorData, ...errorData };
+    }
+
+    if (response.status === 204) {
+      return undefined as T;
+    }
+
+    return response.json();
+  } catch (error: unknown) {
+    // If it's already an API error (has status), re-throw
+    if (error && typeof error === 'object' && 'status' in error) {
+      throw error;
+    }
+    // Network error — try mock fallback
+    return tryMockFallback(method, path, config);
   }
-
-  if (response.status === 204) {
-    return undefined as T;
-  }
-
-  return response.json();
 }
 
 export const httpClient = {

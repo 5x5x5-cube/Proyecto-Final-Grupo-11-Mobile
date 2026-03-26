@@ -13,6 +13,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RootStackParamList } from '../navigation/types';
 import { palette } from '../theme/palette';
 import { useLogin } from '../api/hooks/useAuth';
@@ -61,7 +62,17 @@ export default function LoginScreen() {
 
     login.mutate(
       { email: email.trim(), password },
-      { onSuccess: () => navigation.navigate('MainTabs') }
+      {
+        onSuccess: async (data: any) => {
+          if (data?.token) {
+            await AsyncStorage.setItem('auth_token', data.token);
+          }
+          if (data?.user?.id) {
+            await AsyncStorage.setItem('user_id', String(data.user.id));
+          }
+          navigation.navigate('MainTabs');
+        },
+      }
     );
   }
 

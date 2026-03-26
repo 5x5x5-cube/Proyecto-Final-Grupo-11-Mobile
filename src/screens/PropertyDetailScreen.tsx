@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView, Pressable, FlatList, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -7,16 +7,33 @@ import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-naviga
 import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '../navigation/types';
 import { useHotelDetail } from '../api/hooks/useSearch';
+import { useSetCart } from '../api/hooks/useCart';
 import { useLocale } from '../contexts/LocaleContext';
+import { saveCartSelection } from '../storage/cartStorage';
 import { palette } from '../theme/palette';
 import AmenityTag from '../components/AmenityTag';
 import ActionBar from '../components/ActionBar';
 import PropertyDetailScreenSkeleton from './PropertyDetailScreen.skeleton';
 
 const rooms = [
-  { name: 'Superior', beds: '1 cama king', price: 480000 },
-  { name: 'Doble', beds: '2 camas dobles', price: 520000 },
-  { name: 'Suite Junior', beds: '1 cama king + sala', price: 720000 },
+  {
+    id: 'b1000000-0000-0000-0000-000000000001',
+    name: 'Superior',
+    beds: '1 cama king',
+    price: 480000,
+  },
+  {
+    id: 'b1000000-0000-0000-0000-000000000002',
+    name: 'Doble',
+    beds: '2 camas dobles',
+    price: 520000,
+  },
+  {
+    id: 'b1000000-0000-0000-0000-000000000003',
+    name: 'Suite Junior',
+    beds: '1 cama king + sala',
+    price: 720000,
+  },
 ];
 
 const reviews = [
@@ -48,6 +65,8 @@ export default function PropertyDetailScreen() {
 
   const { data: hotelData, isLoading } = useHotelDetail(route.params.id ?? 1);
   const hotel = (hotelData as any) ?? null;
+  const setCart = useSetCart();
+  const [selectedRoomIndex, setSelectedRoomIndex] = useState(0);
 
   if (isLoading || !hotel) {
     return (
@@ -57,6 +76,33 @@ export default function PropertyDetailScreen() {
         </ScrollView>
       </View>
     );
+  }
+
+  const selectedRoom = rooms[selectedRoomIndex];
+  // TODO: resolve hotel UUID from route.params.id via API once search service returns UUIDs
+  const hotelId = 'a1000000-0000-0000-0000-000000000001';
+
+  async function handleReserve() {
+    const selection = {
+      roomId: selectedRoom.id,
+      hotelId,
+      checkIn: '2026-03-20',
+      checkOut: '2026-03-25',
+      guests: 2,
+    };
+
+    // Optimistic: save locally and navigate immediately without waiting for the server
+    await saveCartSelection(selection);
+    navigation.navigate('ReservationSummary', {
+      hotelId,
+      roomId: selectedRoom.id,
+      checkIn: '2026-03-20',
+      checkOut: '2026-03-25',
+      guests: 2,
+    });
+
+    // Background sync — result is handled in ReservationSummaryScreen
+    setCart.mutate(selection);
   }
 
   return (
@@ -110,21 +156,28 @@ export default function PropertyDetailScreen() {
 
           {/* Rooms */}
           <Text style={styles.sectionTitle}>{t('propertyDetail.availableRooms')}</Text>
-          {rooms.map((room, index) => (
-            <View key={index} style={styles.roomCard}>
-              <LinearGradient
-                colors={hotel.gradient as unknown as [string, string]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.roomGradient}
-              />
-              <View style={styles.roomInfo}>
-                <Text style={styles.roomName}>{room.name}</Text>
-                <Text style={styles.roomBeds}>{room.beds}</Text>
-              </View>
-              <Text style={styles.roomPrice}>{formatPrice(room.price)}</Text>
-            </View>
-          ))}
+          {rooms.map((room, index) => {
+            const isSelected = index === selectedRoomIndex;
+            return (
+              <Pressable
+                key={index}
+                style={[styles.roomCard, isSelected && styles.roomCardSelected]}
+                onPress={() => setSelectedRoomIndex(index)}
+              >
+                <LinearGradient
+                  colors={hotel.gradient as unknown as [string, string]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.roomGradient}
+                />
+                <View style={styles.roomInfo}>
+                  <Text style={styles.roomName}>{room.name}</Text>
+                  <Text style={styles.roomBeds}>{room.beds}</Text>
+                </View>
+                <Text style={styles.roomPrice}>{formatPrice(room.price)}</Text>
+              </Pressable>
+            );
+          })}
 
           {/* Reviews */}
           <Text style={styles.sectionTitle}>{t('propertyDetail.guestReviews')}</Text>
@@ -161,13 +214,10 @@ export default function PropertyDetailScreen() {
       <ActionBar>
         <View style={styles.actionBarContent}>
           <View>
-            <Text style={styles.actionPrice}>{formatPrice(hotel.pricePerNight)}</Text>
+            <Text style={styles.actionPrice}>{formatPrice(selectedRoom.price)}</Text>
             <Text style={styles.actionPriceLabel}>{t('propertyDetail.perNight')}</Text>
           </View>
-          <Pressable
-            style={styles.reserveButton}
-            onPress={() => navigation.navigate('ReservationSummary')}
-          >
+          <Pressable style={styles.reserveButton} onPress={handleReserve}>
             <Text style={styles.reserveButtonText}>{t('propertyDetail.bookNow')}</Text>
           </Pressable>
         </View>
@@ -295,6 +345,11 @@ const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 10,
   },
+  roomCardSelected: {
+    borderColor: palette.primary,
+    borderWidth: 2,
+    backgroundColor: palette.primaryContainer,
+  },
   roomGradient: {
     width: 56,
     height: 56,
@@ -391,6 +446,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 24,
     paddingVertical: 12,
+    minWidth: 140,
+    alignItems: 'center',
   },
   reserveButtonText: {
     fontSize: 14,
