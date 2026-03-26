@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   StyleSheet,
   ScrollView,
   Text,
@@ -13,12 +14,13 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '../navigation/types';
-import { useHotelDetail } from '../api/hooks/useSearch';
+import { useCart } from '../api/hooks/useCart';
 import { useInitiatePayment } from '../api/hooks/usePayments';
 import { useLocale } from '../contexts/LocaleContext';
 import { palette } from '../theme/palette';
 import TopBar from '../components/TopBar';
 import ActionBar from '../components/ActionBar';
+import HoldCountdown from '../components/checkout/HoldCountdown';
 
 type PaymentMethod = 'credit' | 'debit' | 'wallet' | 'transfer';
 
@@ -62,14 +64,27 @@ export default function PaymentScreen() {
   const expiryRef = useRef<TextInput>(null);
   const cvvRef = useRef<TextInput>(null);
 
-  const { data: hotelData } = useHotelDetail(1);
+  const { data: cart, isLoading: isCartLoading } = useCart();
   const initiatePayment = useInitiatePayment();
-  const hotel = (hotelData as any) ?? { name: '', pricePerNight: 480000 };
-  const nights = 5;
-  const nightsTotal = hotel.pricePerNight * nights;
-  const taxes = Math.round(nightsTotal * 0.19);
-  const total = nightsTotal + taxes;
   const loading = initiatePayment.isPending;
+
+  const handleExpired = () => {
+    Alert.alert(t('summary.holdExpired'), t('summary.holdExpiredMessage'), [
+      { text: t('common.ok'), onPress: () => navigation.navigate('MainTabs') },
+    ]);
+  };
+
+  if (isCartLoading || !cart) {
+    return (
+      <View style={styles.container}>
+        <TopBar title={t('payment.title')} onBack={() => navigation.goBack()} />
+        <ActivityIndicator style={{ marginTop: 32 }} color={palette.primary} />
+      </View>
+    );
+  }
+
+  const { hotelName, checkIn, checkOut, priceBreakdown } = cart;
+  const total = priceBreakdown?.total ?? 0;
 
   const showCardForm = selected === 'credit' || selected === 'debit';
 
@@ -107,13 +122,25 @@ export default function PaymentScreen() {
     if (isPayDisabled) return;
     initiatePayment.mutate(
       { cardNumber, cardHolder, expiry, cvv, method: selected, total },
-      { onSuccess: () => navigation.navigate('Success') }
+      {
+        onSuccess: data =>
+          navigation.navigate('Success', {
+            bookingCode: data?.bookingCode ?? 'TH-2026-00000',
+            hotelName,
+            checkIn,
+            checkOut,
+          }),
+      }
     );
   }
 
   return (
     <View style={styles.container}>
       <TopBar title={t('payment.title')} onBack={() => navigation.goBack()} />
+
+      {cart?.holdExpiresAt && (
+        <HoldCountdown expiresAt={cart.holdExpiresAt} onExpired={handleExpired} />
+      )}
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         <Text style={styles.methodLabel}>{t('payment.selectMethod')}</Text>
@@ -227,12 +254,11 @@ export default function PaymentScreen() {
 
         {/* Mini summary */}
         <View style={styles.summaryCard}>
-          <Text style={styles.summaryTitle}>{hotel.name}</Text>
+          <Text style={styles.summaryTitle}>{hotelName}</Text>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>{t('success.dates')}</Text>
             <Text style={styles.summaryValue}>
-              {formatDate(new Date('2026-03-20'), 'short')} -{' '}
-              {formatDate(new Date('2026-03-25'), 'short')}
+              {formatDate(new Date(checkIn), 'short')} - {formatDate(new Date(checkOut), 'short')}
             </Text>
           </View>
           <View style={styles.summaryDivider} />
@@ -341,11 +367,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto_400Regular',
     color: palette.onSurface,
     padding: 0,
-  },
-  fieldValue: {
-    fontSize: 14,
-    fontFamily: 'Roboto_400Regular',
-    color: palette.onSurface,
   },
   fieldDivider: {
     height: 1,

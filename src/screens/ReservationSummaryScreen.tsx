@@ -1,130 +1,125 @@
-import React from 'react';
-import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
+import { View, ScrollView, Pressable, Alert, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '../navigation/types';
-import { useHotelDetail } from '../api/hooks/useSearch';
+import { useCart } from '../api/hooks/useCart';
 import { useLocale } from '../contexts/LocaleContext';
+import { getCartSelection, CartSelection } from '../storage/cartStorage';
 import { palette } from '../theme/palette';
+import Text from '../components/Text';
 import TopBar from '../components/TopBar';
 import ActionBar from '../components/ActionBar';
-import InfoGrid from '../components/InfoGrid';
 import PriceBreakdown from '../components/PriceBreakdown';
+import HotelSummaryCard from '../components/checkout/HotelSummaryCard';
+import BookingInfoGrid from '../components/checkout/BookingInfoGrid';
+import CancellationPolicyCard from '../components/checkout/CancellationPolicyCard';
+import HoldCountdown from '../components/checkout/HoldCountdown';
 import ReservationSummaryScreenSkeleton from './ReservationSummaryScreen.skeleton';
 
 export default function ReservationSummaryScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { t } = useTranslation('mobile');
-  const { formatPrice, formatDate } = useLocale();
-  const { data: hotelData, isLoading } = useHotelDetail(1);
+  const { formatPrice } = useLocale();
 
-  const checkIn = new Date('2026-03-20');
-  const checkOut = new Date('2026-03-25');
-  const nights = 5;
+  const [localSelection, setLocalSelection] = useState<CartSelection | null>(null);
+  const { data: cart, isLoading, isError } = useCart();
+
+  // Load local selection from AsyncStorage on mount for immediate display
+  useEffect(() => {
+    getCartSelection().then(setLocalSelection);
+  }, []);
+
+  const handleExpired = () => {
+    Alert.alert(t('summary.holdExpired'), t('summary.holdExpiredMessage'), [
+      { text: t('common.ok'), onPress: () => navigation.navigate('MainTabs') },
+    ]);
+  };
+
+  // If server sync failed after retries, alert and go back so the user can retry
+  useEffect(() => {
+    if (isError) {
+      Alert.alert(t('summary.syncError'), t('summary.syncErrorMessage'), [
+        { text: t('common.ok'), onPress: () => navigation.goBack() },
+      ]);
+    }
+  }, [isError, navigation, t]);
+
+  // Nothing to show yet — wait for at least local data to be read
+  if (!localSelection && isLoading) {
+    return (
+      <View style={styles.container}>
+        <TopBar title={t('summary.title')} onBack={() => navigation.goBack()} />
+        <ScrollView style={styles.scroll}>
+          <ReservationSummaryScreenSkeleton />
+        </ScrollView>
+      </View>
+    );
+  }
+
+  // Prefer full server cart; fall back to local selection for basic info
+  const hasServerCart = !isLoading && cart != null;
 
   return (
     <View style={styles.container}>
       <TopBar title={t('summary.title')} onBack={() => navigation.goBack()} />
 
-      {isLoading || !hotelData ? (
-        <ScrollView style={styles.scroll}>
-          <ReservationSummaryScreenSkeleton />
-        </ScrollView>
-      ) : (
-        <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-          {(() => {
-            const hotel = hotelData as any;
-            const nightsTotal = hotel.pricePerNight * nights;
-            const taxes = Math.round(nightsTotal * 0.19);
-            const total = nightsTotal + taxes;
-            return (
-              <>
-                {/* Hotel card */}
-                <View style={styles.card}>
-                  <View style={styles.hotelRow}>
-                    <LinearGradient
-                      colors={hotel.gradient as unknown as [string, string]}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 1 }}
-                      style={styles.hotelGradient}
-                    />
-                    <View style={styles.hotelInfo}>
-                      <Text style={styles.hotelName}>{hotel.name}</Text>
-                      <Text style={styles.hotelLocation}>{hotel.location}</Text>
-                      <Text style={styles.hotelRoom}>{t('summary.roomInfo')}</Text>
-                    </View>
-                  </View>
-                </View>
+      {/* HoldCountdown only available once server cart is loaded (holdExpiresAt comes from server) */}
+      {hasServerCart && <HoldCountdown expiresAt={cart.holdExpiresAt} onExpired={handleExpired} />}
 
-                {/* Info Grid */}
-                <View style={styles.card}>
-                  <InfoGrid
-                    items={[
-                      {
-                        label: t('summary.checkIn'),
-                        value: formatDate(checkIn, 'shortWithDay'),
-                        sub: '3:00 PM',
-                      },
-                      {
-                        label: t('summary.checkOut'),
-                        value: formatDate(checkOut, 'shortWithDay'),
-                        sub: '12:00 PM',
-                      },
-                      {
-                        label: t('summary.duration'),
-                        value: t('summary.nights', { count: nights }),
-                      },
-                      {
-                        label: t('summary.guests'),
-                        value: t('summary.guestsValue', { count: 2 }),
-                      },
-                    ]}
-                  />
-                </View>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+        {hasServerCart && (
+          <HotelSummaryCard
+            hotelName={cart.hotelName}
+            location={cart.location}
+            roomName={cart.roomName}
+          />
+        )}
 
-                {/* Price Breakdown */}
-                <View style={styles.card}>
-                  <Text style={styles.priceTitle}>{t('summary.priceDetail')}</Text>
-                  <PriceBreakdown
-                    rows={[
-                      {
-                        label: t('summary.nightsBreakdown', {
-                          count: nights,
-                          price: formatPrice(hotel.pricePerNight),
-                        }),
-                        value: formatPrice(nightsTotal),
-                      },
-                      { label: t('summary.taxes', { percent: 19 }), value: formatPrice(taxes) },
-                    ]}
-                    totalLabel={t('summary.total')}
-                    totalValue={formatPrice(total)}
-                  />
-                </View>
+        <BookingInfoGrid
+          checkIn={cart?.checkIn ?? localSelection?.checkIn ?? ''}
+          checkOut={cart?.checkOut ?? localSelection?.checkOut ?? ''}
+          nights={cart?.priceBreakdown?.nights ?? 0}
+          guests={cart?.guests ?? localSelection?.guests ?? 0}
+        />
 
-                {/* Cancellation policy */}
-                <View style={styles.cancellationCard}>
-                  <View style={styles.cancellationHeader}>
-                    <MaterialCommunityIcons name="shield-check" size={18} color={palette.success} />
-                    <Text style={styles.cancellationTitle}>{t('summary.freeCancellation')}</Text>
-                  </View>
-                  <Text style={styles.cancellationText}>{t('summary.cancellationPolicy')}</Text>
-                </View>
-              </>
-            );
-          })()}
-        </ScrollView>
-      )}
+        {/* Price Breakdown — only when we have the full server cart */}
+        {hasServerCart && (
+          <View style={styles.card}>
+            <Text variant="button" color={palette.onSurface} style={styles.priceTitle}>
+              {t('summary.priceDetail')}
+            </Text>
+            <PriceBreakdown
+              rows={[
+                {
+                  label: t('summary.nightsBreakdown', {
+                    count: cart.priceBreakdown.nights,
+                    price: formatPrice(cart.priceBreakdown.pricePerNight),
+                  }),
+                  value: formatPrice(cart.priceBreakdown.subtotal),
+                },
+                {
+                  label: t('summary.taxes', { percent: 19 }),
+                  value: formatPrice(cart.priceBreakdown.vat),
+                },
+              ]}
+              totalLabel={t('summary.total')}
+              totalValue={formatPrice(cart.priceBreakdown.total)}
+            />
+          </View>
+        )}
 
-      {!isLoading && !!hotelData && (
-        <ActionBar>
-          <Pressable style={styles.continueButton} onPress={() => navigation.navigate('Payment')}>
-            <Text style={styles.continueButtonText}>{t('summary.continueToPayment')}</Text>
-          </Pressable>
-        </ActionBar>
-      )}
+        <CancellationPolicyCard />
+      </ScrollView>
+
+      <ActionBar>
+        <Pressable style={styles.continueButton} onPress={() => navigation.navigate('Payment')}>
+          <Text variant="button" color={palette.onPrimary}>
+            {t('summary.continueToPayment')}
+          </Text>
+        </Pressable>
+      </ActionBar>
     </View>
   );
 }
@@ -143,85 +138,20 @@ const styles = StyleSheet.create({
     paddingBottom: 90,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: palette.surface,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: palette.outlineVariant,
     padding: 16,
     marginBottom: 12,
   },
-  hotelRow: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  hotelGradient: {
-    width: 64,
-    height: 64,
-    borderRadius: 10,
-  },
-  hotelInfo: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  hotelName: {
-    fontSize: 15,
-    fontFamily: 'Roboto_700Bold',
-    fontWeight: 'bold',
-    color: palette.onSurface,
-    marginBottom: 2,
-  },
-  hotelLocation: {
-    fontSize: 12,
-    fontFamily: 'Roboto_400Regular',
-    color: palette.onSurfaceVariant,
-    marginBottom: 2,
-  },
-  hotelRoom: {
-    fontSize: 12,
-    fontFamily: 'Roboto_500Medium',
-    color: palette.primary,
-  },
   priceTitle: {
-    fontSize: 15,
-    fontFamily: 'Roboto_500Medium',
-    fontWeight: '600',
-    color: palette.onSurface,
     marginBottom: 12,
-  },
-  cancellationCard: {
-    backgroundColor: palette.successContainer,
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-  },
-  cancellationHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
-  },
-  cancellationTitle: {
-    fontSize: 14,
-    fontFamily: 'Roboto_500Medium',
-    fontWeight: '600',
-    color: palette.success,
-  },
-  cancellationText: {
-    fontSize: 13,
-    fontFamily: 'Roboto_400Regular',
-    color: palette.success,
-    lineHeight: 19,
   },
   continueButton: {
     backgroundColor: palette.primary,
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
-  },
-  continueButtonText: {
-    fontSize: 15,
-    fontFamily: 'Roboto_500Medium',
-    fontWeight: '600',
-    color: '#fff',
   },
 });

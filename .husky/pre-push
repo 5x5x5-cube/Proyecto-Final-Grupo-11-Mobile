@@ -1,1 +1,5 @@
-yarn jest --passWithNoTests --changedSince=HEAD~1
+#!/bin/sh
+
+# Run tests related to all files changed in the branch (compared to develop)
+BASE_BRANCH=$(git merge-base HEAD origin/develop 2>/dev/null || git merge-base HEAD origin/main 2>/dev/null || echo "HEAD~1")
+yarn jest --passWithNoTests --forceExit --changedSince="$BASE_BRANCH"

@@ -138,6 +138,93 @@ export const mockHandlers: MockRoute[] = [
   {
     method: 'POST',
     pattern: /^\/payments\/initiate$/,
-    handler: () => ok({ paymentId: 'pay-001', status: 'approved' }),
+    handler: () =>
+      ok({
+        paymentId: 'pay-001',
+        status: 'approved',
+        bookingCode: 'TH-2026-48291',
+      }),
+  },
+
+  // ─── Cart ───
+  {
+    method: 'PUT',
+    pattern: /^\/cart$/,
+    handler: config => {
+      const body = config?.body as any;
+      const hotel = mockHotels[0];
+      const nights = 5;
+      return ok({
+        id: 'cart-mock-001',
+        userId: 'c1000000-0000-0000-0000-000000000001',
+        roomId: body?.roomId || 'b1000000-0000-0000-0000-000000000001',
+        hotelId: body?.hotelId || 'a1000000-0000-0000-0000-000000000001',
+        hotelName: hotel.name,
+        roomName: 'Habitación Superior',
+        roomType: 'Superior',
+        roomFeatures: '1 cama King · Vista al jardín · 32 m²',
+        location: hotel.location,
+        rating: hotel.rating,
+        reviewCount: hotel.reviewCount,
+        checkIn: body?.checkIn || '2026-03-20',
+        checkOut: body?.checkOut || '2026-03-25',
+        guests: body?.guests || 2,
+        holdId: 'hold-mock-001',
+        holdExpiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+        priceBreakdown: {
+          pricePerNight: hotel.pricePerNight,
+          nights,
+          subtotal: hotel.pricePerNight * nights,
+          vat: Math.round(hotel.pricePerNight * nights * 0.19),
+          tourismTax: 0,
+          serviceFee: 0,
+          total: Math.round(hotel.pricePerNight * nights * 1.19),
+          currency: 'COP',
+        },
+        createdAt: new Date().toISOString(),
+      });
+    },
+  },
+  {
+    method: 'GET',
+    pattern: /^\/cart$/,
+    handler: () => {
+      const hotel = mockHotels[0];
+      const nights = 5;
+      return ok({
+        id: 'cart-mock-001',
+        userId: 'c1000000-0000-0000-0000-000000000001',
+        roomId: 'b1000000-0000-0000-0000-000000000001',
+        hotelId: 'a1000000-0000-0000-0000-000000000001',
+        hotelName: hotel.name,
+        roomName: 'Habitación Superior',
+        roomType: 'Superior',
+        roomFeatures: '1 cama King · Vista al jardín · 32 m²',
+        location: hotel.location,
+        rating: hotel.rating,
+        reviewCount: hotel.reviewCount,
+        checkIn: '2026-03-20',
+        checkOut: '2026-03-25',
+        guests: 2,
+        holdId: 'hold-mock-001',
+        holdExpiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+        priceBreakdown: {
+          pricePerNight: hotel.pricePerNight,
+          nights,
+          subtotal: hotel.pricePerNight * nights,
+          vat: Math.round(hotel.pricePerNight * nights * 0.19),
+          tourismTax: 0,
+          serviceFee: 0,
+          total: Math.round(hotel.pricePerNight * nights * 1.19),
+          currency: 'COP',
+        },
+        createdAt: new Date().toISOString(),
+      });
+    },
+  },
+  {
+    method: 'DELETE',
+    pattern: /^\/cart$/,
+    handler: () => ({ status: 204, data: undefined }),
   },
 ];
