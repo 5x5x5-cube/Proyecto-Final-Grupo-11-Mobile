@@ -1,11 +1,7 @@
 import type { RequestConfig } from './httpClient';
-import { mockDestinations } from '../data/mockDestinations';
-import { mockHotels } from '../data/mockHotels';
-import {
-  mockReservations,
-  pastReservations,
-  cancelledReservations,
-} from '../data/mockReservations';
+import { mockDestinations } from '@/data/mockDestinations';
+import { mockHotels } from '@/data/mockHotels';
+import { mockReservations, pastReservations, cancelledReservations } from '@/data/mockReservations';
 
 type Handler = (
   config: RequestConfig | undefined,

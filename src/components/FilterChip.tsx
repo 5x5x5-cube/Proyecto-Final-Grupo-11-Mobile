@@ -1,6 +1,7 @@
 import React from 'react';
-import { Text, Pressable, StyleSheet } from 'react-native';
-import { palette } from '../theme/palette';
+import { Pressable, StyleSheet } from 'react-native';
+import { palette } from '@/theme/palette';
+import Text from './Text';
 
 interface FilterChipProps {
   label: string;
@@ -11,7 +12,12 @@ interface FilterChipProps {
 export default function FilterChip({ label, selected = false, onPress }: FilterChipProps) {
   return (
     <Pressable onPress={onPress} style={[styles.container, selected && styles.selected]}>
-      <Text style={[styles.text, selected && styles.textSelected]}>{label}</Text>
+      <Text
+        variant={selected ? 'label' : 'bodySmall'}
+        color={selected ? palette.onPrimaryContainer : palette.onSurfaceVariant}
+      >
+        {label}
+      </Text>
     </Pressable>
   );
 }
@@ -27,15 +33,5 @@ const styles = StyleSheet.create({
   selected: {
     borderColor: palette.primaryContainer,
     backgroundColor: palette.primaryContainer,
-  },
-  text: {
-    fontSize: 13,
-    fontFamily: 'Roboto_400Regular',
-    color: palette.onSurfaceVariant,
-  },
-  textSelected: {
-    fontFamily: 'Roboto_500Medium',
-    fontWeight: '600',
-    color: palette.onPrimaryContainer,
   },
 });

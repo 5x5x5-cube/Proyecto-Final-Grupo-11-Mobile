@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text as RNText, TextProps as RNTextProps } from 'react-native';
-import { typography } from '../theme/typography';
-import { palette } from '../theme/palette';
+import { typography } from '@/theme/typography';
+import { palette } from '@/theme/palette';
 
 type Variant = keyof typeof typography;
 

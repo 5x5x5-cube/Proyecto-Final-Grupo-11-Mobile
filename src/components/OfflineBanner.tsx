@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { palette } from '../theme/palette';
+import { palette } from '@/theme/palette';
+import Text from './Text';
 
 export default function OfflineBanner() {
   const { t } = useTranslation('common');
@@ -10,7 +11,9 @@ export default function OfflineBanner() {
   return (
     <View style={styles.container}>
       <MaterialCommunityIcons name="wifi-off" size={16} color={palette.warning} />
-      <Text style={styles.text}>{t('offline.banner')}</Text>
+      <Text variant="label" color={palette.warning}>
+        {t('offline.banner')}
+      </Text>
     </View>
   );
 }
@@ -23,10 +26,5 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingHorizontal: 16,
     paddingVertical: 8,
-  },
-  text: {
-    fontSize: 12,
-    fontFamily: 'Roboto_500Medium',
-    color: palette.warning,
   },
 });

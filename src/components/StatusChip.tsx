@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { palette } from '../theme/palette';
+import { palette } from '@/theme/palette';
+import Text from './Text';
 
 type Status = 'confirmed' | 'pending' | 'cancelled' | 'past';
 
@@ -26,9 +27,15 @@ export default function StatusChip({ status, label }: StatusChipProps) {
   return (
     <View style={[styles.container, { backgroundColor: config.bg }]}>
       {config.icon && (
-        <MaterialCommunityIcons name={config.icon as any} size={14} color={config.color} />
+        <MaterialCommunityIcons
+          name={config.icon as 'check-circle'}
+          size={14}
+          color={config.color}
+        />
       )}
-      <Text style={[styles.text, { color: config.color }]}>{displayLabel}</Text>
+      <Text variant="label" color={config.color}>
+        {displayLabel}
+      </Text>
     </View>
   );
 }
@@ -41,10 +48,5 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 12,
     borderRadius: 100,
-  },
-  text: {
-    fontSize: 12,
-    fontFamily: 'Roboto_500Medium',
-    fontWeight: '600',
   },
 });

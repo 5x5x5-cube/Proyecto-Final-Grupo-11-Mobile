@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { useLocale } from '../contexts/LocaleContext';
-import type { Language } from '../contexts/LocaleContext';
-import { palette } from '../theme/palette';
+import { View, Pressable, StyleSheet } from 'react-native';
+import { useLocale } from '@/contexts/LocaleContext';
+import type { Language } from '@/contexts/LocaleContext';
+import { palette } from '@/theme/palette';
+import Text from './Text';
 
 const languages: Language[] = ['ES', 'EN'];
 
@@ -19,7 +20,9 @@ export default function LanguagePill() {
             onPress={() => setLanguage(lang)}
             style={[styles.pill, isActive && styles.pillActive]}
           >
-            <Text style={[styles.text, isActive && styles.textActive]}>{lang}</Text>
+            <Text variant="label" color={isActive ? palette.onPrimary : palette.onSurfaceVariant}>
+              {lang}
+            </Text>
           </Pressable>
         );
       })}
@@ -41,13 +44,5 @@ const styles = StyleSheet.create({
   },
   pillActive: {
     backgroundColor: palette.primary,
-  },
-  text: {
-    fontSize: 12,
-    fontFamily: 'Roboto_500Medium',
-    color: palette.onSurfaceVariant,
-  },
-  textActive: {
-    color: palette.onPrimary,
   },
 });

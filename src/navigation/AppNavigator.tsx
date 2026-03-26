@@ -2,16 +2,16 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootStackParamList } from './types';
 import MainTabs from './MainTabs';
-import LoginScreen from '../screens/LoginScreen';
-import RegisterScreen from '../screens/RegisterScreen';
-import ResultsScreen from '../screens/ResultsScreen';
-import PropertyDetailScreen from '../screens/PropertyDetailScreen';
-import ReservationSummaryScreen from '../screens/ReservationSummaryScreen';
-import PaymentScreen from '../screens/PaymentScreen';
-import SuccessScreen from '../screens/SuccessScreen';
-import ReservationDetailScreen from '../screens/ReservationDetailScreen';
-import CancelReservationScreen from '../screens/CancelReservationScreen';
-import QRCheckInScreen from '../screens/QRCheckInScreen';
+import LoginScreen from '@/screens/LoginScreen';
+import RegisterScreen from '@/screens/RegisterScreen';
+import ResultsScreen from '@/screens/ResultsScreen';
+import PropertyDetailScreen from '@/screens/PropertyDetailScreen';
+import ReservationSummaryScreen from '@/screens/ReservationSummaryScreen';
+import PaymentScreen from '@/screens/PaymentScreen';
+import SuccessScreen from '@/screens/SuccessScreen';
+import ReservationDetailScreen from '@/screens/ReservationDetailScreen';
+import CancelReservationScreen from '@/screens/CancelReservationScreen';
+import QRCheckInScreen from '@/screens/QRCheckInScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
