@@ -242,4 +242,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   actionPrice: {},
+  scrollSpacer: {
+    height: 100,
+  },
 });

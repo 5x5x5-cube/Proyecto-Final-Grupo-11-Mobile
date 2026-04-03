@@ -20,7 +20,7 @@ jest.mock('@react-navigation/native', () => ({
 }));
 
 jest.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string, opts?: Record<string, unknown>) => key }),
+  useTranslation: () => ({ t: (key: string, _opts?: Record<string, unknown>) => key }),
 }));
 
 jest.mock('../../i18n', () => ({
@@ -46,7 +46,7 @@ jest.mock('expo-linear-gradient', () => {
 });
 
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
+import { render } from '@testing-library/react-native';
 import { LocaleProvider } from '../../contexts/LocaleContext';
 import PropertyDetailScreen from './PropertyDetailScreen';
 
@@ -96,7 +96,6 @@ describe('PropertyDetailScreen', () => {
   });
 
   it('muestra el contenido del hotel cuando los datos están disponibles', () => {
-    jest.resetModules();
     jest
       .spyOn(require('../../api/hooks/useSearch'), 'useHotelDetail')
       .mockReturnValue({ data: mockHotel, isLoading: false });

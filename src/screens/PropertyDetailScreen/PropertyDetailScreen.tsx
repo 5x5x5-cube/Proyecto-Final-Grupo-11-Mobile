@@ -1,9 +1,6 @@
 import React, { useRef, useState } from 'react';
 import {
-  Dimensions,
   FlatList,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
   Pressable,
   ScrollView,
   View,
@@ -26,8 +23,6 @@ import ActionBar from '@/components/ActionBar';
 import PrimaryButton from '@/components/PrimaryButton';
 import PropertyDetailScreenSkeleton from './PropertyDetailScreen.skeleton';
 import { styles } from './PropertyDetailScreen.styles';
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // Habitación con campos que devuelve la API de search-service
 interface ApiRoom {
@@ -84,6 +79,17 @@ export default function PropertyDetailScreen() {
   const [galleryIndex, setGalleryIndex] = useState(0);
   const galleryRef = useRef<FlatList>(null);
 
+  // Callback para actualizar el índice de slide activo en la galería
+  const onViewableItemsChanged = useRef(
+    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
+      if (viewableItems.length > 0) {
+        setGalleryIndex(viewableItems[0].index ?? 0);
+      }
+    },
+  ).current;
+
+  const viewabilityConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
+
   const isLoading = isLoadingHotel || isLoadingRooms;
 
   if (isLoading || !hotel) {
@@ -114,18 +120,8 @@ export default function PropertyDetailScreen() {
   // Determina si el hotel o la habitación ofrece cancelación gratuita
   const hasFreeCancellation =
     hotel.freeCancellation === true ||
-    (selectedRoom?.free_cancellation === true ?? rooms.some(r => r.free_cancellation));
-
-  // Callback para actualizar el índice de slide activo en la galería
-  const onViewableItemsChanged = useRef(
-    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
-      if (viewableItems.length > 0) {
-        setGalleryIndex(viewableItems[0].index ?? 0);
-      }
-    },
-  ).current;
-
-  const viewabilityConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
+    selectedRoom?.free_cancellation === true ||
+    rooms.some(r => r.free_cancellation);
 
   async function handleReserve() {
     if (!selectedRoom) return;
@@ -408,7 +404,7 @@ export default function PropertyDetailScreen() {
           )}
         />
 
-        <View style={{ height: 100 }} />
+        <View style={styles.scrollSpacer} />
       </ScrollView>
 
       {/* ── Barra de acción fija ─────────────────────────────────────── */}
