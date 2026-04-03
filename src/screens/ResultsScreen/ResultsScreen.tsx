@@ -74,7 +74,7 @@ export default function ResultsScreen() {
           renderItem={({ item }) => (
             <Pressable
               style={styles.card}
-              onPress={() => navigation.navigate('PropertyDetail', { id: item.id })}
+              onPress={() => navigation.navigate('PropertyDetail', { id: String(item.id) })}
             >
               <LinearGradient
                 colors={item.gradient as [string, string]}

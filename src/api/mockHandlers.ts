@@ -22,6 +22,8 @@ const hotelDetail = {
   ...mockHotels[0],
   address: 'Calle del Torno #39-29, Centro Histórico, Cartagena',
   description: 'propertyDetail.descriptionText',
+  stars: 5,
+  freeCancellation: true,
   amenities: [
     { icon: 'wifi', label: 'Wi-Fi gratis' },
     { icon: 'pool', label: 'Piscina' },
@@ -33,7 +35,42 @@ const hotelDetail = {
     { icon: 'restaurant', label: 'Restaurante' },
     { icon: 'local_bar', label: 'Bar' },
   ],
+  images: [
+    { gradient: ['#006874', '#4A9FAA'] as const },
+    { gradient: ['#003740', '#006874'] as const },
+    { gradient: ['#004D57', '#00838F'] as const },
+    { gradient: ['#005662', '#0097A7'] as const },
+    { gradient: ['#006874', '#26C6DA'] as const },
+  ],
 };
+
+// Rooms mock data
+const hotelRooms = [
+  {
+    id: 'b1000000-0000-0000-0000-000000000001',
+    room_type: 'Superior',
+    capacity: 2,
+    price_per_night: 480000,
+    amenities: ['WiFi', 'A/C', 'Vista al jardín'],
+    free_cancellation: true,
+  },
+  {
+    id: 'b1000000-0000-0000-0000-000000000002',
+    room_type: 'Doble',
+    capacity: 4,
+    price_per_night: 520000,
+    amenities: ['WiFi', 'A/C', '2 camas dobles'],
+    free_cancellation: true,
+  },
+  {
+    id: 'b1000000-0000-0000-0000-000000000003',
+    room_type: 'Suite Junior',
+    capacity: 2,
+    price_per_night: 720000,
+    amenities: ['WiFi', 'A/C', 'Sala', 'Vista al mar'],
+    free_cancellation: false,
+  },
+];
 
 // Booking detail mock
 const bookingDetail = {
@@ -94,8 +131,13 @@ export const mockHandlers: MockRoute[] = [
   },
   {
     method: 'GET',
-    pattern: /^\/search\/hotels\/(\d+)$/,
+    pattern: /^\/search\/hotels\/([\w-]+)$/,
     handler: () => ok(hotelDetail),
+  },
+  {
+    method: 'GET',
+    pattern: /^\/search\/hotels\/([\w-]+)\/rooms$/,
+    handler: () => ok({ rooms: hotelRooms, total: hotelRooms.length }),
   },
 
   // ─── Bookings ───
