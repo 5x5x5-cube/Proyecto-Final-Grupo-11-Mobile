@@ -90,7 +90,7 @@ describe('PropertyDetailScreen', () => {
     const { toJSON } = render(
       <LocaleProvider>
         <PropertyDetailScreen />
-      </LocaleProvider>,
+      </LocaleProvider>
     );
     expect(toJSON()).toBeTruthy();
   });
@@ -106,7 +106,7 @@ describe('PropertyDetailScreen', () => {
     const { getByText } = render(
       <LocaleProvider>
         <PropertyDetailScreen />
-      </LocaleProvider>,
+      </LocaleProvider>
     );
 
     expect(getByText(mockHotel.name)).toBeTruthy();
@@ -115,12 +115,15 @@ describe('PropertyDetailScreen', () => {
   it('muestra la pantalla sin errores con datos cargados', () => {
     const useSearchMock = require('../../api/hooks/useSearch');
     useSearchMock.useHotelDetail = () => ({ data: mockHotel, isLoading: false });
-    useSearchMock.useHotelRooms = () => ({ data: { rooms: mockRooms, total: 2 }, isLoading: false });
+    useSearchMock.useHotelRooms = () => ({
+      data: { rooms: mockRooms, total: 2 },
+      isLoading: false,
+    });
 
     const { toJSON } = render(
       <LocaleProvider>
         <PropertyDetailScreen />
-      </LocaleProvider>,
+      </LocaleProvider>
     );
     expect(toJSON()).toBeTruthy();
   });
@@ -128,12 +131,15 @@ describe('PropertyDetailScreen', () => {
   it('muestra el botón de reservar', () => {
     const useSearchMock = require('../../api/hooks/useSearch');
     useSearchMock.useHotelDetail = () => ({ data: mockHotel, isLoading: false });
-    useSearchMock.useHotelRooms = () => ({ data: { rooms: mockRooms, total: 2 }, isLoading: false });
+    useSearchMock.useHotelRooms = () => ({
+      data: { rooms: mockRooms, total: 2 },
+      isLoading: false,
+    });
 
     const { getByText } = render(
       <LocaleProvider>
         <PropertyDetailScreen />
-      </LocaleProvider>,
+      </LocaleProvider>
     );
     expect(getByText('propertyDetail.bookNow')).toBeTruthy();
   });

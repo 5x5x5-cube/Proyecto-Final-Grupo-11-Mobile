@@ -1,11 +1,5 @@
 import React, { useRef, useState } from 'react';
-import {
-  FlatList,
-  Pressable,
-  ScrollView,
-  View,
-  ViewToken,
-} from 'react-native';
+import { FlatList, Pressable, ScrollView, View, ViewToken } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -66,7 +60,7 @@ export default function PropertyDetailScreen() {
   // Calcula el número de noches entre check-in y check-out
   const nights =
     Math.round(
-      (new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24),
+      (new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24)
     ) || 5;
 
   const { data: hotelData, isLoading: isLoadingHotel } = useHotelDetail(hotelId);
@@ -80,13 +74,11 @@ export default function PropertyDetailScreen() {
   const galleryRef = useRef<FlatList>(null);
 
   // Callback para actualizar el índice de slide activo en la galería
-  const onViewableItemsChanged = useRef(
-    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
-      if (viewableItems.length > 0) {
-        setGalleryIndex(viewableItems[0].index ?? 0);
-      }
-    },
-  ).current;
+  const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
+    if (viewableItems.length > 0) {
+      setGalleryIndex(viewableItems[0].index ?? 0);
+    }
+  }).current;
 
   const viewabilityConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
 
@@ -289,7 +281,8 @@ export default function PropertyDetailScreen() {
               >
                 <LinearGradient
                   colors={
-                    (hotel.gradient as [string, string]) ?? GALLERY_GRADIENTS[index % GALLERY_GRADIENTS.length]
+                    (hotel.gradient as [string, string]) ??
+                    GALLERY_GRADIENTS[index % GALLERY_GRADIENTS.length]
                   }
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
@@ -323,9 +316,7 @@ export default function PropertyDetailScreen() {
                     color={isSelected ? palette.onPrimary : palette.primary}
                     style={styles.selectBtnText}
                   >
-                    {isSelected
-                      ? t('propertyDetail.selected')
-                      : t('propertyDetail.selectRoom')}
+                    {isSelected ? t('propertyDetail.selected') : t('propertyDetail.selectRoom')}
                   </Text>
                 </View>
               </Pressable>
