@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Pressable, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { palette } from '../theme/palette';
+import { palette } from '@/theme/palette';
+import Text from './Text';
 
 interface ProfileMenuRowProps {
   icon: React.ReactNode;
@@ -14,8 +15,14 @@ export default function ProfileMenuRow({ icon, label, value, onPress }: ProfileM
   return (
     <Pressable onPress={onPress} style={styles.container} disabled={!onPress}>
       <View style={styles.iconWrap}>{icon}</View>
-      <Text style={styles.label}>{label}</Text>
-      {value && <Text style={styles.value}>{value}</Text>}
+      <Text variant="body" color={palette.onSurface} style={styles.label}>
+        {label}
+      </Text>
+      {value && (
+        <Text variant="bodySmall" color={palette.onSurfaceVariant}>
+          {value}
+        </Text>
+      )}
       <MaterialCommunityIcons name="chevron-right" size={20} color={palette.onSurfaceVariant} />
     </Pressable>
   );
@@ -33,14 +40,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   label: {
-    fontSize: 14,
-    fontFamily: 'Roboto_400Regular',
-    color: palette.onSurface,
     flex: 1,
-  },
-  value: {
-    fontSize: 13,
-    fontFamily: 'Roboto_400Regular',
-    color: palette.onSurfaceVariant,
   },
 });

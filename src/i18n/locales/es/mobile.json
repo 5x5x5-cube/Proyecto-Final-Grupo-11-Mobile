@@ -1,4 +1,7 @@
 {
+  "common": {
+    "ok": "OK"
+  },
   "login": {
     "subtitle": "Inicia sesion para gestionar tus reservas",
     "title": "Iniciar sesion",
@@ -50,11 +53,21 @@
   },
   "propertyDetail": {
     "photos": "+{{count}} fotos",
+    "slideOf": "{{current}} / {{total}}",
     "reviews": "{{count}} resenas",
     "description": "Disfrute de una estadia inolvidable en uno de los hoteles mas iconicos de Cartagena. Ubicado en el corazon del centro historico, ofrece una combinacion perfecta de historia, lujo y comodidad moderna.",
     "includedServices": "Servicios incluidos",
     "availableRooms": "Habitaciones disponibles",
     "perNight": "/noche",
+    "capacity": "{{count}} personas",
+    "selectRoom": "Seleccionar",
+    "selected": "Seleccionada",
+    "freeCancellation": "Cancelacion gratuita",
+    "freeCancellationDetail": "Sin cargo hasta 48h antes del check-in",
+    "priceBreakdown": "Desglose del precio",
+    "nightsBreakdown": "{{count}} noches x {{price}}",
+    "taxes": "Impuestos y tasas (19%)",
+    "totalEstimated": "Total estimado",
     "guestReviews": "Resenas de huespedes",
     "bookNow": "Reservar ahora",
     "rooms": {
@@ -65,6 +78,7 @@
       "bedDouble": "2 camas dobles",
       "bedKingSuite": "1 cama King + sala"
     },
+    "roomUnavailable": "Esta habitacion ya no esta disponible. Selecciona otra opcion.",
     "reviewTexts": {
       "review1": "Excelente ubicacion y servicio. Volveria sin dudarlo.",
       "review2": "Muy buen hotel, desayuno variado. La piscina es hermosa.",
@@ -75,7 +89,9 @@
     "title": "Resumen de reserva",
     "roomInfo": "Habitacion Superior · 1 cama King",
     "checkIn": "Check-in",
+    "checkInTime": "3:00 PM",
     "checkOut": "Check-out",
+    "checkOutTime": "12:00 PM",
     "duration": "Duracion",
     "nights": "{{count}} noches",
     "guests": "Huespedes",
@@ -86,7 +102,12 @@
     "total": "Total",
     "freeCancellation": "Cancelacion gratuita",
     "cancellationPolicy": "Cancelacion gratuita hasta 48 horas antes del check-in. Despues se cobra el 50% de la primera noche.",
-    "continueToPayment": "Continuar al pago"
+    "continueToPayment": "Continuar al pago",
+    "holdCountdown": "Tu habitacion esta reservada por {{time}}",
+    "holdExpired": "Reserva expirada",
+    "holdExpiredMessage": "El tiempo de reserva ha expirado. Por favor, selecciona nuevamente tu habitacion.",
+    "syncError": "Error de sincronizacion",
+    "syncErrorMessage": "No pudimos confirmar tu reserva con el servidor. Por favor, intentalo de nuevo."
   },
   "payment": {
     "title": "Metodo de pago",

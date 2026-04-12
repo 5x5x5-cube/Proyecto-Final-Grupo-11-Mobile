@@ -1,4 +1,7 @@
 {
+  "common": {
+    "ok": "OK"
+  },
   "login": {
     "subtitle": "Sign in to manage your reservations",
     "title": "Sign in",
@@ -50,11 +53,21 @@
   },
   "propertyDetail": {
     "photos": "+{{count}} photos",
+    "slideOf": "{{current}} / {{total}}",
     "reviews": "{{count}} reviews",
     "description": "Enjoy an unforgettable stay at one of Cartagena's most iconic hotels. Located in the heart of the historic center, it offers a perfect blend of history, luxury, and modern comfort.",
     "includedServices": "Included services",
     "availableRooms": "Available rooms",
     "perNight": "/night",
+    "capacity": "{{count}} persons",
+    "selectRoom": "Select",
+    "selected": "Selected",
+    "freeCancellation": "Free cancellation",
+    "freeCancellationDetail": "No charge up to 48h before check-in",
+    "priceBreakdown": "Price breakdown",
+    "nightsBreakdown": "{{count}} nights x {{price}}",
+    "taxes": "Taxes and fees (19%)",
+    "totalEstimated": "Estimated total",
     "guestReviews": "Guest reviews",
     "bookNow": "Book now",
     "rooms": {
@@ -65,6 +78,7 @@
       "bedDouble": "2 double beds",
       "bedKingSuite": "1 King bed + living room"
     },
+    "roomUnavailable": "This room is no longer available. Please select another option.",
     "reviewTexts": {
       "review1": "Excellent location and service. Would come back without hesitation.",
       "review2": "Very good hotel, varied breakfast. The pool is beautiful.",
@@ -75,7 +89,9 @@
     "title": "Reservation summary",
     "roomInfo": "Superior Room · 1 King bed",
     "checkIn": "Check-in",
+    "checkInTime": "3:00 PM",
     "checkOut": "Check-out",
+    "checkOutTime": "12:00 PM",
     "duration": "Duration",
     "nights": "{{count}} nights",
     "guests": "Guests",
@@ -86,7 +102,12 @@
     "total": "Total",
     "freeCancellation": "Free cancellation",
     "cancellationPolicy": "Free cancellation up to 48 hours before check-in. After that, 50% of the first night is charged.",
-    "continueToPayment": "Continue to payment"
+    "continueToPayment": "Continue to payment",
+    "holdCountdown": "Your room is reserved for {{time}}",
+    "holdExpired": "Reservation expired",
+    "holdExpiredMessage": "The reservation time has expired. Please select your room again.",
+    "syncError": "Sync error",
+    "syncErrorMessage": "We could not confirm your reservation with the server. Please try again."
   },
   "payment": {
     "title": "Payment method",

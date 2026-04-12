@@ -23,9 +23,18 @@ export function useSearchHotels(params?: Record<string, unknown>) {
   });
 }
 
-export function useHotelDetail(hotelId: number) {
+export function useHotelDetail(hotelId: string) {
   return useQuery({
     queryKey: ['hotels', hotelId],
     queryFn: () => httpClient.get(`/search/hotels/${hotelId}`),
+    enabled: !!hotelId,
+  });
+}
+
+export function useHotelRooms(hotelId: string) {
+  return useQuery({
+    queryKey: ['hotels', hotelId, 'rooms'],
+    queryFn: () => httpClient.get(`/search/hotels/${hotelId}/rooms`),
+    enabled: !!hotelId,
   });
 }
