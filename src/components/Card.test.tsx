@@ -1,5 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
+import { ReactTestRendererJSON } from 'react-test-renderer';
 import { Text } from 'react-native';
 import Card from './Card';
 import { palette } from '../theme/palette';
@@ -20,11 +21,11 @@ describe('Card', () => {
         <Text>Default</Text>
       </Card>
     );
-    const tree = toJSON();
+    const tree = toJSON() as ReactTestRendererJSON;
     expect(tree).toBeTruthy();
-    const flatStyle = Array.isArray(tree!.props.style)
-      ? Object.assign({}, ...tree!.props.style.filter(Boolean))
-      : tree!.props.style;
+    const flatStyle = Array.isArray(tree.props.style)
+      ? Object.assign({}, ...tree.props.style.filter(Boolean))
+      : tree.props.style;
     expect(flatStyle.padding).toBe(16);
     expect(flatStyle.marginBottom).toBe(12);
   });
@@ -35,10 +36,10 @@ describe('Card', () => {
         <Text>Custom padding</Text>
       </Card>
     );
-    const tree = toJSON();
-    const flatStyle = Array.isArray(tree!.props.style)
-      ? Object.assign({}, ...tree!.props.style.filter(Boolean))
-      : tree!.props.style;
+    const tree = toJSON() as ReactTestRendererJSON;
+    const flatStyle = Array.isArray(tree.props.style)
+      ? Object.assign({}, ...tree.props.style.filter(Boolean))
+      : tree.props.style;
     expect(flatStyle.padding).toBe(24);
   });
 
@@ -48,10 +49,10 @@ describe('Card', () => {
         <Text>Custom margin</Text>
       </Card>
     );
-    const tree = toJSON();
-    const flatStyle = Array.isArray(tree!.props.style)
-      ? Object.assign({}, ...tree!.props.style.filter(Boolean))
-      : tree!.props.style;
+    const tree = toJSON() as ReactTestRendererJSON;
+    const flatStyle = Array.isArray(tree.props.style)
+      ? Object.assign({}, ...tree.props.style.filter(Boolean))
+      : tree.props.style;
     expect(flatStyle.marginBottom).toBe(20);
   });
 
@@ -61,10 +62,10 @@ describe('Card', () => {
         <Text>Token check</Text>
       </Card>
     );
-    const tree = toJSON();
-    const flatStyle = Array.isArray(tree!.props.style)
-      ? Object.assign({}, ...tree!.props.style.filter(Boolean))
-      : tree!.props.style;
+    const tree = toJSON() as ReactTestRendererJSON;
+    const flatStyle = Array.isArray(tree.props.style)
+      ? Object.assign({}, ...tree.props.style.filter(Boolean))
+      : tree.props.style;
     expect(flatStyle.backgroundColor).toBe(palette.surface);
     expect(flatStyle.borderColor).toBe(palette.outlineVariant);
   });
