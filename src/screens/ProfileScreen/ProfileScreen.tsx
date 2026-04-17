@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import Constants from 'expo-constants';
 import { RootStackParamList } from '../../navigation/types';
 import { palette } from '../../theme/palette';
 import { useCurrentUser } from '../../api/hooks/useAuth';
@@ -28,6 +29,8 @@ const currencyOptions: { key: Currency; label: string }[] = [
   { key: 'CLP', label: 'CLP \u2014 Peso chileno' },
   { key: 'PEN', label: 'PEN \u2014 Sol peruano' },
 ];
+
+const appVersion = Constants.expoConfig?.version ?? '0.0.0';
 
 export default function ProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -154,6 +157,15 @@ export default function ProfileScreen() {
           {t('profile.logout')}
         </Text>
       </Pressable>
+
+      {/* App version */}
+      <Text
+        variant="bodySmall"
+        color={palette.onSurfaceVariant}
+        style={{ fontSize: 12, color: '#999', textAlign: 'center', marginTop: 16 }}
+      >
+        v{appVersion}
+      </Text>
 
       {/* Modals */}
       <PickerModal
