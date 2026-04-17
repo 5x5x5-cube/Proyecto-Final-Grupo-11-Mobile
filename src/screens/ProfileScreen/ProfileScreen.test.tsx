@@ -1,3 +1,10 @@
+jest.mock('expo-constants', () => ({
+  __esModule: true,
+  default: {
+    expoConfig: { version: '0.2.0' },
+  },
+}));
+
 jest.mock('@react-native-async-storage/async-storage', () => ({
   __esModule: true,
   default: {

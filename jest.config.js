@@ -4,7 +4,7 @@ module.exports = {
   testMatch: ['**/__tests__/**/*.{ts,tsx}', '**/*.test.{ts,tsx}'],
   transformIgnorePatterns: [
     'node_modules/(?!(' +
-      'expo|@expo|expo-modules-core|expo-font|expo-linear-gradient|expo-status-bar' +
+      'expo|@expo|expo-modules-core|expo-constants|expo-font|expo-linear-gradient|expo-status-bar' +
       '|react-native' +
       '|@react-native' +
       '|@react-navigation' +
