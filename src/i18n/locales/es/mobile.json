@@ -124,7 +124,9 @@
     "nights": "{{count}} noches",
     "total": "Total",
     "securityNote": "Transaccion protegida con cifrado SSL",
-    "payButton": "Pagar {{amount}}"
+    "payButton": "Pagar {{amount}}",
+    "processingPayment": "Procesando pago...",
+    "paymentError": "No se pudo procesar la transaccion. Verifique los datos o contacte a su banco."
   },
   "success": {
     "title": "Reserva creada exitosamente",
