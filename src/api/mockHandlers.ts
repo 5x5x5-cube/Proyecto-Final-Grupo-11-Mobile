@@ -175,7 +175,7 @@ export const mockHandlers: MockRoute[] = [
   // ─── Payments ───
   {
     method: 'POST',
-    pattern: /^\/payments\/tokenize$/,
+    pattern: /^\/gateway\/tokenize$/,
     handler: config => {
       const body = config?.body as any;
       const rawDigits = String(body?.cardNumber ?? '').replace(/\D/g, '');

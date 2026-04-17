@@ -37,7 +37,7 @@ interface PaymentStatusResponse {
 export function useTokenizeCard() {
   return useMutation({
     mutationFn: (data: TokenizeCardInput) =>
-      httpClient.post<TokenizeCardResponse>('/payments/tokenize', { body: data }),
+      httpClient.post<TokenizeCardResponse>('/gateway/tokenize', { body: data }),
   });
 }
 

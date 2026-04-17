@@ -33,7 +33,7 @@ beforeEach(() => {
 });
 
 describe('useTokenizeCard', () => {
-  it('posts card data to /payments/tokenize and returns token', async () => {
+  it('posts card data to /gateway/tokenize and returns token', async () => {
     const mockResponse = {
       token: 'tok_mock_xxxx',
       cardLast4: '4242',
@@ -53,7 +53,7 @@ describe('useTokenizeCard', () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    expect(mockPost).toHaveBeenCalledWith('/payments/tokenize', {
+    expect(mockPost).toHaveBeenCalledWith('/gateway/tokenize', {
       body: {
         cardNumber: '4111111111114242',
         cardHolder: 'Carlos Martinez',
