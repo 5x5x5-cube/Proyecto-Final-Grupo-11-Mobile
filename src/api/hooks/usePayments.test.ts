@@ -91,8 +91,7 @@ describe('useInitiatePayment', () => {
 
     result.current.mutate({
       token: 'tok_mock_xxxx',
-      amount: 2664000,
-      currency: 'COP',
+      cartId: 'cart-mock-001',
       method: 'credit',
     });
 
@@ -101,8 +100,7 @@ describe('useInitiatePayment', () => {
     expect(mockPost).toHaveBeenCalledWith('/payments/initiate', {
       body: {
         token: 'tok_mock_xxxx',
-        amount: 2664000,
-        currency: 'COP',
+        cartId: 'cart-mock-001',
         method: 'credit',
       },
     });
@@ -116,8 +114,7 @@ describe('useInitiatePayment', () => {
 
     result.current.mutate({
       token: 'tok_abc',
-      amount: 100000,
-      currency: 'COP',
+      cartId: 'cart-mock-002',
       method: 'debit',
     });
 

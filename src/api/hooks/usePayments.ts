@@ -17,9 +17,7 @@ interface TokenizeCardResponse {
 
 interface InitiatePaymentInput {
   token: string;
-  bookingId?: string;
-  amount: number;
-  currency: string;
+  cartId: string;
   method: string;
 }
 

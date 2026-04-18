@@ -124,7 +124,6 @@ export default function PaymentScreen() {
 
   const { hotelName, checkIn, checkOut, priceBreakdown } = cart;
   const total = priceBreakdown?.total ?? 0;
-  const currency = priceBreakdown?.currency ?? 'COP';
 
   const showCardForm = selected === 'credit' || selected === 'debit';
 
@@ -176,8 +175,7 @@ export default function PaymentScreen() {
           initiatePayment.mutate(
             {
               token: tokenData.token,
-              amount: total,
-              currency,
+              cartId: cart.id,
               method: selected,
             },
             {
