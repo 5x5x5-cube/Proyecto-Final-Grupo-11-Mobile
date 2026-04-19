@@ -10,12 +10,7 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({ navigate: jest.fn(), goBack: jest.fn() }),
   useRoute: () => ({
-    params: {
-      bookingCode: 'TH-2026-00001',
-      hotelName: 'Test Hotel',
-      checkIn: '2026-03-20',
-      checkOut: '2026-03-25',
-    },
+    params: { paymentId: 'pay-123' },
   }),
 }));
 
@@ -25,6 +20,37 @@ jest.mock('react-i18next', () => ({
 
 jest.mock('../../i18n', () => ({
   changeLanguage: jest.fn(),
+}));
+
+jest.mock('../../api/hooks/usePayments', () => ({
+  usePaymentStatus: () => ({
+    data: {
+      paymentId: 'pay-123',
+      status: 'approved',
+      paymentMethod: { displayLabel: 'Visa •••• 4242' },
+      amount: 595000,
+      currency: 'COP',
+    },
+  }),
+}));
+
+jest.mock('../../api/hooks/useBookings', () => ({
+  useBookingByPaymentId: () => ({
+    data: {
+      code: 'BK-12345678',
+      hotelId: 'hotel-1',
+      checkIn: '2026-05-01',
+      checkOut: '2026-05-03',
+      guests: 2,
+      totalPrice: 595000,
+    },
+  }),
+}));
+
+jest.mock('../../api/hooks/useSearch', () => ({
+  useHotelDetail: () => ({
+    data: { name: 'Test Hotel', city: 'Bogota', country: 'Colombia' },
+  }),
 }));
 
 import React from 'react';

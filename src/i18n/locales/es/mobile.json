@@ -126,21 +126,26 @@
     "securityNote": "Transaccion protegida con cifrado SSL",
     "payButton": "Pagar {{amount}}",
     "processingPayment": "Procesando pago...",
-    "paymentError": "No se pudo procesar la transaccion. Verifique los datos o contacte a su banco."
+    "paymentError": "Error de pago",
+    "declinedMessage": "No se pudo procesar la transaccion. Verifique los datos o contacte a su banco.",
+    "cardNumberInvalid": "Numero de tarjeta invalido",
+    "expiryInvalid": "La tarjeta esta vencida"
   },
   "success": {
     "title": "Reserva creada exitosamente",
     "subtitle": "Hemos enviado la confirmacion a tu correo electronico",
     "reservationCode": "CODIGO DE RESERVA",
     "hotel": "Hotel",
+    "location": "Ubicacion",
     "dates": "Fechas",
     "room": "Habitacion",
     "guests": "Huespedes",
     "guestsValue": "{{count}} adultos",
-    "total": "Total",
+    "nights": "Noches",
+    "nightsValue": "{{count}} noches",
+    "totalPaid": "Total pagado",
     "viewReservations": "Ver mis reservas",
-    "backToHome": "Volver al inicio",
-    "roomValue": "Superior · 1 cama King"
+    "backToHome": "Volver al inicio"
   },
   "myReservations": {
     "title": "Mis reservas",
