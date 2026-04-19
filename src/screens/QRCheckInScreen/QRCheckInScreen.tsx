@@ -23,7 +23,7 @@ export default function QRCheckInScreen() {
 
   const bookingId = route.params.id ?? 1;
   const { data: reservationData } = useBookingDetail(bookingId);
-  const { data: qrData, isLoading, error } = useBookingQR(bookingId);
+  const { data: qrData } = useBookingQR(bookingId);
   const reservation = (reservationData as any) ?? {};
   const qrCode = qrData?.qrCode ?? reservation.code ?? '';
   const isFromCache = qrData?.isFromCache ?? false;
