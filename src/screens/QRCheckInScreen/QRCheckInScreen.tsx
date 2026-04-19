@@ -23,9 +23,10 @@ export default function QRCheckInScreen() {
 
   const bookingId = route.params.id ?? 1;
   const { data: reservationData } = useBookingDetail(bookingId);
-  const { data: qrData } = useBookingQR(bookingId);
+  const { data: qrData, isLoading, error } = useBookingQR(bookingId);
   const reservation = (reservationData as any) ?? {};
   const qrCode = qrData?.qrCode ?? reservation.code ?? '';
+  const isFromCache = qrData?.isFromCache ?? false;
 
   return (
     <View style={styles.container}>
@@ -58,6 +59,16 @@ export default function QRCheckInScreen() {
         <Text variant="caption" color={palette.onSurfaceVariant} style={styles.roomGuests}>
           {reservation.room} · {reservation.guests}
         </Text>
+
+        {/* Offline indicator */}
+        {isFromCache && (
+          <View style={styles.offlineBadge}>
+            <MaterialCommunityIcons name="cloud-off-outline" size={16} color={palette.onSurfaceVariant} />
+            <Text variant="caption" color={palette.onSurfaceVariant}>
+              {t('qrCheckIn.offlineMode')}
+            </Text>
+          </View>
+        )}
 
         {/* Instruction card */}
         <View style={styles.instructionCard}>
