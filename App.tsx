@@ -11,6 +11,7 @@ import {
 } from '@expo-google-fonts/roboto';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { LocaleProvider } from './src/contexts/LocaleContext';
+import { AuthProvider } from './src/contexts/AuthContext';
 import AppNavigator from './src/navigation/AppNavigator';
 import { palette } from './src/theme/palette';
 import { queryClient } from './src/api/queryClient';
@@ -40,11 +41,13 @@ export default function App() {
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
         <QueryClientProvider client={queryClient}>
-          <LocaleProvider>
-            <NavigationContainer>
-              <AppNavigator />
-            </NavigationContainer>
-          </LocaleProvider>
+          <AuthProvider>
+            <LocaleProvider>
+              <NavigationContainer>
+                <AppNavigator />
+              </NavigationContainer>
+            </LocaleProvider>
+          </AuthProvider>
         </QueryClientProvider>
       </SafeAreaView>
     </SafeAreaProvider>
