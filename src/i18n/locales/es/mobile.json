@@ -178,7 +178,8 @@
   "qrCheckIn": {
     "title": "Check-in con codigo QR",
     "instruction": "Presenta este codigo en recepcion para realizar tu check-in de manera rapida y sin contacto.",
-    "downloadQR": "Descargar QR"
+    "downloadQR": "Descargar QR",
+    "offlineMode": "Modo sin conexion"
   },
   "profile": {
     "personalInfo": "Informacion personal",

@@ -178,7 +178,8 @@
   "qrCheckIn": {
     "title": "QR code check-in",
     "instruction": "Show this code at the front desk for a quick and contactless check-in.",
-    "downloadQR": "Download QR"
+    "downloadQR": "Download QR",
+    "offlineMode": "Offline mode"
   },
   "profile": {
     "personalInfo": "Personal information",
