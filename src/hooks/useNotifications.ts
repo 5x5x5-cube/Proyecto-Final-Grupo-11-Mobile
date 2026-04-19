@@ -44,7 +44,8 @@ async function registerForPushNotificationsAsync() {
     }
 
     try {
-      const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
+      const projectId =
+        Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
       if (!projectId) {
         throw new Error('Project ID not found');
       }
@@ -69,7 +70,7 @@ export function useNotifications() {
   const { mutate: registerToken } = useRegisterPushToken();
 
   useEffect(() => {
-    registerForPushNotificationsAsync().then((token) => {
+    registerForPushNotificationsAsync().then(token => {
       if (token) {
         setExpoPushToken(token);
 
@@ -84,18 +85,20 @@ export function useNotifications() {
     });
 
     // Listener for notifications received while app is in foreground
-    notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
       setNotification(notification);
     });
 
     // Listener for when user taps on notification
-    responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
-      const bookingId = response.notification.request.content.data.bookingId;
-      if (bookingId) {
-        // Navigate to reservation detail
-        navigation.navigate('ReservationDetail', { id: Number(bookingId) });
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(
+      response => {
+        const bookingId = response.notification.request.content.data.bookingId;
+        if (bookingId) {
+          // Navigate to reservation detail
+          navigation.navigate('ReservationDetail', { id: Number(bookingId) });
+        }
       }
-    });
+    );
 
     return () => {
       notificationListener.current?.remove();

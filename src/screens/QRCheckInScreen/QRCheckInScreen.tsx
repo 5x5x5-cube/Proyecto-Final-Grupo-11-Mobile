@@ -31,7 +31,9 @@ export default function QRCheckInScreen() {
   return (
     <View style={styles.container}>
       <TopBar title={t('qrCheckIn.title')} onBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 24 + insets.bottom }]}>
+      <ScrollView
+        contentContainerStyle={[styles.content, { paddingBottom: 24 + insets.bottom }]}
+      >
         {/* QR Code card */}
         <View style={styles.qrCard}>
           <QRCode value={qrCode || 'TH-2026-48291'} size={240} />
