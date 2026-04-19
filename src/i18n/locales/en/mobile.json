@@ -126,21 +126,26 @@
     "securityNote": "Transaction protected with SSL encryption",
     "payButton": "Pay {{amount}}",
     "processingPayment": "Processing payment...",
-    "paymentError": "The transaction could not be processed. Please check your details or contact your bank."
+    "paymentError": "Payment error",
+    "declinedMessage": "The transaction could not be processed. Please check your details or contact your bank.",
+    "cardNumberInvalid": "Invalid card number",
+    "expiryInvalid": "Card is expired"
   },
   "success": {
     "title": "Reservation created successfully",
     "subtitle": "We have sent the confirmation to your email",
     "reservationCode": "RESERVATION CODE",
     "hotel": "Hotel",
+    "location": "Location",
     "dates": "Dates",
     "room": "Room",
     "guests": "Guests",
     "guestsValue": "{{count}} adults",
-    "total": "Total",
+    "nights": "Nights",
+    "nightsValue": "{{count}} nights",
+    "totalPaid": "Total paid",
     "viewReservations": "View my reservations",
-    "backToHome": "Back to home",
-    "roomValue": "Superior · 1 King bed"
+    "backToHome": "Back to home"
   },
   "myReservations": {
     "title": "My reservations",

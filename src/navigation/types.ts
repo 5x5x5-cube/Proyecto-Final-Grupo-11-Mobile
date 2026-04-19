@@ -15,10 +15,7 @@ export type RootStackParamList = {
   };
   Payment: undefined;
   Success: {
-    bookingCode: string;
-    hotelName: string;
-    checkIn: string;
-    checkOut: string;
+    paymentId: string;
   };
   ReservationDetail: { id: number };
   CancelReservation: { id: number };

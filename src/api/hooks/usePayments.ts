@@ -26,10 +26,24 @@ interface InitiatePaymentResponse {
   status: string;
 }
 
-interface PaymentStatusResponse {
+export interface PaymentMethodDetail {
+  id: string;
+  methodType: string;
+  displayLabel: string;
+  cardLast4: string | null;
+  cardBrand: string | null;
+}
+
+export interface PaymentStatusResponse {
   paymentId: string;
   status: 'processing' | 'approved' | 'declined';
-  bookingCode?: string;
+  paymentMethod: PaymentMethodDetail;
+  amount: number;
+  currency: string;
+  transactionId: string | null;
+  message: string | null;
+  createdAt: string;
+  processedAt: string | null;
 }
 
 export function useTokenizeCard() {

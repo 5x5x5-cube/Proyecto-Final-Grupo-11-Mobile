@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '@/navigation/types';
 import { useCart } from '@/api/hooks/useCart';
 import { useTokenizeCard, useInitiatePayment, usePaymentStatus } from '@/api/hooks/usePayments';
+import { isValidLuhn } from '@/utils/luhn';
 import { useLocale } from '@/contexts/LocaleContext';
 import { palette } from '@/theme/palette';
 import Text from '@/components/Text';
@@ -87,23 +88,16 @@ export default function PaymentScreen() {
   React.useEffect(() => {
     if (!paymentStatus.data) return;
 
-    const { status, bookingCode } = paymentStatus.data;
+    const { status } = paymentStatus.data;
 
-    if (status === 'approved') {
+    if (status === 'approved' && paymentId) {
+      const pid = paymentId;
       setPaymentId(null);
-      navigation.navigate('Success', {
-        bookingCode: bookingCode ?? 'TH-2026-00000',
-        hotelName: cart?.hotelName ?? '',
-        checkIn: cart?.checkIn ?? '',
-        checkOut: cart?.checkOut ?? '',
-      });
+      navigation.navigate('Success', { paymentId: pid });
     } else if (status === 'declined') {
       setPaymentId(null);
       setFormEnabled(true);
-      Alert.alert(
-        t('payment.paymentError'),
-        'No se pudo procesar la transacción. Verifique los datos o contacte a su banco.'
-      );
+      Alert.alert(t('payment.paymentError'), t('payment.declinedMessage'));
     }
   }, [paymentStatus.data?.status]);
 
@@ -129,10 +123,22 @@ export default function PaymentScreen() {
 
   // Validation uses raw digit count (without spaces)
   const rawDigits = rawCardNumber.replace(/\D/g, '');
+  const isCardNumberComplete = rawDigits.length === 16;
+  const isCardNumberValid = isCardNumberComplete && isValidLuhn(rawDigits);
+
+  const isExpiryFormatValid = expiry.length === 5;
+  const isExpiryNotExpired = (() => {
+    if (!isExpiryFormatValid) return true;
+    const [mm, yy] = expiry.split('/').map(Number);
+    const expiryDate = new Date(2000 + yy, mm);
+    return expiryDate > new Date();
+  })();
+
   const isCardFormValid =
-    rawDigits.length === 16 &&
+    isCardNumberValid &&
+    isExpiryNotExpired &&
+    isExpiryFormatValid &&
     cardHolder.trim().length > 0 &&
-    expiry.length === 5 &&
     cvv.length === 3;
 
   const isPayDisabled = loading || !formEnabled || (showCardForm && !isCardFormValid);
@@ -184,20 +190,14 @@ export default function PaymentScreen() {
               },
               onError: () => {
                 setFormEnabled(true);
-                Alert.alert(
-                  t('payment.paymentError'),
-                  'No se pudo procesar la transacción. Verifique los datos o contacte a su banco.'
-                );
+                Alert.alert(t('payment.paymentError'), t('payment.declinedMessage'));
               },
             }
           );
         },
         onError: () => {
           setFormEnabled(true);
-          Alert.alert(
-            t('payment.paymentError'),
-            'No se pudo procesar la transacción. Verifique los datos o contacte a su banco.'
-          );
+          Alert.alert(t('payment.paymentError'), t('payment.declinedMessage'));
         },
       }
     );
