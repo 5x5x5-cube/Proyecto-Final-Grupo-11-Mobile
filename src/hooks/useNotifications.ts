@@ -90,15 +90,13 @@ export function useNotifications() {
     });
 
     // Listener for when user taps on notification
-    responseListener.current = Notifications.addNotificationResponseReceivedListener(
-      response => {
-        const bookingId = response.notification.request.content.data.bookingId;
-        if (bookingId) {
-          // Navigate to reservation detail
-          navigation.navigate('ReservationDetail', { id: Number(bookingId) });
-        }
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      const bookingId = response.notification.request.content.data.bookingId;
+      if (bookingId) {
+        // Navigate to reservation detail
+        navigation.navigate('ReservationDetail', { id: Number(bookingId) });
       }
-    );
+    });
 
     return () => {
       notificationListener.current?.remove();
