@@ -14,6 +14,8 @@ Notifications.setNotificationHandler({
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
   }),
 });
 
@@ -47,7 +49,8 @@ async function registerForPushNotificationsAsync() {
       const projectId =
         Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
       if (!projectId) {
-        throw new Error('Project ID not found');
+        console.warn('EAS projectId not configured. Push notifications will not work.');
+        return null;
       }
       token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
     } catch (e) {
@@ -64,12 +67,17 @@ async function registerForPushNotificationsAsync() {
 export function useNotifications() {
   const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
   const [notification, setNotification] = useState<Notifications.Notification | null>(null);
-  const notificationListener = useRef<Notifications.Subscription>();
-  const responseListener = useRef<Notifications.Subscription>();
+  const notificationListener = useRef<Notifications.Subscription | null>(null);
+  const responseListener = useRef<Notifications.Subscription | null>(null);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { mutate: registerToken } = useRegisterPushToken();
 
   useEffect(() => {
+    // Skip notifications on web - not supported
+    if (Platform.OS === 'web') {
+      return;
+    }
+
     registerForPushNotificationsAsync().then(token => {
       if (token) {
         setExpoPushToken(token);
@@ -91,7 +99,7 @@ export function useNotifications() {
 
     // Listener for when user taps on notification
     responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      const bookingId = response.notification.request.content.data.bookingId;
+      const bookingId = response.notification.request.content.data?.bookingId;
       if (bookingId) {
         // Navigate to reservation detail
         navigation.navigate('ReservationDetail', { id: Number(bookingId) });

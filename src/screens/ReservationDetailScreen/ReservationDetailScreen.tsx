@@ -30,7 +30,19 @@ export default function ReservationDetailScreen() {
   const { data: reservationData, isLoading } = useBookingDetail(route.params.id ?? 1);
   const reservation = reservationData as any;
 
-  if (isLoading || !reservation) {
+  // Map backend fields to frontend format
+  const mappedReservation = reservation ? {
+    ...reservation,
+    gradient: ['#006874', '#4A9FAA'] as const, // Default gradient
+    hotelType: 'Hotel',
+    hotelName: `Hotel ${reservation.hotelId}`,
+    location: 'Unknown',
+    nights: 0, // Calculate if needed
+    room: `Room ${reservation.roomId}`,
+    totalPriceCop: reservation.totalPrice,
+  } : null;
+
+  if (isLoading || !mappedReservation) {
     return (
       <View style={styles.container}>
         <OfflineBanner />
@@ -40,8 +52,8 @@ export default function ReservationDetailScreen() {
     );
   }
 
-  const accommodationCop = Math.round(reservation.totalPriceCop * 0.81);
-  const taxesCop = reservation.totalPriceCop - accommodationCop;
+  const accommodationCop = Math.round(mappedReservation.totalPriceCop * 0.81);
+  const taxesCop = mappedReservation.totalPriceCop - accommodationCop;
 
   return (
     <View style={styles.container}>
@@ -50,29 +62,29 @@ export default function ReservationDetailScreen() {
       <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 24 + insets.bottom }]}>
         {/* Status row */}
         <View style={styles.statusRow}>
-          <StatusChip status={reservation.status} />
+          <StatusChip status={mappedReservation.status} />
           <Text variant="caption" color={palette.outline} style={styles.code}>
-            {reservation.code}
+            {mappedReservation.code}
           </Text>
         </View>
 
         {/* Hotel card */}
         <View style={styles.card}>
           <LinearGradient
-            colors={[reservation.gradient[0], reservation.gradient[1]]}
+            colors={[mappedReservation.gradient[0], mappedReservation.gradient[1]]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.hotelGradient}
           />
           <View style={styles.hotelInfo}>
             <Text variant="captionSmall" color={palette.primary} style={styles.hotelType}>
-              {reservation.hotelType}
+              {mappedReservation.hotelType}
             </Text>
             <Text variant="subtitle" color={palette.onSurface} style={styles.hotelName}>
-              {reservation.hotelName}
+              {mappedReservation.hotelName}
             </Text>
             <Text variant="bodySmall" color={palette.onSurfaceVariant} style={styles.hotelLocation}>
-              {reservation.location}
+              {mappedReservation.location}
             </Text>
           </View>
         </View>
@@ -84,21 +96,21 @@ export default function ReservationDetailScreen() {
               items={[
                 {
                   label: 'Check-in',
-                  value: formatDate(reservation.checkIn, 'medium'),
+                  value: formatDate(mappedReservation.checkIn, 'medium'),
                   sub: '3:00 PM',
                 },
                 {
                   label: 'Check-out',
-                  value: formatDate(reservation.checkOut, 'medium'),
+                  value: formatDate(mappedReservation.checkOut, 'medium'),
                   sub: '12:00 PM',
                 },
                 {
                   label: t('reservationDetail.duration'),
-                  value: t('reservationDetail.nights', { count: reservation.nights }),
+                  value: t('reservationDetail.nights', { count: mappedReservation.nights }),
                 },
                 {
                   label: t('reservationDetail.guests'),
-                  value: reservation.guests,
+                  value: mappedReservation.guests,
                 },
               ]}
             />
@@ -112,7 +124,7 @@ export default function ReservationDetailScreen() {
               {t('reservationDetail.room')}
             </Text>
             <Text variant="button" color={palette.onSurface} style={styles.roomValue}>
-              {reservation.room}
+              {mappedReservation.room}
             </Text>
           </View>
         </View>
@@ -126,13 +138,13 @@ export default function ReservationDetailScreen() {
             <PriceBreakdown
               rows={[
                 {
-                  label: t('reservationDetail.accommodation', { count: reservation.nights }),
+                  label: t('reservationDetail.accommodation', { count: mappedReservation.nights }),
                   value: formatPrice(accommodationCop),
                 },
                 { label: t('reservationDetail.taxes'), value: formatPrice(taxesCop) },
               ]}
               totalLabel={t('reservationDetail.totalPaid')}
-              totalValue={formatPrice(reservation.totalPriceCop)}
+              totalValue={formatPrice(mappedReservation.totalPriceCop)}
             />
           </View>
         </View>
@@ -141,7 +153,7 @@ export default function ReservationDetailScreen() {
         <View style={styles.buttonsColumn}>
           <Pressable
             style={styles.primaryButton}
-            onPress={() => navigation.navigate('QRCheckIn', { id: reservation.id })}
+            onPress={() => navigation.navigate('QRCheckIn', { id: mappedReservation.id })}
           >
             <MaterialCommunityIcons name="qrcode" size={20} color={palette.onPrimary} />
             <Text variant="button" color={palette.onPrimary} style={styles.primaryButtonText}>
@@ -150,7 +162,7 @@ export default function ReservationDetailScreen() {
           </Pressable>
           <Pressable
             style={styles.errorButton}
-            onPress={() => navigation.navigate('CancelReservation', { id: reservation.id })}
+            onPress={() => navigation.navigate('CancelReservation', { id: mappedReservation.id })}
           >
             <Text variant="button" color={palette.error} style={styles.errorButtonText}>
               {t('reservationDetail.cancelReservation')}

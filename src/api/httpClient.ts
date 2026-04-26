@@ -9,7 +9,7 @@ export interface RequestConfig {
 }
 
 // For React Native, configure via app config or .env
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:8080/api/v1';
+const API_BASE_URL = 'http://a1a689e9face5475b8fc95c6638b22fa-80a0709c1bbff823.elb.us-east-1.amazonaws.com/api/v1';
 
 function buildUrl(path: string, params?: Record<string, unknown>): string {
   let url = `${API_BASE_URL}${path}`;

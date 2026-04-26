@@ -15,7 +15,7 @@ import { AuthProvider } from './src/contexts/AuthContext';
 import AppNavigator from './src/navigation/AppNavigator';
 import { palette } from './src/theme/palette';
 import { queryClient } from './src/api/queryClient';
-import { useNotifications } from './src/hooks/useNotifications';
+import AppContent from './src/components/AppContent';
 import './src/i18n';
 
 export default function App() {
@@ -25,9 +25,6 @@ export default function App() {
     Roboto_500Medium,
     Roboto_700Bold,
   });
-
-  // Initialize push notifications
-  useNotifications();
 
   if (!fontsLoaded) {
     return (
@@ -44,7 +41,7 @@ export default function App() {
           <AuthProvider>
             <LocaleProvider>
               <NavigationContainer>
-                <AppNavigator />
+                <AppContent />
               </NavigationContainer>
             </LocaleProvider>
           </AuthProvider>
