@@ -51,14 +51,14 @@ export function useBookings() {
 export function usePastBookings() {
   return useQuery({
     queryKey: ['bookings', 'past'],
-    queryFn: () => httpClient.get('/bookings/past'),
+    queryFn: () => httpClient.get('/bookings'), // Backend doesn't have past filter, fetch all and filter on client
   });
 }
 
 export function useCancelledBookings() {
   return useQuery({
     queryKey: ['bookings', 'cancelled'],
-    queryFn: () => httpClient.get('/bookings/cancelled'),
+    queryFn: () => httpClient.get('/bookings', { params: { status: 'cancelled' } }),
   });
 }
 
