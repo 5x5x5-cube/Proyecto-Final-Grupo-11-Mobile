@@ -42,21 +42,48 @@ export default function MyReservationsScreen() {
   const { data: pastData, isLoading: loadingPast } = usePastBookings();
   const { data: cancelledData, isLoading: loadingCancelled } = useCancelledBookings();
 
-  const activeReservations = (activeData as Reservation[]) ?? [];
-  const pastReservations = (pastData as Reservation[]) ?? [];
-  const cancelledReservations = (cancelledData as Reservation[]) ?? [];
+  // Backend returns { data: [...], total, page, limit }, extract data array
+  const activeReservations = (activeData as any)?.data ?? [];
+  const pastReservations = (pastData as any)?.data ?? [];
+  const cancelledReservations = (cancelledData as any)?.data ?? [];
   const isLoading = loadingActive || loadingPast || loadingCancelled;
 
+  // Map backend fields to frontend format
+  const mapReservation = (b: any): Reservation => ({
+    id: b.id,
+    hotelType: 'Hotel',
+    hotelName: `Hotel ${b.hotelId}`, // Backend doesn't return hotel name, use ID
+    location: 'Unknown', // Backend doesn't return location
+    checkIn: b.checkIn,
+    checkOut: b.checkOut,
+    nights: 0, // Calculate if needed
+    guests: b.guests,
+    room: `Room ${b.roomId}`, // Backend doesn't return room name
+    status: b.status,
+    code: b.code,
+    totalPrice: `${b.totalPrice} ${b.currency}`,
+    totalPriceCop: b.totalPrice,
+    gradient: ['#006874', '#4A9FAA'] as const, // Default gradient
+  });
+
+  const activeReservationsMapped = activeReservations.map(mapReservation);
+  const pastReservationsMapped = pastReservations.map(mapReservation);
+  const cancelledReservationsMapped = cancelledReservations.map(mapReservation);
+
   const tabs: { key: Tab; label: string; count: number }[] = [
-    { key: 'active', label: t('myReservations.active'), count: activeReservations.length },
-    { key: 'past', label: t('myReservations.past'), count: pastReservations.length },
-    { key: 'cancelled', label: t('myReservations.cancelled'), count: cancelledReservations.length },
+    { key: 'active', label: t('myReservations.active'), count: activeReservationsMapped.length },
+    { key: 'past', label: t('myReservations.past'), count: pastReservationsMapped.length },
+    {
+      key: 'cancelled',
+      label: t('myReservations.cancelled'),
+      count: cancelledReservationsMapped.length,
+    },
   ];
 
   const dataMap: Record<Tab, Reservation[]> = {
-    active: activeReservations,
-    past: pastReservations,
-    cancelled: cancelledReservations,
+    active: activeReservationsMapped,
+    past: pastReservationsMapped,
+    cancelled: cancelledReservationsMapped,
   };
 
   const renderCard = ({ item }: { item: Reservation }) => (

@@ -43,6 +43,16 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
   },
+  offlineBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: palette.surfaceContainerHigh,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginBottom: 16,
+  },
   instructionCard: {
     backgroundColor: palette.surfaceContainer,
     borderRadius: 10,

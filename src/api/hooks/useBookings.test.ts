@@ -72,7 +72,7 @@ describe('useBookingQR', () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    expect(result.current.data).toEqual(mockQR);
+    expect(result.current.data).toEqual({ ...mockQR, isFromCache: false });
     expect(mockGet).toHaveBeenCalledWith('/bookings/42/qr');
   });
 });

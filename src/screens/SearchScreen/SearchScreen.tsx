@@ -39,7 +39,7 @@ export default function SearchScreen() {
   const { t } = useTranslation('mobile');
   const { formatDate } = useLocale();
   const { data: destinationsData } = useDestinations();
-  const destinations = destinationsData ?? [];
+  const destinations = Array.isArray(destinationsData) ? destinationsData : [];
 
   const [destination, setDestination] = useState('Cartagena');
   const [checkIn, setCheckIn] = useState('2026-03-15');

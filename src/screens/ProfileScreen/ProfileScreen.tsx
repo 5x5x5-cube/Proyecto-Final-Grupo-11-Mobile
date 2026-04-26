@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import Constants from 'expo-constants';
 import { RootStackParamList } from '../../navigation/types';
 import { palette } from '../../theme/palette';
-import { useCurrentUser } from '../../api/hooks/useAuth';
+import { useAuth } from '../../contexts/AuthContext';
 import { useLocale, currencyNames, languageNames } from '../../contexts/LocaleContext';
 import type { Language, Currency } from '../../contexts/LocaleContext';
 import ProfileMenuRow from '../../components/ProfileMenuRow';
@@ -36,10 +36,10 @@ export default function ProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { t } = useTranslation('mobile');
   const { language, currency, setLanguage, setCurrency } = useLocale();
-  const { data: currentUser } = useCurrentUser();
-  const userName = currentUser?.name ?? 'Carlos Martinez';
-  const userEmail = currentUser?.email ?? 'carlos.martinez@email.com';
-  const userInitials = currentUser?.initials ? `${currentUser.initials}M` : 'CM';
+  const { user } = useAuth();
+  const userName = user.name;
+  const userEmail = user.email;
+  const userInitials = user.initials;
 
   const [langModalVisible, setLangModalVisible] = useState(false);
   const [currModalVisible, setCurrModalVisible] = useState(false);
@@ -105,7 +105,7 @@ export default function ProfileScreen() {
             />
           }
           label={t('profile.phone')}
-          value="+57 300 123 4567"
+          value={user.phone}
         />
       </Card>
 

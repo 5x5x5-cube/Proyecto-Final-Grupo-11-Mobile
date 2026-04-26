@@ -175,12 +175,32 @@ export const mockHandlers: MockRoute[] = [
   // ─── Payments ───
   {
     method: 'POST',
+    pattern: /^\/gateway\/tokenize$/,
+    handler: config => {
+      const body = config?.body as any;
+      const rawDigits = String(body?.cardNumber ?? '').replace(/\D/g, '');
+      const last4 = rawDigits.slice(-4) || '0000';
+      return ok({
+        token: 'tok_mock_xxxx',
+        cardLast4: last4,
+        cardBrand: 'Visa',
+        expiresAt: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+      });
+    },
+  },
+  {
+    method: 'POST',
     pattern: /^\/payments\/initiate$/,
+    handler: () => ({ status: 202, data: { paymentId: 'pay-001', status: 'processing' } }),
+  },
+  {
+    method: 'GET',
+    pattern: /^\/payments\/([\w-]+)$/,
     handler: () =>
       ok({
         paymentId: 'pay-001',
         status: 'approved',
-        bookingCode: 'TH-2026-48291',
+        bookingCode: 'BK-MOCK001',
       }),
   },
 

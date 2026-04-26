@@ -25,7 +25,9 @@ jest.mock('../../api/hooks/useCart', () => ({
 }));
 
 jest.mock('../../api/hooks/usePayments', () => ({
+  useTokenizeCard: () => ({ mutate: jest.fn(), isPending: false }),
   useInitiatePayment: () => ({ mutate: jest.fn(), isPending: false }),
+  usePaymentStatus: () => ({ data: undefined, isSuccess: false }),
 }));
 
 import React from 'react';
