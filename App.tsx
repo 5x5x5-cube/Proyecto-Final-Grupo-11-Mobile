@@ -12,7 +12,6 @@ import {
 import { QueryClientProvider } from '@tanstack/react-query';
 import { LocaleProvider } from './src/contexts/LocaleContext';
 import { AuthProvider } from './src/contexts/AuthContext';
-import AppNavigator from './src/navigation/AppNavigator';
 import { palette } from './src/theme/palette';
 import { queryClient } from './src/api/queryClient';
 import AppContent from './src/components/AppContent';
