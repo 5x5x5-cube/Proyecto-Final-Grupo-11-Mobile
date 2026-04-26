@@ -31,16 +31,18 @@ export default function ReservationDetailScreen() {
   const reservation = reservationData as any;
 
   // Map backend fields to frontend format
-  const mappedReservation = reservation ? {
-    ...reservation,
-    gradient: ['#006874', '#4A9FAA'] as const, // Default gradient
-    hotelType: 'Hotel',
-    hotelName: `Hotel ${reservation.hotelId}`,
-    location: 'Unknown',
-    nights: 0, // Calculate if needed
-    room: `Room ${reservation.roomId}`,
-    totalPriceCop: reservation.totalPrice,
-  } : null;
+  const mappedReservation = reservation
+    ? {
+        ...reservation,
+        gradient: ['#006874', '#4A9FAA'] as const, // Default gradient
+        hotelType: 'Hotel',
+        hotelName: `Hotel ${reservation.hotelId}`,
+        location: 'Unknown',
+        nights: 0, // Calculate if needed
+        room: `Room ${reservation.roomId}`,
+        totalPriceCop: reservation.totalPrice,
+      }
+    : null;
 
   if (isLoading || !mappedReservation) {
     return (

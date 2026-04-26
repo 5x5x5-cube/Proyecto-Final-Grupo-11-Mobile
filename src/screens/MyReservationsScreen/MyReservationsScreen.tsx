@@ -73,7 +73,11 @@ export default function MyReservationsScreen() {
   const tabs: { key: Tab; label: string; count: number }[] = [
     { key: 'active', label: t('myReservations.active'), count: activeReservationsMapped.length },
     { key: 'past', label: t('myReservations.past'), count: pastReservationsMapped.length },
-    { key: 'cancelled', label: t('myReservations.cancelled'), count: cancelledReservationsMapped.length },
+    {
+      key: 'cancelled',
+      label: t('myReservations.cancelled'),
+      count: cancelledReservationsMapped.length,
+    },
   ];
 
   const dataMap: Record<Tab, Reservation[]> = {
