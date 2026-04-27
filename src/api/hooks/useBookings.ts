@@ -56,6 +56,8 @@ export function useBookings(filters?: { status?: string; timeframe?: string }) {
       );
       return Array.isArray(raw) ? raw : ((raw as BookingListResponse).data ?? []);
     },
+    networkMode: 'offlineFirst',
+    gcTime: 1000 * 60 * 60 * 24, // 24h — keep cached data for offline browsing
   });
 }
 
@@ -63,6 +65,8 @@ export function useBookingDetail(bookingId: number) {
   return useQuery({
     queryKey: ['bookings', bookingId],
     queryFn: () => httpClient.get(`/bookings/${bookingId}`),
+    networkMode: 'offlineFirst',
+    gcTime: 1000 * 60 * 60 * 24,
   });
 }
 
