@@ -167,6 +167,14 @@ export function useHotelRooms(hotelId: string, checkIn?: string) {
   });
 }
 
+export function useHotelReviews(hotelId: string) {
+  return useQuery({
+    queryKey: ['hotels', hotelId, 'reviews'],
+    queryFn: () => httpClient.get(`/search/hotels/${hotelId}/reviews`),
+    enabled: !!hotelId,
+  });
+}
+
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 const AMENITY_MAP: Record<string, { icon: string; label: string }> = {

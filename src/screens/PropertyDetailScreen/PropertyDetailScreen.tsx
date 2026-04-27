@@ -6,7 +6,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '@/navigation/types';
-import { useHotelDetail, useHotelRooms } from '@/api/hooks/useSearch';
+import { useHotelDetail, useHotelReviews, useHotelRooms } from '@/api/hooks/useSearch';
 import { useSetCart } from '@/api/hooks/useCart';
 import { useLocale } from '@/contexts/LocaleContext';
 import { saveCartSelection } from '@/storage/cartStorage';
@@ -31,11 +31,6 @@ interface NormalizedRoom {
 
 const TAX_RATE = 0.19;
 
-const reviews = [
-  { name: 'Maria G.', initials: 'MG', rating: 5, textKey: 'propertyDetail.reviewTexts.review1' },
-  { name: 'Carlos M.', initials: 'CM', rating: 4, textKey: 'propertyDetail.reviewTexts.review2' },
-  { name: 'Ana L.', initials: 'AL', rating: 5, textKey: 'propertyDetail.reviewTexts.review3' },
-];
 
 // Paleta de degradados para los slides de la galería
 const GALLERY_GRADIENTS: [string, string][] = [
@@ -66,8 +61,16 @@ export default function PropertyDetailScreen() {
 
   const { data: hotelData, isLoading: isLoadingHotel } = useHotelDetail(hotelId);
   const { data: roomsData, isLoading: isLoadingRooms } = useHotelRooms(hotelId);
+  const { data: reviewsData, isLoading: isLoadingReviews } = useHotelReviews(hotelId);
   const hotel = (hotelData as any) ?? null;
   const rooms: NormalizedRoom[] = Array.isArray(roomsData) ? roomsData : [];
+
+  const reviews = (Array.isArray(reviewsData) ? reviewsData : []).map((r: any) => ({
+    name: r.name ?? '',
+    initials: r.initial ?? r.name?.charAt(0) ?? '',
+    rating: r.stars ?? r.rating ?? 5,
+    text: r.text ?? r.comment ?? '',
+  }));
 
   const setCart = useSetCart();
   const [selectedRoomIndex, setSelectedRoomIndex] = useState(0);
@@ -231,19 +234,18 @@ export default function PropertyDetailScreen() {
 
           {/* Rating + reseñas */}
           <View style={styles.ratingRow}>
-            <View style={styles.ratingBadge}>
-              <Text variant="bodySmall" color={palette.onPrimary} style={styles.ratingBadgeText}>
-                {hotel.rating}
-              </Text>
-            </View>
+            <MaterialCommunityIcons name="star" size={16} color={palette.star} />
+            <Text variant="bodySmall" color={palette.onSurface} style={styles.ratingBadgeText}>
+              {hotel.rating}
+            </Text>
             <Text variant="bodySmall" color={palette.onSurfaceVariant} style={styles.reviewCount}>
-              {t('propertyDetail.reviews', { count: hotel.reviewCount })}
+              ({t('propertyDetail.reviews', { count: reviews.length })})
             </Text>
           </View>
 
           {/* Descripción */}
           <Text variant="bodySmall" color={palette.onSurface} style={styles.description}>
-            {t('propertyDetail.description')}
+            {hotel.description || t('propertyDetail.description')}
           </Text>
 
           {/* ── Servicios incluidos ──────────────────────────────────── */}
@@ -373,40 +375,48 @@ export default function PropertyDetailScreen() {
           )}
 
           {/* ── Reseñas de huéspedes ─────────────────────────────────── */}
-          <Text variant="button" color={palette.onSurface} style={styles.sectionTitle}>
-            {t('propertyDetail.guestReviews')}
-          </Text>
+          {!isLoadingReviews && reviews.length === 0 ? null : (
+            <Text variant="button" color={palette.onSurface} style={styles.sectionTitle}>
+              {t('propertyDetail.guestReviews')}
+            </Text>
+          )}
         </View>
 
-        <FlatList
-          horizontal
-          data={reviews}
-          keyExtractor={(_, index) => index.toString()}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.reviewsList}
-          renderItem={({ item }) => (
-            <View style={styles.reviewCard}>
-              <View style={styles.reviewHeader}>
-                <View style={styles.avatar}>
-                  <Text variant="captionSmall" color={palette.onPrimaryContainer}>
-                    {item.initials}
+        {isLoadingReviews ? (
+          <Text variant="caption" color={palette.onSurfaceVariant} style={styles.reviewsList}>
+            {t('propertyDetail.loadingReviews', 'Cargando reseñas...')}
+          </Text>
+        ) : reviews.length > 0 ? (
+          <FlatList
+            horizontal
+            data={reviews}
+            keyExtractor={(_, index) => index.toString()}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.reviewsList}
+            renderItem={({ item }) => (
+              <View style={styles.reviewCard}>
+                <View style={styles.reviewHeader}>
+                  <View style={styles.avatar}>
+                    <Text variant="captionSmall" color={palette.onPrimaryContainer}>
+                      {item.initials}
+                    </Text>
+                  </View>
+                  <Text variant="bodySmall" color={palette.onSurface} style={styles.reviewName}>
+                    {item.name}
                   </Text>
                 </View>
-                <Text variant="bodySmall" color={palette.onSurface} style={styles.reviewName}>
-                  {item.name}
+                <View style={styles.starsRowSmall}>
+                  {Array.from({ length: item.rating }).map((_, i) => (
+                    <MaterialCommunityIcons key={i} name="star" size={14} color={palette.star} />
+                  ))}
+                </View>
+                <Text variant="caption" color={palette.onSurfaceVariant}>
+                  {item.text}
                 </Text>
               </View>
-              <View style={styles.starsRowSmall}>
-                {Array.from({ length: item.rating }).map((_, i) => (
-                  <MaterialCommunityIcons key={i} name="star" size={14} color={palette.star} />
-                ))}
-              </View>
-              <Text variant="caption" color={palette.onSurfaceVariant}>
-                {t(item.textKey)}
-              </Text>
-            </View>
-          )}
-        />
+            )}
+          />
+        ) : null}
 
         <View style={styles.scrollSpacer} />
       </ScrollView>
