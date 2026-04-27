@@ -4,7 +4,12 @@ export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
   MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
-  Results: undefined;
+  Results: {
+    destination: string;
+    checkIn: string;
+    checkOut: string;
+    guests: number;
+  };
   PropertyDetail: { id: string; checkIn?: string; checkOut?: string; guests?: number };
   ReservationSummary: {
     hotelId: string;

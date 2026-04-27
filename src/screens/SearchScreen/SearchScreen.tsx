@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { View, Pressable, ScrollView, FlatList } from 'react-native';
+import { View, Pressable, ScrollView, FlatList, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -199,7 +199,29 @@ export default function SearchScreen() {
             />
           </Pressable>
 
-          <Pressable style={styles.searchButton} onPress={() => navigation.navigate('Results')}>
+          <Pressable
+            style={styles.searchButton}
+            onPress={() => {
+              if (!destination) {
+                Alert.alert(t('search.errorDestination'));
+                return;
+              }
+              if (!checkIn) {
+                Alert.alert(t('search.errorCheckIn'));
+                return;
+              }
+              if (!checkOut) {
+                Alert.alert(t('search.errorCheckOut'));
+                return;
+              }
+              navigation.navigate('Results', {
+                destination: destination ?? '',
+                checkIn: checkIn ?? '',
+                checkOut: checkOut ?? '',
+                guests,
+              });
+            }}
+          >
             <MaterialCommunityIcons name="magnify" size={18} color={palette.onPrimaryContainer} />
             <Text variant="button" color={palette.onPrimaryContainer}>
               {t('search.searchButton')}

@@ -30,6 +30,7 @@ jest.mock('../../i18n', () => ({
 jest.mock('../../api/hooks/useSearch', () => ({
   useHotelDetail: () => ({ data: null, isLoading: true }),
   useHotelRooms: () => ({ data: null, isLoading: true }),
+  useHotelReviews: () => ({ data: null, isLoading: true }),
 }));
 
 jest.mock('../../api/hooks/useCart', () => ({
@@ -142,5 +143,108 @@ describe('PropertyDetailScreen', () => {
       </LocaleProvider>
     );
     expect(getByText('propertyDetail.bookNow')).toBeTruthy();
+  });
+
+  it('muestra la descripción del hotel desde la API cuando está disponible', () => {
+    const useSearchMock = require('../../api/hooks/useSearch');
+    const hotelWithDescription = { ...mockHotel, description: 'Un hotel histórico en el corazón de Cartagena' };
+    useSearchMock.useHotelDetail = () => ({ data: hotelWithDescription, isLoading: false });
+    useSearchMock.useHotelRooms = () => ({
+      data: { rooms: mockRooms, total: 2 },
+      isLoading: false,
+    });
+    useSearchMock.useHotelReviews = () => ({ data: null, isLoading: false });
+
+    const { getByText } = render(
+      <LocaleProvider>
+        <PropertyDetailScreen />
+      </LocaleProvider>
+    );
+
+    expect(getByText('Un hotel histórico en el corazón de Cartagena')).toBeTruthy();
+  });
+
+  it('muestra el fallback i18n de descripción cuando el hotel no tiene descripción', () => {
+    const useSearchMock = require('../../api/hooks/useSearch');
+    const hotelWithoutDescription = { ...mockHotel, description: '' };
+    useSearchMock.useHotelDetail = () => ({ data: hotelWithoutDescription, isLoading: false });
+    useSearchMock.useHotelRooms = () => ({
+      data: { rooms: mockRooms, total: 2 },
+      isLoading: false,
+    });
+    useSearchMock.useHotelReviews = () => ({ data: null, isLoading: false });
+
+    const { getByText } = render(
+      <LocaleProvider>
+        <PropertyDetailScreen />
+      </LocaleProvider>
+    );
+
+    expect(getByText('propertyDetail.description')).toBeTruthy();
+  });
+
+  it('muestra las reseñas provenientes de la API cuando están disponibles', () => {
+    const useSearchMock = require('../../api/hooks/useSearch');
+    useSearchMock.useHotelDetail = () => ({ data: mockHotel, isLoading: false });
+    useSearchMock.useHotelRooms = () => ({
+      data: { rooms: mockRooms, total: 2 },
+      isLoading: false,
+    });
+    useSearchMock.useHotelReviews = () => ({
+      data: [
+        { name: 'Laura P.', initial: 'LP', stars: 5, text: 'Excelente servicio y ubicación.' },
+        { name: 'Juan S.', initial: 'JS', stars: 4, text: 'Muy buena experiencia.' },
+      ],
+      isLoading: false,
+    });
+
+    const { getByText } = render(
+      <LocaleProvider>
+        <PropertyDetailScreen />
+      </LocaleProvider>
+    );
+
+    expect(getByText('Laura P.')).toBeTruthy();
+    expect(getByText('Juan S.')).toBeTruthy();
+  });
+
+  it('no muestra reseñas cuando la API devuelve lista vacía', () => {
+    const useSearchMock = require('../../api/hooks/useSearch');
+    useSearchMock.useHotelDetail = () => ({ data: mockHotel, isLoading: false });
+    useSearchMock.useHotelRooms = () => ({
+      data: { rooms: mockRooms, total: 2 },
+      isLoading: false,
+    });
+    useSearchMock.useHotelReviews = () => ({ data: [], isLoading: false });
+
+    const { queryByText } = render(
+      <LocaleProvider>
+        <PropertyDetailScreen />
+      </LocaleProvider>
+    );
+
+    expect(queryByText('Maria G.')).toBeNull();
+    expect(queryByText('Carlos M.')).toBeNull();
+    expect(queryByText('Ana L.')).toBeNull();
+  });
+
+  it('muestra un indicador de carga cuando las reseñas están cargando', () => {
+    const useSearchMock = require('../../api/hooks/useSearch');
+    useSearchMock.useHotelDetail = () => ({ data: mockHotel, isLoading: false });
+    useSearchMock.useHotelRooms = () => ({
+      data: { rooms: mockRooms, total: 2 },
+      isLoading: false,
+    });
+    useSearchMock.useHotelReviews = () => ({ data: null, isLoading: true });
+
+    const { getByText, queryByText } = render(
+      <LocaleProvider>
+        <PropertyDetailScreen />
+      </LocaleProvider>
+    );
+
+    expect(getByText('propertyDetail.loadingReviews')).toBeTruthy();
+    expect(queryByText('Maria G.')).toBeNull();
+    expect(queryByText('Carlos M.')).toBeNull();
   });
 });
