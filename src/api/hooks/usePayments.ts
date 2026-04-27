@@ -80,13 +80,13 @@ export interface PaymentStatusResponse {
 
 export function useTokenize() {
   return useMutation<TokenizeResponse, Error, TokenizeRequest>({
-    mutationFn: (data) => httpClient.post('/gateway/tokenize', { body: data }),
+    mutationFn: data => httpClient.post('/gateway/tokenize', { body: data }),
   });
 }
 
 export function useInitiatePayment() {
   return useMutation<InitiatePaymentResponse, Error, InitiatePaymentRequest>({
-    mutationFn: (data) =>
+    mutationFn: data =>
       httpClient.post<InitiatePaymentResponse>('/payments/initiate', { body: data }),
   });
 }
@@ -96,7 +96,7 @@ export function usePaymentStatus(paymentId: string | null) {
     queryKey: ['payments', paymentId, 'status'],
     queryFn: () => httpClient.get<PaymentStatusResponse>(`/payments/${paymentId}`),
     enabled: !!paymentId,
-    refetchInterval: (query) => {
+    refetchInterval: query => {
       const status = query.state.data?.status;
       if (status === 'approved' || status === 'declined') return false;
       return 1000;

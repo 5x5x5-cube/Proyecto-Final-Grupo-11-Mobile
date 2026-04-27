@@ -33,7 +33,7 @@ describe('LocaleContext – buildRatesMap', () => {
     const { getByTestId } = render(
       <LocaleProvider>
         <PriceConsumer amount={100000} />
-      </LocaleProvider>,
+      </LocaleProvider>
     );
 
     // COP fallback rate=1, decimals=0 → "COP 100.000"
@@ -48,7 +48,7 @@ describe('LocaleContext – buildRatesMap', () => {
     const { getByTestId } = render(
       <LocaleProvider>
         <PriceConsumer amount={100000} />
-      </LocaleProvider>,
+      </LocaleProvider>
     );
 
     expect(getByTestId('price').props.children).toMatch(/COP/);
@@ -60,7 +60,7 @@ describe('LocaleContext – buildRatesMap', () => {
     const { getByTestId } = render(
       <LocaleProvider>
         <PriceConsumer amount={100000} />
-      </LocaleProvider>,
+      </LocaleProvider>
     );
 
     expect(getByTestId('price').props.children).toMatch(/COP/);
@@ -77,7 +77,7 @@ describe('LocaleContext – buildRatesMap', () => {
     const { getByTestId } = render(
       <LocaleProvider>
         <PriceConsumer amount={100000} />
-      </LocaleProvider>,
+      </LocaleProvider>
     );
 
     expect(getByTestId('price').props.children).toMatch(/COP/);

@@ -25,7 +25,7 @@ export function useDestinations() {
     queryKey: ['destinations'],
     queryFn: async () => {
       const raw = await httpClient.get<DestinationsResponse | Destination[]>(
-        '/search/destinations',
+        '/search/destinations'
       );
 
       // Mock fallback returns a plain array with { name, country, gradient, ... }
@@ -35,7 +35,7 @@ export function useDestinations() {
 
       // Real API returns { destinations: [{ city, country }], total }
       const list = (raw as DestinationsResponse).destinations ?? [];
-      return list.map((d) => ({
+      return list.map(d => ({
         name: d.city,
         country: d.country,
         hotelCount: 0,
@@ -98,7 +98,7 @@ export function useSearchHotels(params?: HotelSearchParams) {
         ? raw
         : ((raw as HotelsSearchResponse).results ?? []);
 
-      return list.map((h) => ({
+      return list.map(h => ({
         id: h.id,
         type: 'Hotel',
         name: h.name,
@@ -152,7 +152,7 @@ export function useHotelRooms(hotelId: string, checkIn?: string) {
       const list: BackendRoom[] = Array.isArray(raw)
         ? raw
         : ((raw as HotelRoomsResponse).rooms ?? []);
-      return list.map((r) => ({
+      return list.map(r => ({
         id: r.id,
         roomType: r.room_type,
         roomNumber: r.room_number,
@@ -183,7 +183,7 @@ const AMENITY_MAP: Record<string, { icon: string; label: string }> = {
 };
 
 function mapAmenities(
-  amenities: Record<string, boolean> | undefined,
+  amenities: Record<string, boolean> | undefined
 ): Array<{ key: string; icon: string; label: string }> {
   if (!amenities) return [];
   return Object.entries(amenities)

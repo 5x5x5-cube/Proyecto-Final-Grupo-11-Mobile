@@ -47,7 +47,7 @@ export function useBookings() {
     queryKey: ['bookings'],
     queryFn: async () => {
       const raw = await httpClient.get<BookingListResponse | BookingData[]>('/bookings');
-      return Array.isArray(raw) ? raw : (raw as BookingListResponse).data ?? [];
+      return Array.isArray(raw) ? raw : ((raw as BookingListResponse).data ?? []);
     },
   });
 }
@@ -57,7 +57,7 @@ export function usePastBookings() {
     queryKey: ['bookings', 'past'],
     queryFn: async () => {
       const raw = await httpClient.get<BookingListResponse | BookingData[]>('/bookings');
-      return Array.isArray(raw) ? raw : (raw as BookingListResponse).data ?? [];
+      return Array.isArray(raw) ? raw : ((raw as BookingListResponse).data ?? []);
     },
   });
 }
@@ -69,7 +69,7 @@ export function useCancelledBookings() {
       const raw = await httpClient.get<BookingListResponse | BookingData[]>('/bookings', {
         params: { status: 'cancelled' },
       });
-      return Array.isArray(raw) ? raw : (raw as BookingListResponse).data ?? [];
+      return Array.isArray(raw) ? raw : ((raw as BookingListResponse).data ?? []);
     },
   });
 }

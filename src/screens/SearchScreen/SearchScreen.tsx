@@ -82,7 +82,7 @@ export default function SearchScreen() {
       { key: 'ci3', label: t('search.inWeek'), date: toIso(addDays(today, 7)) },
       { key: 'ci4', label: t('search.inWeeks', { count: 2 }), date: toIso(addDays(today, 14)) },
     ],
-    [today, t],
+    [today, t]
   );
 
   const checkOutOptions = useMemo(() => {

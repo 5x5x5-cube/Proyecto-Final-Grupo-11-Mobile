@@ -252,7 +252,7 @@ export default function PropertyDetailScreen() {
           </Text>
           {hotelAmenities.length > 0 && (
             <View style={styles.amenitiesRow}>
-              {hotelAmenities.map((amenity) => (
+              {hotelAmenities.map(amenity => (
                 <AmenityTag key={amenity.key} icon={amenity.icon} label={amenity.label} />
               ))}
             </View>
