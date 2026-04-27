@@ -7,8 +7,7 @@ export interface RequestConfig {
   body?: unknown;
 }
 
-const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:8090/api/v1';
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:8090/api/v1';
 
 function buildUrl(path: string, params?: Record<string, unknown>): string {
   let url = `${API_BASE_URL}${path}`;

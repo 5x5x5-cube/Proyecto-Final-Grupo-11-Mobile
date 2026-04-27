@@ -83,7 +83,9 @@ describe('QRCheckInScreen', () => {
   it('shows error state when QR fetch fails with date range error', () => {
     mockUseBookingQR.mockReturnValue({
       data: null,
-      error: { detail: 'QR code can only be generated within 3 days before or after check-in date' },
+      error: {
+        detail: 'QR code can only be generated within 3 days before or after check-in date',
+      },
       isLoading: false,
     });
 
@@ -96,7 +98,9 @@ describe('QRCheckInScreen', () => {
   it('shows error state when QR fetch fails with not confirmed error', () => {
     mockUseBookingQR.mockReturnValue({
       data: null,
-      error: { detail: 'QR code can only be generated for confirmed bookings. Current status: pending' },
+      error: {
+        detail: 'QR code can only be generated for confirmed bookings. Current status: pending',
+      },
       isLoading: false,
     });
 
@@ -130,7 +134,9 @@ describe('QRCheckInScreen', () => {
   it('hides instruction card when error is shown', () => {
     mockUseBookingQR.mockReturnValue({
       data: null,
-      error: { detail: 'QR code can only be generated within 3 days before or after check-in date' },
+      error: {
+        detail: 'QR code can only be generated within 3 days before or after check-in date',
+      },
       isLoading: false,
     });
 

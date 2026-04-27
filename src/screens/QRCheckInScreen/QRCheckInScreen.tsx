@@ -41,11 +41,7 @@ export default function QRCheckInScreen() {
       <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 24 + insets.bottom }]}>
         {hasError ? (
           <View style={styles.errorCard}>
-            <MaterialCommunityIcons
-              name="qrcode-remove"
-              size={64}
-              color={palette.outline}
-            />
+            <MaterialCommunityIcons name="qrcode-remove" size={64} color={palette.outline} />
             <Text variant="body" color={palette.onSurface} style={styles.errorTitle}>
               {t('qrCheckIn.errorTitle')}
             </Text>
@@ -88,7 +84,8 @@ export default function QRCheckInScreen() {
 
         {/* Room + guests */}
         <Text variant="caption" color={palette.onSurfaceVariant} style={styles.roomGuests}>
-          {reservation.room ? `${reservation.room} · ` : ''}{t('qrCheckIn.guests', { count: reservation.guests })}
+          {reservation.room ? `${reservation.room} · ` : ''}
+          {t('qrCheckIn.guests', { count: reservation.guests })}
         </Text>
 
         {/* Offline indicator */}
@@ -108,12 +105,15 @@ export default function QRCheckInScreen() {
         {/* Instruction card */}
         {!hasError && (
           <View style={styles.instructionCard}>
-            <Text variant="bodySmall" color={palette.onSurfaceVariant} style={styles.instructionText}>
+            <Text
+              variant="bodySmall"
+              color={palette.onSurfaceVariant}
+              style={styles.instructionText}
+            >
               {t('qrCheckIn.instruction')}
             </Text>
           </View>
         )}
-
       </ScrollView>
     </View>
   );
