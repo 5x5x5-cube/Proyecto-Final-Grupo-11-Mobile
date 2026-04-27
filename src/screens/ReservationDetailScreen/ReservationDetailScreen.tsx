@@ -34,12 +34,12 @@ export default function ReservationDetailScreen() {
   const mappedReservation = reservation
     ? {
         ...reservation,
-        gradient: ['#006874', '#4A9FAA'] as const, // Default gradient
+        gradient: ['#006874', '#4A9FAA'] as const,
         hotelType: 'Hotel',
-        hotelName: `Hotel ${reservation.hotelId}`,
-        location: 'Unknown',
-        nights: 0, // Calculate if needed
-        room: `Room ${reservation.roomId}`,
+        hotelName: reservation.hotelName ?? reservation.code,
+        location: reservation.location ?? '',
+        nights: reservation.nights ?? 0,
+        room: reservation.roomName ?? '',
         totalPriceCop: reservation.totalPrice,
       }
     : null;
@@ -54,8 +54,9 @@ export default function ReservationDetailScreen() {
     );
   }
 
-  const accommodationCop = Math.round(mappedReservation.totalPriceCop * 0.81);
-  const taxesCop = mappedReservation.totalPriceCop - accommodationCop;
+  const pb = mappedReservation.priceBreakdown;
+  const accommodationCop = pb ? Number(pb.basePrice) : Math.round(mappedReservation.totalPriceCop * 0.81);
+  const taxesCop = pb ? Number(pb.vat) + Number(pb.serviceFee || 0) : mappedReservation.totalPriceCop - accommodationCop;
 
   return (
     <View style={styles.container}>
@@ -153,15 +154,17 @@ export default function ReservationDetailScreen() {
 
         {/* Action buttons */}
         <View style={styles.buttonsColumn}>
-          <Pressable
-            style={styles.primaryButton}
-            onPress={() => navigation.navigate('QRCheckIn', { id: mappedReservation.id })}
-          >
-            <MaterialCommunityIcons name="qrcode" size={20} color={palette.onPrimary} />
-            <Text variant="button" color={palette.onPrimary} style={styles.primaryButtonText}>
-              {t('reservationDetail.showQR')}
-            </Text>
-          </Pressable>
+          {mappedReservation.status === 'confirmed' && (
+            <Pressable
+              style={styles.primaryButton}
+              onPress={() => navigation.navigate('QRCheckIn', { id: mappedReservation.id })}
+            >
+              <MaterialCommunityIcons name="qrcode" size={20} color={palette.onPrimary} />
+              <Text variant="button" color={palette.onPrimary} style={styles.primaryButtonText}>
+                {t('reservationDetail.showQR')}
+              </Text>
+            </Pressable>
+          )}
           <Pressable
             style={styles.errorButton}
             onPress={() => navigation.navigate('CancelReservation', { id: mappedReservation.id })}

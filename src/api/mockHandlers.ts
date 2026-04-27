@@ -139,6 +139,15 @@ export const mockHandlers: MockRoute[] = [
     pattern: /^\/search\/hotels\/([\w-]+)\/rooms$/,
     handler: () => ok({ rooms: hotelRooms, total: hotelRooms.length }),
   },
+  {
+    method: 'GET',
+    pattern: /^\/search\/hotels\/([^/]+)\/reviews$/,
+    handler: () => ok([
+      { initial: 'MG', name: 'Maria G.', date: '2026-02-15', stars: 5, text: 'Excelente hotel, las instalaciones son increíbles y el personal muy amable.' },
+      { initial: 'CM', name: 'Carlos M.', date: '2026-02-10', stars: 4, text: 'Muy buena ubicación y habitaciones cómodas. El desayuno podría mejorar.' },
+      { initial: 'AL', name: 'Ana L.', date: '2026-01-28', stars: 5, text: 'Una experiencia maravillosa. Definitivamente volveré.' },
+    ]),
+  },
 
   // ─── Bookings ───
   {

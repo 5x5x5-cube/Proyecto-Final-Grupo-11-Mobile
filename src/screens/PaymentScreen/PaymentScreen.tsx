@@ -1,217 +1,65 @@
-import React, { useRef, useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, TextInput, View, Pressable } from 'react-native';
+import React from 'react';
+import { ActivityIndicator, ScrollView, View, Pressable } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
-import { RootStackParamList } from '@/navigation/types';
-import { useCart } from '@/api/hooks/useCart';
-import { useTokenize, useInitiatePayment, usePaymentStatus } from '@/api/hooks/usePayments';
-import type { PaymentMethod as ApiPaymentMethod } from '@/api/hooks/usePayments';
-import { isValidLuhn } from '@/utils/luhn';
 import { useLocale } from '@/contexts/LocaleContext';
 import { palette } from '@/theme/palette';
 import Text from '@/components/Text';
 import TopBar from '@/components/TopBar';
 import ActionBar from '@/components/ActionBar';
 import HoldCountdown from '@/modules/checkout/HoldCountdown';
+import CardForm from '@/modules/checkout/CardForm';
+import WalletForm from '@/modules/checkout/WalletForm';
+import TransferForm from '@/modules/checkout/TransferForm';
 import Card from '@/components/Card';
 import Divider from '@/components/Divider';
 import PrimaryButton from '@/components/PrimaryButton';
+import { usePaymentFlow } from '@/modules/checkout/hooks/usePaymentFlow';
+import { usePaymentMethodForm } from '@/modules/checkout/hooks/usePaymentMethodForm';
+import type { UIPaymentMethod } from '@/modules/checkout/hooks/usePaymentMethodForm';
 import { styles } from './PaymentScreen.styles';
 
-type PaymentMethod = 'credit' | 'debit' | 'wallet' | 'transfer';
-
-const paymentMethods: { key: PaymentMethod; labelKey: string; icon: string }[] = [
+const paymentMethods: { key: UIPaymentMethod; labelKey: string; icon: string }[] = [
   { key: 'credit', labelKey: 'payment.creditCard', icon: 'credit-card' },
   { key: 'debit', labelKey: 'payment.debitCard', icon: 'bank' },
   { key: 'wallet', labelKey: 'payment.digitalWallet', icon: 'wallet' },
   { key: 'transfer', labelKey: 'payment.transfer', icon: 'swap-horizontal' },
 ];
 
-function formatCardNumber(raw: string): string {
-  const digits = raw.replace(/\D/g, '').slice(0, 16);
-  return digits.replace(/(.{4})/g, '$1 ').trim();
-}
-
-function maskCardNumber(raw: string): string {
-  const digits = raw.replace(/\D/g, '').slice(0, 16);
-  if (digits.length <= 4) {
-    return digits.replace(/(.{4})/g, '$1 ').trim();
-  }
-  const last4 = digits.slice(-4);
-  const maskedCount = digits.length - 4;
-  const masked = '\u2022'.repeat(maskedCount);
-  const full = (masked + last4).padEnd(16, ' ').slice(0, 16);
-  return full.replace(/(.{4})/g, '$1 ').trim();
-}
-
-function formatExpiry(raw: string): string {
-  const digits = raw.replace(/\D/g, '').slice(0, 4);
-  if (digits.length > 2) {
-    return digits.slice(0, 2) + '/' + digits.slice(2);
-  }
-  return digits;
-}
-
-function isExpiryMonthValid(value: string): boolean {
-  if (value.length < 2) return true;
-  const month = parseInt(value.slice(0, 2), 10);
-  return month >= 1 && month <= 12;
-}
-
 export default function PaymentScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { t } = useTranslation('mobile');
   const { formatPrice, formatDate } = useLocale();
-  const [selected, setSelected] = useState<PaymentMethod>('credit');
-  const [rawCardNumber, setRawCardNumber] = useState('');
-  const [cardHolder, setCardHolder] = useState('');
-  const [expiry, setExpiry] = useState('');
-  const [cvv, setCvv] = useState('');
-  const [isCardFocused, setIsCardFocused] = useState(false);
-  const [paymentId, setPaymentId] = useState<string | null>(null);
-  const [formEnabled, setFormEnabled] = useState(true);
 
-  const nameRef = useRef<TextInput>(null);
-  const expiryRef = useRef<TextInput>(null);
-  const cvvRef = useRef<TextInput>(null);
+  const flow = usePaymentFlow();
+  const form = usePaymentMethodForm();
 
-  const { data: cart, isLoading: isCartLoading } = useCart();
-  const tokenize = useTokenize();
-  const initiatePayment = useInitiatePayment();
-  const paymentStatus = usePaymentStatus(paymentId);
-
-  const isPolling = !!paymentId && paymentStatus.data?.status === 'processing';
-  const loading = tokenize.isPending || initiatePayment.isPending || isPolling;
-
-  // React to polling result
-  React.useEffect(() => {
-    if (!paymentStatus.data) return;
-
-    const { status } = paymentStatus.data;
-
-    if (status === 'approved' && paymentId) {
-      const pid = paymentId;
-      setPaymentId(null);
-      navigation.navigate('Success', { paymentId: pid });
-    } else if (status === 'declined') {
-      setPaymentId(null);
-      setFormEnabled(true);
-      Alert.alert(t('payment.paymentError'), t('payment.declinedMessage'));
-    }
-  }, [paymentStatus.data?.status]);
-
-  const handleExpired = () => {
-    Alert.alert(t('summary.holdExpired'), t('summary.holdExpiredMessage'), [
-      { text: t('common.ok'), onPress: () => navigation.navigate('MainTabs') },
-    ]);
-  };
-
-  if (isCartLoading || !cart) {
+  if (flow.isCartLoading || !flow.cart) {
     return (
       <View style={styles.container}>
-        <TopBar title={t('payment.title')} onBack={() => navigation.goBack()} />
+        <TopBar title={t('payment.title')} onBack={flow.goBack} />
         <ActivityIndicator style={{ marginTop: 32 }} color={palette.primary} />
       </View>
     );
   }
 
-  const { hotelName, checkIn, checkOut } = cart;
-  const total = Number(cart.pricing?.total ?? cart.priceBreakdown?.total ?? 0);
+  const { hotelName, checkIn, checkOut } = flow.cart;
+  const total = Number(flow.cart.pricing?.total ?? flow.cart.priceBreakdown?.total ?? 0);
 
-  const showCardForm = selected === 'credit' || selected === 'debit';
-
-  // Validation uses raw digit count (without spaces)
-  const rawDigits = rawCardNumber.replace(/\D/g, '');
-  const isCardNumberComplete = rawDigits.length === 16;
-  const isCardNumberValid = isCardNumberComplete && isValidLuhn(rawDigits);
-
-  const isExpiryFormatValid = expiry.length === 5;
-  const isExpiryNotExpired = (() => {
-    if (!isExpiryFormatValid) return true;
-    const [mm, yy] = expiry.split('/').map(Number);
-    const expiryDate = new Date(2000 + yy, mm);
-    return expiryDate > new Date();
-  })();
-
-  const isCardFormValid =
-    isCardNumberValid &&
-    isExpiryNotExpired &&
-    isExpiryFormatValid &&
-    cardHolder.trim().length > 0 &&
-    cvv.length === 3;
-
-  const isPayDisabled = loading || !formEnabled || (showCardForm && !isCardFormValid);
-
-  // Show masked value when card input is not focused, raw formatted when focused
-  const cardDisplayValue = isCardFocused
-    ? formatCardNumber(rawCardNumber)
-    : maskCardNumber(rawCardNumber);
-
-  function handleCardNumberChange(text: string) {
-    // Strip dots (mask characters) and non-digits, then store raw digits
-    const digits = text.replace(/[^\d]/g, '').slice(0, 16);
-    setRawCardNumber(digits);
-  }
-
-  function handleExpiryChange(text: string) {
-    const prev = expiry;
-    if (text.length < prev.length) {
-      if (prev.length === 3 && text.length === 2 && text[1] === '/') {
-        setExpiry(text.slice(0, 1));
-        return;
-      }
-      setExpiry(text);
-      return;
-    }
-    const formatted = formatExpiry(text);
-    if (!isExpiryMonthValid(formatted)) return;
-    setExpiry(formatted);
-  }
+  const isPayDisabled = flow.isProcessing || !flow.formEnabled || !form.isFormValid;
 
   function handlePay() {
     if (isPayDisabled) return;
-
-    setFormEnabled(false);
-
-    const apiMethod: ApiPaymentMethod = selected === 'debit' ? 'debit_card' : 'credit_card';
-
-    tokenize.mutate(
-      { method: apiMethod, cardNumber: rawCardNumber, cardHolder, expiry, cvv },
-      {
-        onSuccess: tokenData => {
-          initiatePayment.mutate(
-            {
-              token: tokenData.token,
-              cartId: cart!.id,
-              method: apiMethod,
-            },
-            {
-              onSuccess: initiateData => {
-                setPaymentId(initiateData.paymentId);
-              },
-              onError: () => {
-                setFormEnabled(true);
-                Alert.alert(t('payment.paymentError'), t('payment.declinedMessage'));
-              },
-            }
-          );
-        },
-        onError: () => {
-          setFormEnabled(true);
-          Alert.alert(t('payment.paymentError'), t('payment.declinedMessage'));
-        },
-      }
-    );
+    const payload = form.buildTokenizePayload();
+    const method = form.getApiMethod();
+    flow.submitPayment(payload, method);
   }
 
   return (
     <View style={styles.container}>
-      <TopBar title={t('payment.title')} onBack={() => navigation.goBack()} />
+      <TopBar title={t('payment.title')} onBack={flow.goBack} />
 
-      {cart?.holdExpiresAt && (
-        <HoldCountdown expiresAt={cart.holdExpiresAt} onExpired={handleExpired} />
+      {flow.cart?.holdExpiresAt && (
+        <HoldCountdown expiresAt={flow.cart.holdExpiresAt} onExpired={flow.handleExpired} />
       )}
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
@@ -222,7 +70,7 @@ export default function PaymentScreen() {
         {/* Payment methods grid */}
         <View style={styles.methodGrid}>
           {paymentMethods.map(method => {
-            const isSelected = selected === method.key;
+            const isSelected = form.selected === method.key;
             return (
               <Pressable
                 key={method.key}
@@ -231,7 +79,7 @@ export default function PaymentScreen() {
                   isSelected && styles.methodCardSelected,
                   pressed && { opacity: 0.8 },
                 ]}
-                onPress={() => setSelected(method.key)}
+                onPress={() => form.setSelected(method.key)}
               >
                 <MaterialCommunityIcons
                   name={method.icon as any}
@@ -250,90 +98,44 @@ export default function PaymentScreen() {
           })}
         </View>
 
-        {/* Card form */}
-        {showCardForm && (
-          <Card marginBottom={16}>
-            <View style={styles.fieldRow}>
-              <MaterialCommunityIcons
-                name="credit-card"
-                size={20}
-                color={palette.onSurfaceVariant}
-              />
-              <TextInput
-                style={styles.fieldInput}
-                value={cardDisplayValue}
-                onChangeText={handleCardNumberChange}
-                onFocus={() => setIsCardFocused(true)}
-                onBlur={() => setIsCardFocused(false)}
-                placeholder={t('payment.cardNumber')}
-                placeholderTextColor={palette.onSurfaceVariant}
-                keyboardType="number-pad"
-                maxLength={19}
-                returnKeyType="next"
-                onSubmitEditing={() => nameRef.current?.focus()}
-                blurOnSubmit={false}
-                editable={formEnabled}
-              />
-            </View>
-            <Divider />
-            <View style={styles.fieldRow}>
-              <MaterialCommunityIcons name="account" size={20} color={palette.onSurfaceVariant} />
-              <TextInput
-                ref={nameRef}
-                style={styles.fieldInput}
-                value={cardHolder}
-                onChangeText={setCardHolder}
-                placeholder={t('payment.cardHolder')}
-                placeholderTextColor={palette.onSurfaceVariant}
-                autoCapitalize="words"
-                returnKeyType="next"
-                onSubmitEditing={() => expiryRef.current?.focus()}
-                blurOnSubmit={false}
-                editable={formEnabled}
-              />
-            </View>
-            <Divider />
-            <View style={styles.fieldRowSplit}>
-              <View style={styles.fieldHalf}>
-                <MaterialCommunityIcons
-                  name="calendar"
-                  size={20}
-                  color={palette.onSurfaceVariant}
-                />
-                <TextInput
-                  ref={expiryRef}
-                  style={styles.fieldInput}
-                  value={expiry}
-                  onChangeText={handleExpiryChange}
-                  placeholder={t('payment.expiry')}
-                  placeholderTextColor={palette.onSurfaceVariant}
-                  keyboardType="number-pad"
-                  maxLength={5}
-                  returnKeyType="next"
-                  onSubmitEditing={() => cvvRef.current?.focus()}
-                  blurOnSubmit={false}
-                  editable={formEnabled}
-                />
-              </View>
-              <View style={styles.fieldHalfDivider} />
-              <View style={styles.fieldHalf}>
-                <MaterialCommunityIcons name="lock" size={20} color={palette.onSurfaceVariant} />
-                <TextInput
-                  ref={cvvRef}
-                  style={styles.fieldInput}
-                  value={cvv}
-                  onChangeText={text => setCvv(text.replace(/\D/g, '').slice(0, 3))}
-                  placeholder={t('payment.cvv')}
-                  placeholderTextColor={palette.onSurfaceVariant}
-                  keyboardType="number-pad"
-                  maxLength={3}
-                  secureTextEntry
-                  returnKeyType="done"
-                  editable={formEnabled}
-                />
-              </View>
-            </View>
-          </Card>
+        {/* Form per selected method */}
+        {form.showCardForm && (
+          <CardForm
+            cardNumber={form.rawCardNumber}
+            cardHolder={form.cardHolder}
+            expiry={form.expiry}
+            cvv={form.cvv}
+            onCardNumberChange={form.handleCardNumberChange}
+            onCardHolderChange={form.setCardHolder}
+            onExpiryChange={form.handleExpiryChange}
+            onCvvChange={form.handleCvvChange}
+            disabled={!flow.formEnabled}
+            cardDisplayValue={form.cardDisplayValue}
+            onCardFocus={() => form.setIsCardFocused(true)}
+            onCardBlur={() => form.setIsCardFocused(false)}
+          />
+        )}
+
+        {form.showWalletForm && (
+          <WalletForm
+            provider={form.walletProvider}
+            email={form.walletEmail}
+            onProviderChange={form.setWalletProvider}
+            onEmailChange={form.setWalletEmail}
+            disabled={!flow.formEnabled}
+          />
+        )}
+
+        {form.showTransferForm && (
+          <TransferForm
+            bankCode={form.bankCode}
+            accountNumber={form.accountNumber}
+            accountHolder={form.accountHolder}
+            onBankChange={form.setBankCode}
+            onAccountNumberChange={form.setAccountNumber}
+            onAccountHolderChange={form.setAccountHolder}
+            disabled={!flow.formEnabled}
+          />
         )}
 
         {/* Mini summary */}
@@ -372,12 +174,12 @@ export default function PaymentScreen() {
       <ActionBar>
         <PrimaryButton
           title={
-            loading
+            flow.isProcessing
               ? t('payment.processingPayment')
               : t('payment.payButton', { amount: formatPrice(total) })
           }
           onPress={handlePay}
-          loading={loading}
+          loading={flow.isProcessing}
           disabled={isPayDisabled}
         />
       </ActionBar>

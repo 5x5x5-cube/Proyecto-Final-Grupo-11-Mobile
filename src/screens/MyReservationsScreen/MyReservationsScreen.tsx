@@ -42,28 +42,27 @@ export default function MyReservationsScreen() {
   const { data: pastData, isLoading: loadingPast } = usePastBookings();
   const { data: cancelledData, isLoading: loadingCancelled } = useCancelledBookings();
 
-  // Backend returns { data: [...], total, page, limit }, extract data array
-  const activeReservations = (activeData as any)?.data ?? [];
-  const pastReservations = (pastData as any)?.data ?? [];
-  const cancelledReservations = (cancelledData as any)?.data ?? [];
+  const activeReservations = activeData ?? [];
+  const pastReservations = pastData ?? [];
+  const cancelledReservations = cancelledData ?? [];
   const isLoading = loadingActive || loadingPast || loadingCancelled;
 
   // Map backend fields to frontend format
   const mapReservation = (b: any): Reservation => ({
     id: b.id,
     hotelType: 'Hotel',
-    hotelName: `Hotel ${b.hotelId}`, // Backend doesn't return hotel name, use ID
-    location: 'Unknown', // Backend doesn't return location
+    hotelName: b.hotelName ?? b.code,
+    location: b.location ?? '',
     checkIn: b.checkIn,
     checkOut: b.checkOut,
-    nights: 0, // Calculate if needed
+    nights: b.nights ?? 0,
     guests: b.guests,
-    room: `Room ${b.roomId}`, // Backend doesn't return room name
+    room: b.roomName ?? '',
     status: b.status,
     code: b.code,
     totalPrice: `${b.totalPrice} ${b.currency}`,
     totalPriceCop: b.totalPrice,
-    gradient: ['#006874', '#4A9FAA'] as const, // Default gradient
+    gradient: ['#006874', '#4A9FAA'] as const,
   });
 
   const activeReservationsMapped = activeReservations.map(mapReservation);
