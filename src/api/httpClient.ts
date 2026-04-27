@@ -34,9 +34,6 @@ async function request<T>(method: Method, path: string, config?: RequestConfig):
   const token = await AsyncStorage.getItem('auth_token');
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  const userId = await AsyncStorage.getItem('user_id');
-  if (userId) headers['X-User-Id'] = userId;
-
   const fetchOptions: RequestInit = {
     method,
     headers,
