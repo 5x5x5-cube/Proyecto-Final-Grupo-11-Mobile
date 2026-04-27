@@ -211,18 +211,13 @@ describe('ResultsScreen', () => {
   it('sort picker becomes visible after pressing sort icon', () => {
     mockUseSearchHotels.mockReturnValue({ data: mockHotels, isLoading: false });
 
-    const { getAllByText, queryAllByText } = render(
+    const { queryAllByText } = render(
       <LocaleProvider>
         <ResultsScreen />
       </LocaleProvider>
     );
 
-    // The sort icon Pressable does not have a text label so we iterate all
-    // text-labelled elements. Instead we use getAllByText to find the sort label
-    // key rendered in the filter row (there is no other way without testID).
-    // We trigger it by pressing the icon area — identified by getting all
-    // "results.sortRecommended" labels that come from the PickerModal title.
-    // Before opening: only 0 occurrences of "results.sortPriceLow"
+    // Before opening: 0 occurrences of "results.sortPriceLow"
     expect(queryAllByText('results.sortPriceLow')).toHaveLength(0);
 
     // The sort icon is a standalone Pressable in the filter scroll (not a FilterChip).
@@ -257,9 +252,7 @@ describe('ResultsScreen', () => {
     // Simpler approach: use testID-free access via the text that appears after pressing
     // We know pressing the sort icon shows sortPriceLow. Walk the fiber tree.
     // Fall back: use fireEvent on the component itself.
-    const found = findAndPressSortIcon(UNSAFE_root);
-    // Whether we found it or not, we check that it's possible via direct state inspection
-    // by calling setSortPickerVisible via a button text approach.
+    findAndPressSortIcon(UNSAFE_root);
     expect(true).toBeTruthy(); // guard: component didn't crash
   });
 
@@ -291,16 +284,12 @@ describe('ResultsScreen', () => {
     ];
     mockUseSearchHotels.mockReturnValue({ data: hotels, isLoading: false });
 
-    const { getAllByText, queryAllByText } = render(
+    const { getAllByText } = render(
       <LocaleProvider>
         <ResultsScreen />
       </LocaleProvider>
     );
 
-    // Open sort picker by triggering with the sort icon approach
-    // Since we can't easily press the icon without testID, we verify the
-    // PickerModal component responds to the state changes by testing it
-    // directly via its visible prop — here we confirm hotels render correctly.
     expect(getAllByText('Hotel Santa Clara')).toHaveLength(1);
     expect(getAllByText('Hotel Las Americas')).toHaveLength(1);
     expect(getAllByText('Hotel Boutique')).toHaveLength(1);

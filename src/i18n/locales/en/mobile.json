@@ -150,7 +150,19 @@
     "paymentError": "Payment error",
     "declinedMessage": "The transaction could not be processed. Please check your details or contact your bank.",
     "cardNumberInvalid": "Invalid card number",
-    "expiryInvalid": "Card is expired"
+    "expiryInvalid": "Card is expired",
+    "walletProvider": "Wallet provider",
+    "selectProvider": "Select a provider",
+    "walletEmail": "Email address",
+    "walletEmailPlaceholder": "email@example.com",
+    "walletEmailInvalid": "Invalid email address",
+    "providerPayPal": "PayPal",
+    "providerGooglePay": "Google Pay",
+    "providerApplePay": "Apple Pay",
+    "selectBank": "Select a bank",
+    "accountNumber": "Account number",
+    "accountNumberInvalid": "Account number must be at least 6 digits",
+    "accountHolder": "Account holder name"
   },
   "success": {
     "title": "Reservation created successfully",

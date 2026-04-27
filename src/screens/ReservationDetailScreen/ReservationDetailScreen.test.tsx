@@ -24,8 +24,30 @@ jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
 
+const mockReservation = {
+  id: 1,
+  code: 'RES-001',
+  hotelName: 'Grand Hyatt Bogotá',
+  roomName: 'Deluxe King Room',
+  location: 'Bogotá, Colombia',
+  nights: 3,
+  checkIn: '2024-06-01',
+  checkOut: '2024-06-04',
+  guests: '2 adults',
+  status: 'confirmed' as const,
+  totalPrice: 900000,
+  currency: 'COP',
+  priceBreakdown: {
+    basePrice: '729000',
+    vat: '116640',
+    serviceFee: '54360',
+  },
+};
+
+const mockUseBookingDetail = jest.fn(() => ({ data: mockReservation, isLoading: false }));
+
 jest.mock('../../api/hooks/useBookings', () => ({
-  useBookingDetail: () => ({ data: null, isLoading: true }),
+  useBookingDetail: (...args: unknown[]) => mockUseBookingDetail(...args),
 }));
 
 jest.mock('expo-linear-gradient', () => {
@@ -43,6 +65,10 @@ import { LocaleProvider } from '../../contexts/LocaleContext';
 import ReservationDetailScreen from './ReservationDetailScreen';
 
 describe('ReservationDetailScreen', () => {
+  beforeEach(() => {
+    mockUseBookingDetail.mockReturnValue({ data: mockReservation, isLoading: false });
+  });
+
   it('renders without crashing', () => {
     const { toJSON } = render(
       <LocaleProvider>
@@ -50,5 +76,111 @@ describe('ReservationDetailScreen', () => {
       </LocaleProvider>
     );
     expect(toJSON()).toBeTruthy();
+  });
+
+  it('renders hotel name from API (not UUID)', () => {
+    const { getByText } = render(
+      <LocaleProvider>
+        <ReservationDetailScreen />
+      </LocaleProvider>
+    );
+    expect(getByText('Grand Hyatt Bogotá')).toBeTruthy();
+  });
+
+  it('renders room name from API', () => {
+    const { getByText } = render(
+      <LocaleProvider>
+        <ReservationDetailScreen />
+      </LocaleProvider>
+    );
+    expect(getByText('Deluxe King Room')).toBeTruthy();
+  });
+
+  it('renders location from API', () => {
+    const { getByText } = render(
+      <LocaleProvider>
+        <ReservationDetailScreen />
+      </LocaleProvider>
+    );
+    expect(getByText('Bogotá, Colombia')).toBeTruthy();
+  });
+
+  it('renders nights count from API', () => {
+    const { getByText } = render(
+      <LocaleProvider>
+        <ReservationDetailScreen />
+      </LocaleProvider>
+    );
+    // t() returns the key with interpolated values via identity mock
+    expect(getByText('reservationDetail.nights')).toBeTruthy();
+  });
+
+  it('uses priceBreakdown when available', () => {
+    const { getByText } = render(
+      <LocaleProvider>
+        <ReservationDetailScreen />
+      </LocaleProvider>
+    );
+    // PriceBreakdown row labels are rendered via t() keys
+    expect(getByText('reservationDetail.taxes')).toBeTruthy();
+    expect(getByText('reservationDetail.totalPaid')).toBeTruthy();
+  });
+
+  // QR button visibility tests
+  it('shows QR button when booking status is confirmed', () => {
+    mockUseBookingDetail.mockReturnValue({
+      data: { ...mockReservation, status: 'confirmed' as const },
+      isLoading: false,
+    });
+    const { getByText } = render(
+      <LocaleProvider>
+        <ReservationDetailScreen />
+      </LocaleProvider>
+    );
+    expect(getByText('reservationDetail.showQR')).toBeTruthy();
+  });
+
+  it('hides QR button when booking status is pending', () => {
+    mockUseBookingDetail.mockReturnValue({
+      data: { ...mockReservation, status: 'pending' as const },
+      isLoading: false,
+    });
+    const { queryByText } = render(
+      <LocaleProvider>
+        <ReservationDetailScreen />
+      </LocaleProvider>
+    );
+    expect(queryByText('reservationDetail.showQR')).toBeNull();
+  });
+
+  it('hides QR button when booking status is cancelled', () => {
+    mockUseBookingDetail.mockReturnValue({
+      data: { ...mockReservation, status: 'cancelled' as const },
+      isLoading: false,
+    });
+    const { queryByText } = render(
+      <LocaleProvider>
+        <ReservationDetailScreen />
+      </LocaleProvider>
+    );
+    expect(queryByText('reservationDetail.showQR')).toBeNull();
+  });
+
+  it('always shows cancel button regardless of status', () => {
+    const statuses = ['confirmed', 'pending', 'cancelled'] as const;
+
+    statuses.forEach(status => {
+      mockUseBookingDetail.mockReturnValue({
+        data: { ...mockReservation, status },
+        isLoading: false,
+      });
+      const { getByText, unmount } = render(
+        <LocaleProvider>
+          <ReservationDetailScreen />
+        </LocaleProvider>
+      );
+      expect(getByText('reservationDetail.cancelReservation')).toBeTruthy();
+      unmount();
+    });
   });
 });
