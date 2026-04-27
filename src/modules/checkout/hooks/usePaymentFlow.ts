@@ -54,10 +54,7 @@ export function usePaymentFlow() {
     ]);
   };
 
-  function submitPayment(
-    tokenizePayload: Record<string, unknown>,
-    apiMethod: ApiPaymentMethod
-  ) {
+  function submitPayment(tokenizePayload: Record<string, unknown>, apiMethod: ApiPaymentMethod) {
     setFormEnabled(false);
 
     tokenize.mutate(tokenizePayload as any, {

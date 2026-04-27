@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { mockHandlers } from './mockHandlers';
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
@@ -8,7 +7,6 @@ export interface RequestConfig {
   body?: unknown;
 }
 
-// For React Native, configure via app config or .env
 const API_BASE_URL =
   'http://a1a689e9face5475b8fc95c6638b22fa-80a0709c1bbff823.elb.us-east-1.amazonaws.com/api/v1';
 
@@ -24,20 +22,6 @@ function buildUrl(path: string, params?: Record<string, unknown>): string {
     }
   }
   return url;
-}
-
-async function tryMockFallback<T>(
-  method: Method,
-  path: string,
-  config?: RequestConfig
-): Promise<T> {
-  const route = mockHandlers.find(r => r.method === method && r.pattern.test(path));
-  if (!route) throw { status: 503, data: { message: 'Service unavailable' } };
-  await new Promise(r => setTimeout(r, 300 + Math.random() * 200));
-  const match = path.match(route.pattern)!;
-  const result = route.handler(config, match);
-  if (result.status >= 400) throw { status: result.status, data: result.data };
-  return result.data as T;
 }
 
 async function request<T>(method: Method, path: string, config?: RequestConfig): Promise<T> {
@@ -62,31 +46,18 @@ async function request<T>(method: Method, path: string, config?: RequestConfig):
     fetchOptions.body = JSON.stringify(config.body);
   }
 
-  try {
-    const response = await fetch(url, fetchOptions);
+  const response = await fetch(url, fetchOptions);
 
-    if (response.status === 501) {
-      return tryMockFallback(method, path, config);
-    }
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: response.statusText }));
-      throw { status: response.status, data: errorData, ...errorData };
-    }
-
-    if (response.status === 204) {
-      return undefined as T;
-    }
-
-    return response.json();
-  } catch (error: unknown) {
-    // If it's already an API error (has status), re-throw
-    if (error && typeof error === 'object' && 'status' in error) {
-      throw error;
-    }
-    // Network error — try mock fallback
-    return tryMockFallback(method, path, config);
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ message: response.statusText }));
+    throw { status: response.status, data: errorData, ...errorData };
   }
+
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  return response.json();
 }
 
 export const httpClient = {

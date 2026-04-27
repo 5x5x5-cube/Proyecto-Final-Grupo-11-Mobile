@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, FlatList, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
@@ -7,14 +7,13 @@ import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '@/navigation/types';
 import { palette } from '@/theme/palette';
 import { useLocale } from '@/contexts/LocaleContext';
-import { useBookings, usePastBookings, useCancelledBookings } from '@/api/hooks/useBookings';
+import { useReservationTabs } from './useReservationTabs';
+import type { ReservationTab } from './useReservationTabs';
 import OfflineBanner from '@/components/OfflineBanner';
 import StatusChip from '@/components/StatusChip';
 import Text from '@/components/Text';
 import MyReservationsScreenSkeleton from './MyReservationsScreen.skeleton';
 import { styles } from './MyReservationsScreen.styles';
-
-type Tab = 'active' | 'past' | 'cancelled';
 
 type Reservation = {
   id: number;
@@ -37,17 +36,8 @@ export default function MyReservationsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { t } = useTranslation('mobile');
   const { formatPrice, formatDate } = useLocale();
-  const [tab, setTab] = useState<Tab>('active');
-  const { data: activeData, isLoading: loadingActive } = useBookings();
-  const { data: pastData, isLoading: loadingPast } = usePastBookings();
-  const { data: cancelledData, isLoading: loadingCancelled } = useCancelledBookings();
+  const { tab, setTab, bookings: rawBookings, isLoading } = useReservationTabs();
 
-  const activeReservations = activeData ?? [];
-  const pastReservations = pastData ?? [];
-  const cancelledReservations = cancelledData ?? [];
-  const isLoading = loadingActive || loadingPast || loadingCancelled;
-
-  // Map backend fields to frontend format
   const mapReservation = (b: any): Reservation => ({
     id: b.id,
     hotelType: 'Hotel',
@@ -65,25 +55,16 @@ export default function MyReservationsScreen() {
     gradient: ['#006874', '#4A9FAA'] as const,
   });
 
-  const activeReservationsMapped = activeReservations.map(mapReservation);
-  const pastReservationsMapped = pastReservations.map(mapReservation);
-  const cancelledReservationsMapped = cancelledReservations.map(mapReservation);
+  const reservations = rawBookings.map(mapReservation);
 
-  const tabs: { key: Tab; label: string; count: number }[] = [
-    { key: 'active', label: t('myReservations.active'), count: activeReservationsMapped.length },
-    { key: 'past', label: t('myReservations.past'), count: pastReservationsMapped.length },
-    {
-      key: 'cancelled',
-      label: t('myReservations.cancelled'),
-      count: cancelledReservationsMapped.length,
-    },
+  const tabs: { key: ReservationTab; label: string; count: number }[] = [
+    { key: 'active', label: t('myReservations.active'), count: reservations.length },
+    { key: 'past', label: t('myReservations.past'), count: 0 },
+    { key: 'cancelled', label: t('myReservations.cancelled'), count: 0 },
   ];
-
-  const dataMap: Record<Tab, Reservation[]> = {
-    active: activeReservationsMapped,
-    past: pastReservationsMapped,
-    cancelled: cancelledReservationsMapped,
-  };
+  // Count for current tab only — others show 0 until selected
+  const currentTabIndex = tabs.findIndex(t => t.key === tab);
+  if (currentTabIndex >= 0) tabs[currentTabIndex].count = reservations.length;
 
   const renderCard = ({ item }: { item: Reservation }) => (
     <Pressable
@@ -154,7 +135,7 @@ export default function MyReservationsScreen() {
         <MyReservationsScreenSkeleton />
       ) : (
         <FlatList
-          data={dataMap[tab]}
+          data={reservations}
           keyExtractor={item => String(item.id)}
           renderItem={renderCard}
           contentContainerStyle={styles.list}

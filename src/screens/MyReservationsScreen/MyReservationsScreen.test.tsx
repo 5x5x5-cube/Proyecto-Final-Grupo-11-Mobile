@@ -51,10 +51,13 @@ const mockActiveBookings = [
   },
 ];
 
-jest.mock('../../api/hooks/useBookings', () => ({
-  useBookings: () => ({ data: mockActiveBookings, isLoading: false }),
-  usePastBookings: () => ({ data: [], isLoading: false }),
-  useCancelledBookings: () => ({ data: [], isLoading: false }),
+jest.mock('./useReservationTabs', () => ({
+  useReservationTabs: () => ({
+    tab: 'active',
+    setTab: jest.fn(),
+    bookings: mockActiveBookings,
+    isLoading: false,
+  }),
 }));
 
 jest.mock('expo-linear-gradient', () => {

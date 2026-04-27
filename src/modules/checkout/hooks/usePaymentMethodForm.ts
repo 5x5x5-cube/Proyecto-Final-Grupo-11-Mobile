@@ -88,7 +88,11 @@ export function usePaymentMethodForm() {
     if (digits.length <= 4) return digits.replace(/(.{4})/g, '$1 ').trim();
     const last4 = digits.slice(-4);
     const masked = '\u2022'.repeat(digits.length - 4) + last4;
-    return masked.padEnd(16, ' ').slice(0, 16).replace(/(.{4})/g, '$1 ').trim();
+    return masked
+      .padEnd(16, ' ')
+      .slice(0, 16)
+      .replace(/(.{4})/g, '$1 ')
+      .trim();
   }
 
   const cardDisplayValue = isCardFocused

@@ -31,7 +31,6 @@ interface NormalizedRoom {
 
 const TAX_RATE = 0.19;
 
-
 // Paleta de degradados para los slides de la galería
 const GALLERY_GRADIENTS: [string, string][] = [
   ['#006874', '#4A9FAA'],

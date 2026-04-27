@@ -44,9 +44,7 @@ describe('WalletForm', () => {
 
   it('calls onEmailChange when email input changes', () => {
     const onEmailChange = jest.fn();
-    const { getByTestId } = render(
-      <WalletForm {...defaultProps} onEmailChange={onEmailChange} />
-    );
+    const { getByTestId } = render(<WalletForm {...defaultProps} onEmailChange={onEmailChange} />);
     fireEvent.changeText(getByTestId('wallet-email-input'), 'user@example.com');
     expect(onEmailChange).toHaveBeenCalledWith('user@example.com');
   });
@@ -69,9 +67,7 @@ describe('WalletForm', () => {
   });
 
   it('does not open picker when disabled', () => {
-    const { getByTestId, queryAllByText } = render(
-      <WalletForm {...defaultProps} disabled />
-    );
+    const { getByTestId, queryAllByText } = render(<WalletForm {...defaultProps} disabled />);
     fireEvent.press(getByTestId('wallet-provider-picker'));
     // When disabled the modal does not open — the title is only shown inside the modal,
     // so we expect at most 1 occurrence (none at all when modal is closed).
@@ -80,9 +76,7 @@ describe('WalletForm', () => {
   });
 
   it('renders with an existing provider selected', () => {
-    const { getByText } = render(
-      <WalletForm {...defaultProps} provider="google_pay" />
-    );
+    const { getByText } = render(<WalletForm {...defaultProps} provider="google_pay" />);
     expect(getByText('payment.providerGooglePay')).toBeTruthy();
   });
 });

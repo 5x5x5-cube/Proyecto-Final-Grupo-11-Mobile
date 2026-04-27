@@ -12,7 +12,7 @@ export default function Brand({ size = 22, variant = 'nav' }: BrandProps) {
   const color = variant === 'hero' ? palette.onSurface : palette.primary;
   return (
     <Text style={{ fontFamily: fontFamily.bold, fontSize: size, letterSpacing: -0.25, color }}>
-      <Text style={{ fontFamily: fontFamily.light }}>Travel</Text>Hub
+      <Text style={{ fontFamily: fontFamily.light, fontSize: size }}>Travel</Text>Hub
     </Text>
   );
 }
