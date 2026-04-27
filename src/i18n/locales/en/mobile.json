@@ -40,7 +40,20 @@
     "popularDestinations": "Popular destinations",
     "hotels": "{{count}} hotels",
     "checkIn": "Check-in",
-    "checkOut": "Check-out"
+    "checkOut": "Check-out",
+    "selectDate": "Select",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "inDays": "In {{count}} days",
+    "inWeek": "In 1 week",
+    "inWeeks": "In {{count}} weeks",
+    "plusDay": "+1 day",
+    "plusDays": "+{{count}} days",
+    "plusWeek": "+1 week",
+    "plusWeeks": "+{{count}} weeks",
+    "errorDestination": "Select a destination",
+    "errorCheckIn": "Select a check-in date",
+    "errorCheckOut": "Select a check-out date"
   },
   "results": {
     "filterPrice": "Price",
@@ -124,21 +137,28 @@
     "nights": "{{count}} nights",
     "total": "Total",
     "securityNote": "Transaction protected with SSL encryption",
-    "payButton": "Pay {{amount}}"
+    "payButton": "Pay {{amount}}",
+    "processingPayment": "Processing payment...",
+    "paymentError": "Payment error",
+    "declinedMessage": "The transaction could not be processed. Please check your details or contact your bank.",
+    "cardNumberInvalid": "Invalid card number",
+    "expiryInvalid": "Card is expired"
   },
   "success": {
     "title": "Reservation created successfully",
     "subtitle": "We have sent the confirmation to your email",
     "reservationCode": "RESERVATION CODE",
     "hotel": "Hotel",
+    "location": "Location",
     "dates": "Dates",
     "room": "Room",
     "guests": "Guests",
     "guestsValue": "{{count}} adults",
-    "total": "Total",
+    "nights": "Nights",
+    "nightsValue": "{{count}} nights",
+    "totalPaid": "Total paid",
     "viewReservations": "View my reservations",
-    "backToHome": "Back to home",
-    "roomValue": "Superior · 1 King bed"
+    "backToHome": "Back to home"
   },
   "myReservations": {
     "title": "My reservations",
@@ -176,7 +196,8 @@
   "qrCheckIn": {
     "title": "QR code check-in",
     "instruction": "Show this code at the front desk for a quick and contactless check-in.",
-    "downloadQR": "Download QR"
+    "downloadQR": "Download QR",
+    "offlineMode": "Offline mode"
   },
   "profile": {
     "personalInfo": "Personal information",

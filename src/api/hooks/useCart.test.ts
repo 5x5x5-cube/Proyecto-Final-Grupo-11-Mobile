@@ -63,7 +63,77 @@ describe('useCart', () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
     expect(mockGet).toHaveBeenCalledWith('/cart');
-    expect(result.current.data).toEqual(mockCart);
+    expect(result.current.data).toMatchObject(mockCart);
+  });
+
+  it('normalizes prices from priceBreakdown and adds pricing property', async () => {
+    const mockCart: Partial<Cart> = {
+      id: 'cart-2',
+      userId: 'user-1',
+      roomId: 'room-1',
+      hotelId: 'hotel-1',
+      hotelName: 'Test Hotel',
+      roomName: 'Suite',
+      checkIn: '2026-04-10',
+      checkOut: '2026-04-13',
+      guests: 2,
+      createdAt: '2026-04-09T00:00:00Z',
+      priceBreakdown: {
+        pricePerNight: '150000' as unknown as number,
+        nights: 3,
+        subtotal: '450000' as unknown as number,
+        vat: '85500' as unknown as number,
+        tourismTax: '4500' as unknown as number,
+        serviceFee: '10000' as unknown as number,
+        total: '550000' as unknown as number,
+        currency: 'COP',
+      },
+    };
+    mockGet.mockResolvedValueOnce(mockCart);
+
+    const { result } = renderHook(() => useCart(), { wrapper: createWrapper() });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    // pricing should have coerced numbers and aggregated taxes
+    expect(result.current.data?.pricing).toEqual({
+      pricePerNight: 150000,
+      nights: 3,
+      subtotal: 450000,
+      taxes: 100000, // 85500 + 4500 + 10000
+      total: 550000,
+      currency: 'COP',
+    });
+    expect(result.current.pricing).toEqual(result.current.data?.pricing);
+  });
+
+  it('returns EMPTY_PRICING when cart has no priceBreakdown', async () => {
+    const mockCart: Partial<Cart> = {
+      id: 'cart-3',
+      userId: 'user-1',
+      roomId: 'room-1',
+      hotelId: 'hotel-1',
+      hotelName: 'Test Hotel',
+      roomName: 'Room',
+      checkIn: '2026-04-10',
+      checkOut: '2026-04-13',
+      guests: 2,
+      createdAt: '2026-04-09T00:00:00Z',
+    };
+    mockGet.mockResolvedValueOnce(mockCart);
+
+    const { result } = renderHook(() => useCart(), { wrapper: createWrapper() });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    expect(result.current.data?.pricing).toEqual({
+      pricePerNight: 0,
+      nights: 0,
+      subtotal: 0,
+      taxes: 0,
+      total: 0,
+      currency: 'COP',
+    });
   });
 });
 

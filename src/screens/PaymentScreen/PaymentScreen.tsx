@@ -6,7 +6,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '@/navigation/types';
 import { useCart } from '@/api/hooks/useCart';
-import { useInitiatePayment } from '@/api/hooks/usePayments';
+import { useTokenize, useInitiatePayment, usePaymentStatus } from '@/api/hooks/usePayments';
+import type { PaymentMethod as ApiPaymentMethod } from '@/api/hooks/usePayments';
+import { isValidLuhn } from '@/utils/luhn';
 import { useLocale } from '@/contexts/LocaleContext';
 import { palette } from '@/theme/palette';
 import Text from '@/components/Text';
@@ -32,6 +34,18 @@ function formatCardNumber(raw: string): string {
   return digits.replace(/(.{4})/g, '$1 ').trim();
 }
 
+function maskCardNumber(raw: string): string {
+  const digits = raw.replace(/\D/g, '').slice(0, 16);
+  if (digits.length <= 4) {
+    return digits.replace(/(.{4})/g, '$1 ').trim();
+  }
+  const last4 = digits.slice(-4);
+  const maskedCount = digits.length - 4;
+  const masked = '\u2022'.repeat(maskedCount);
+  const full = (masked + last4).padEnd(16, ' ').slice(0, 16);
+  return full.replace(/(.{4})/g, '$1 ').trim();
+}
+
 function formatExpiry(raw: string): string {
   const digits = raw.replace(/\D/g, '').slice(0, 4);
   if (digits.length > 2) {
@@ -51,18 +65,42 @@ export default function PaymentScreen() {
   const { t } = useTranslation('mobile');
   const { formatPrice, formatDate } = useLocale();
   const [selected, setSelected] = useState<PaymentMethod>('credit');
-  const [cardNumber, setCardNumber] = useState('');
+  const [rawCardNumber, setRawCardNumber] = useState('');
   const [cardHolder, setCardHolder] = useState('');
   const [expiry, setExpiry] = useState('');
   const [cvv, setCvv] = useState('');
+  const [isCardFocused, setIsCardFocused] = useState(false);
+  const [paymentId, setPaymentId] = useState<string | null>(null);
+  const [formEnabled, setFormEnabled] = useState(true);
 
   const nameRef = useRef<TextInput>(null);
   const expiryRef = useRef<TextInput>(null);
   const cvvRef = useRef<TextInput>(null);
 
   const { data: cart, isLoading: isCartLoading } = useCart();
+  const tokenize = useTokenize();
   const initiatePayment = useInitiatePayment();
-  const loading = initiatePayment.isPending;
+  const paymentStatus = usePaymentStatus(paymentId);
+
+  const isPolling = !!paymentId && paymentStatus.data?.status === 'processing';
+  const loading = tokenize.isPending || initiatePayment.isPending || isPolling;
+
+  // React to polling result
+  React.useEffect(() => {
+    if (!paymentStatus.data) return;
+
+    const { status } = paymentStatus.data;
+
+    if (status === 'approved' && paymentId) {
+      const pid = paymentId;
+      setPaymentId(null);
+      navigation.navigate('Success', { paymentId: pid });
+    } else if (status === 'declined') {
+      setPaymentId(null);
+      setFormEnabled(true);
+      Alert.alert(t('payment.paymentError'), t('payment.declinedMessage'));
+    }
+  }, [paymentStatus.data?.status]);
 
   const handleExpired = () => {
     Alert.alert(t('summary.holdExpired'), t('summary.holdExpiredMessage'), [
@@ -79,29 +117,47 @@ export default function PaymentScreen() {
     );
   }
 
-  const { hotelName, checkIn, checkOut, priceBreakdown } = cart;
-  const total = priceBreakdown?.total ?? 0;
+  const { hotelName, checkIn, checkOut } = cart;
+  const total = Number(cart.pricing?.total ?? cart.priceBreakdown?.total ?? 0);
 
   const showCardForm = selected === 'credit' || selected === 'debit';
 
+  // Validation uses raw digit count (without spaces)
+  const rawDigits = rawCardNumber.replace(/\D/g, '');
+  const isCardNumberComplete = rawDigits.length === 16;
+  const isCardNumberValid = isCardNumberComplete && isValidLuhn(rawDigits);
+
+  const isExpiryFormatValid = expiry.length === 5;
+  const isExpiryNotExpired = (() => {
+    if (!isExpiryFormatValid) return true;
+    const [mm, yy] = expiry.split('/').map(Number);
+    const expiryDate = new Date(2000 + yy, mm);
+    return expiryDate > new Date();
+  })();
+
   const isCardFormValid =
-    cardNumber.length === 19 &&
+    isCardNumberValid &&
+    isExpiryNotExpired &&
+    isExpiryFormatValid &&
     cardHolder.trim().length > 0 &&
-    expiry.length === 5 &&
     cvv.length === 3;
 
-  const isPayDisabled = loading || (showCardForm && !isCardFormValid);
+  const isPayDisabled = loading || !formEnabled || (showCardForm && !isCardFormValid);
+
+  // Show masked value when card input is not focused, raw formatted when focused
+  const cardDisplayValue = isCardFocused
+    ? formatCardNumber(rawCardNumber)
+    : maskCardNumber(rawCardNumber);
 
   function handleCardNumberChange(text: string) {
-    const formatted = formatCardNumber(text);
-    setCardNumber(formatted);
+    // Strip dots (mask characters) and non-digits, then store raw digits
+    const digits = text.replace(/[^\d]/g, '').slice(0, 16);
+    setRawCardNumber(digits);
   }
 
   function handleExpiryChange(text: string) {
     const prev = expiry;
-    // Allow deleting the slash naturally
     if (text.length < prev.length) {
-      // If user deletes the slash, also remove the preceding digit
       if (prev.length === 3 && text.length === 2 && text[1] === '/') {
         setExpiry(text.slice(0, 1));
         return;
@@ -116,16 +172,36 @@ export default function PaymentScreen() {
 
   function handlePay() {
     if (isPayDisabled) return;
-    initiatePayment.mutate(
-      { cardNumber, cardHolder, expiry, cvv, method: selected, total },
+
+    setFormEnabled(false);
+
+    const apiMethod: ApiPaymentMethod = selected === 'debit' ? 'debit_card' : 'credit_card';
+
+    tokenize.mutate(
+      { method: apiMethod, cardNumber: rawCardNumber, cardHolder, expiry, cvv },
       {
-        onSuccess: data =>
-          navigation.navigate('Success', {
-            bookingCode: data?.bookingCode ?? 'TH-2026-00000',
-            hotelName,
-            checkIn,
-            checkOut,
-          }),
+        onSuccess: tokenData => {
+          initiatePayment.mutate(
+            {
+              token: tokenData.token,
+              cartId: cart!.id,
+              method: apiMethod,
+            },
+            {
+              onSuccess: initiateData => {
+                setPaymentId(initiateData.paymentId);
+              },
+              onError: () => {
+                setFormEnabled(true);
+                Alert.alert(t('payment.paymentError'), t('payment.declinedMessage'));
+              },
+            }
+          );
+        },
+        onError: () => {
+          setFormEnabled(true);
+          Alert.alert(t('payment.paymentError'), t('payment.declinedMessage'));
+        },
       }
     );
   }
@@ -185,8 +261,10 @@ export default function PaymentScreen() {
               />
               <TextInput
                 style={styles.fieldInput}
-                value={cardNumber}
+                value={cardDisplayValue}
                 onChangeText={handleCardNumberChange}
+                onFocus={() => setIsCardFocused(true)}
+                onBlur={() => setIsCardFocused(false)}
                 placeholder={t('payment.cardNumber')}
                 placeholderTextColor={palette.onSurfaceVariant}
                 keyboardType="number-pad"
@@ -194,6 +272,7 @@ export default function PaymentScreen() {
                 returnKeyType="next"
                 onSubmitEditing={() => nameRef.current?.focus()}
                 blurOnSubmit={false}
+                editable={formEnabled}
               />
             </View>
             <Divider />
@@ -210,6 +289,7 @@ export default function PaymentScreen() {
                 returnKeyType="next"
                 onSubmitEditing={() => expiryRef.current?.focus()}
                 blurOnSubmit={false}
+                editable={formEnabled}
               />
             </View>
             <Divider />
@@ -232,6 +312,7 @@ export default function PaymentScreen() {
                   returnKeyType="next"
                   onSubmitEditing={() => cvvRef.current?.focus()}
                   blurOnSubmit={false}
+                  editable={formEnabled}
                 />
               </View>
               <View style={styles.fieldHalfDivider} />
@@ -248,6 +329,7 @@ export default function PaymentScreen() {
                   maxLength={3}
                   secureTextEntry
                   returnKeyType="done"
+                  editable={formEnabled}
                 />
               </View>
             </View>
@@ -289,7 +371,11 @@ export default function PaymentScreen() {
 
       <ActionBar>
         <PrimaryButton
-          title={t('payment.payButton', { amount: formatPrice(total) })}
+          title={
+            loading
+              ? t('payment.processingPayment')
+              : t('payment.payButton', { amount: formatPrice(total) })
+          }
           onPress={handlePay}
           loading={loading}
           disabled={isPayDisabled}

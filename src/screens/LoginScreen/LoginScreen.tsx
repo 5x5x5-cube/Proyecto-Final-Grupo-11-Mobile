@@ -58,11 +58,11 @@ export default function LoginScreen() {
       { email: email.trim(), password },
       {
         onSuccess: async (data: any) => {
-          if (data?.token) {
-            await AsyncStorage.setItem('auth_token', data.token);
+          if (data?.access_token) {
+            await AsyncStorage.setItem('auth_token', data.access_token);
           }
-          if (data?.user?.id) {
-            await AsyncStorage.setItem('user_id', String(data.user.id));
+          if (data?.user_id) {
+            await AsyncStorage.setItem('user_id', String(data.user_id));
           }
           navigation.navigate('MainTabs');
         },

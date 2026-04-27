@@ -1,6 +1,8 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import i18n from '../i18n';
+import { useExchangeRates } from '@/api/hooks/useExchangeRates';
+import type { ExchangeRate } from '@/api/hooks/useExchangeRates';
 
 type Language = 'ES' | 'EN';
 type Currency = 'COP' | 'USD' | 'MXN' | 'ARS' | 'CLP' | 'PEN';
@@ -24,7 +26,8 @@ interface LocaleContextType {
   formatDate: (date: string | Date, format: DateFormat) => string;
 }
 
-const exchangeRates: Record<Currency, { rate: number; symbol: string; decimals: number }> = {
+// Fallback rates used when backend is unreachable
+const FALLBACK_RATES: Record<Currency, { rate: number; symbol: string; decimals: number }> = {
   COP: { rate: 1, symbol: 'COP', decimals: 0 },
   USD: { rate: 0.00024, symbol: 'USD', decimals: 2 },
   MXN: { rate: 0.0041, symbol: 'MXN', decimals: 0 },
@@ -47,11 +50,27 @@ const languageNames: Record<Language, string> = {
   EN: 'English',
 };
 
+function buildRatesMap(
+  apiRates: ExchangeRate[] | undefined
+): Record<Currency, { rate: number; symbol: string; decimals: number }> {
+  if (!Array.isArray(apiRates) || apiRates.length === 0) return FALLBACK_RATES;
+  const map = { ...FALLBACK_RATES };
+  for (const r of apiRates) {
+    if (r.currency in map) {
+      map[r.currency as Currency] = { rate: r.rate, symbol: r.symbol, decimals: r.decimals };
+    }
+  }
+  return map;
+}
+
 const LocaleContext = createContext<LocaleContextType | null>(null);
 
 export function LocaleProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<Language>('ES');
   const [currency, setCurrencyState] = useState<Currency>('COP');
+
+  const { data: apiRates } = useExchangeRates();
+  const rates = useMemo(() => buildRatesMap(apiRates), [apiRates]);
 
   useEffect(() => {
     AsyncStorage.getItem('language').then(val => {
@@ -61,7 +80,7 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
       }
     });
     AsyncStorage.getItem('currency').then(val => {
-      if (val && val in exchangeRates) setCurrencyState(val as Currency);
+      if (val && val in FALLBACK_RATES) setCurrencyState(val as Currency);
     });
   }, []);
 
@@ -83,7 +102,7 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
   };
 
   const formatPrice = (copAmount: number): string => {
-    const { rate, symbol, decimals } = exchangeRates[currency];
+    const { rate, symbol, decimals } = rates[currency];
     const converted = copAmount * rate;
     const formatted = converted.toLocaleString('es-CO', {
       minimumFractionDigits: decimals,

@@ -18,14 +18,15 @@ import PrimaryButton from '@/components/PrimaryButton';
 import PropertyDetailScreenSkeleton from './PropertyDetailScreen.skeleton';
 import { styles } from './PropertyDetailScreen.styles';
 
-// Habitación con campos que devuelve la API de search-service
-interface ApiRoom {
+interface NormalizedRoom {
   id: string;
-  room_type: string;
+  roomType: string;
+  roomNumber: string;
   capacity: number;
-  price_per_night: number;
-  amenities?: string[];
-  free_cancellation?: boolean;
+  pricePerNight: number;
+  taxRate: number;
+  description: string;
+  amenities: Array<{ key: string; icon: string; label: string }>;
 }
 
 const TAX_RATE = 0.19;
@@ -66,7 +67,7 @@ export default function PropertyDetailScreen() {
   const { data: hotelData, isLoading: isLoadingHotel } = useHotelDetail(hotelId);
   const { data: roomsData, isLoading: isLoadingRooms } = useHotelRooms(hotelId);
   const hotel = (hotelData as any) ?? null;
-  const rooms: ApiRoom[] = (roomsData as any)?.rooms ?? [];
+  const rooms: NormalizedRoom[] = Array.isArray(roomsData) ? roomsData : [];
 
   const setCart = useSetCart();
   const [selectedRoomIndex, setSelectedRoomIndex] = useState(0);
@@ -105,15 +106,25 @@ export default function PropertyDetailScreen() {
   const selectedRoom = rooms[selectedRoomIndex] ?? null;
 
   // Cálculo del desglose de precio según la habitación seleccionada
-  const subtotal = selectedRoom ? selectedRoom.price_per_night * nights : 0;
+  const subtotal = selectedRoom ? selectedRoom.pricePerNight * nights : 0;
   const taxes = Math.round(subtotal * TAX_RATE);
   const total = subtotal + taxes;
 
-  // Determina si el hotel o la habitación ofrece cancelación gratuita
-  const hasFreeCancellation =
-    hotel.freeCancellation === true ||
-    selectedRoom?.free_cancellation === true ||
-    rooms.some(r => r.free_cancellation);
+  // Aggregate unique amenities from all rooms (same pattern as web)
+  const hotelAmenities = (() => {
+    const map = new Map<string, { key: string; icon: string; label: string }>();
+    for (const room of rooms) {
+      for (const amenity of room.amenities) {
+        if (!map.has(amenity.label)) {
+          map.set(amenity.label, amenity);
+        }
+      }
+    }
+    return Array.from(map.values());
+  })();
+
+  // Determina si el hotel ofrece cancelación gratuita
+  const hasFreeCancellation = hotel.freeCancellation === true;
 
   async function handleReserve() {
     if (!selectedRoom) return;
@@ -239,11 +250,13 @@ export default function PropertyDetailScreen() {
           <Text variant="button" color={palette.onSurface} style={styles.sectionTitle}>
             {t('propertyDetail.includedServices')}
           </Text>
-          <View style={styles.amenitiesRow}>
-            {hotel.amenities.map((amenity: any, index: number) => (
-              <AmenityTag key={index} icon={amenity.icon} label={amenity.label} />
-            ))}
-          </View>
+          {hotelAmenities.length > 0 && (
+            <View style={styles.amenitiesRow}>
+              {hotelAmenities.map(amenity => (
+                <AmenityTag key={amenity.key} icon={amenity.icon} label={amenity.label} />
+              ))}
+            </View>
+          )}
 
           {/* ── Política de cancelación ──────────────────────────────── */}
           {hasFreeCancellation && (
@@ -290,7 +303,7 @@ export default function PropertyDetailScreen() {
                 />
                 <View style={styles.roomInfo}>
                   <Text variant="body" color={palette.onSurface} style={styles.roomName}>
-                    {room.room_type}
+                    {room.roomType}
                   </Text>
                   <View style={styles.roomMeta}>
                     <MaterialCommunityIcons
@@ -304,7 +317,7 @@ export default function PropertyDetailScreen() {
                     </Text>
                   </View>
                   <Text variant="body" color={palette.primary} style={styles.roomPrice}>
-                    {formatPrice(room.price_per_night)}
+                    {formatPrice(room.pricePerNight)}
                     <Text variant="caption" color={palette.onSurfaceVariant}>
                       {t('propertyDetail.perNight')}
                     </Text>
@@ -333,7 +346,7 @@ export default function PropertyDetailScreen() {
                 <Text variant="bodySmall" color={palette.onSurfaceVariant}>
                   {t('propertyDetail.nightsBreakdown', {
                     count: nights,
-                    price: formatPrice(selectedRoom.price_per_night),
+                    price: formatPrice(selectedRoom.pricePerNight),
                   })}
                 </Text>
                 <Text variant="bodySmall" color={palette.onSurface}>

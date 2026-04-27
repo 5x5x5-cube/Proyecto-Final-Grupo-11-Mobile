@@ -1,7 +1,13 @@
 import { renderHook, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
-import { useBookings, useBookingDetail, useCancelBooking, useBookingQR } from './useBookings';
+import {
+  useBookings,
+  useBookingDetail,
+  useCancelBooking,
+  useBookingQR,
+  useCreateBooking,
+} from './useBookings';
 
 jest.mock('../httpClient', () => ({
   httpClient: {
@@ -33,7 +39,7 @@ beforeEach(() => {
 });
 
 describe('useBookings', () => {
-  it('fetches bookings list', async () => {
+  it('unwraps { data, total } envelope from API', async () => {
     const mockData = {
       data: [{ id: '1', code: 'BK-001', status: 'pending' }],
       total: 1,
@@ -44,8 +50,48 @@ describe('useBookings', () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    expect(result.current.data).toEqual(mockData);
+    expect(result.current.data).toEqual(mockData.data);
     expect(mockGet).toHaveBeenCalledWith('/bookings');
+  });
+
+  it('handles plain array response from mock fallback', async () => {
+    const mockArray = [{ id: '1', code: 'BK-001', status: 'pending' }];
+    mockGet.mockResolvedValueOnce(mockArray);
+
+    const { result } = renderHook(() => useBookings(), { wrapper: createWrapper() });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    expect(result.current.data).toEqual(mockArray);
+  });
+});
+
+describe('useCreateBooking', () => {
+  it('posts to /bookings with the booking data', async () => {
+    const mockResponse = { id: '1', code: 'BK-NEW', status: 'pending' };
+    mockPost.mockResolvedValueOnce(mockResponse);
+
+    const { result } = renderHook(() => useCreateBooking(), { wrapper: createWrapper() });
+
+    result.current.mutate({
+      roomId: 'room-1',
+      hotelId: 'hotel-1',
+      checkIn: '2026-04-10',
+      checkOut: '2026-04-13',
+      guests: 2,
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    expect(mockPost).toHaveBeenCalledWith('/bookings', {
+      body: {
+        roomId: 'room-1',
+        hotelId: 'hotel-1',
+        checkIn: '2026-04-10',
+        checkOut: '2026-04-13',
+        guests: 2,
+      },
+    });
   });
 });
 
@@ -72,7 +118,7 @@ describe('useBookingQR', () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    expect(result.current.data).toEqual(mockQR);
+    expect(result.current.data).toEqual({ ...mockQR, isFromCache: false });
     expect(mockGet).toHaveBeenCalledWith('/bookings/42/qr');
   });
 });
