@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Pressable, ScrollView, FlatList } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -18,21 +18,30 @@ import { styles } from './SearchScreen.styles';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
-const checkInOptions = [
-  { key: 'ci1', label: '15 Mar 2026', date: '2026-03-15' },
-  { key: 'ci2', label: '20 Mar 2026', date: '2026-03-20' },
-  { key: 'ci3', label: '1 Abr 2026', date: '2026-04-01' },
-  { key: 'ci4', label: '10 Abr 2026', date: '2026-04-10' },
-  { key: 'ci5', label: '1 May 2026', date: '2026-05-01' },
-];
+function addDays(base: Date, days: number): Date {
+  const d = new Date(base);
+  d.setDate(d.getDate() + days);
+  return d;
+}
 
-const checkOutOptions = [
-  { key: 'co1', label: '20 Mar 2026', date: '2026-03-20' },
-  { key: 'co2', label: '25 Mar 2026', date: '2026-03-25' },
-  { key: 'co3', label: '5 Abr 2026', date: '2026-04-05' },
-  { key: 'co4', label: '15 Abr 2026', date: '2026-04-15' },
-  { key: 'co5', label: '7 May 2026', date: '2026-05-07' },
-];
+function toIso(date: Date): string {
+  return date.toISOString().split('T')[0];
+}
+
+const FALLBACK_GRADIENT: readonly [string, string] = ['#006874', '#4A9FAA'];
+
+function parseGradient(gradient: unknown): readonly [string, string] {
+  if (Array.isArray(gradient) && gradient.length >= 2) {
+    return [gradient[0], gradient[1]];
+  }
+  if (typeof gradient === 'string') {
+    const hexMatches = gradient.match(/#[0-9a-fA-F]{3,8}/g);
+    if (hexMatches && hexMatches.length >= 2) {
+      return [hexMatches[0], hexMatches[1]];
+    }
+  }
+  return FALLBACK_GRADIENT;
+}
 
 export default function SearchScreen() {
   const navigation = useNavigation<Nav>();
@@ -41,9 +50,9 @@ export default function SearchScreen() {
   const { data: destinationsData } = useDestinations();
   const destinations = Array.isArray(destinationsData) ? destinationsData : [];
 
-  const [destination, setDestination] = useState('Cartagena');
-  const [checkIn, setCheckIn] = useState('2026-03-15');
-  const [checkOut, setCheckOut] = useState('2026-03-20');
+  const [destination, setDestination] = useState<string | null>(null);
+  const [checkIn, setCheckIn] = useState<string | null>(null);
+  const [checkOut, setCheckOut] = useState<string | null>(null);
   const [guests, setGuests] = useState(2);
 
   const [destModal, setDestModal] = useState(false);
@@ -56,7 +65,43 @@ export default function SearchScreen() {
     label: `${d.name}, ${d.country}`,
   }));
 
-  const selectedCountry = destinations.find(d => d.name === destination)?.country ?? '';
+  const selectedDest = destinations.find(d => d.name === destination);
+  const selectedCountry = selectedDest?.country ?? '';
+
+  const today = useMemo(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, []);
+
+  const checkInOptions = useMemo(
+    () => [
+      { key: 'ci0', label: t('search.today'), date: toIso(today) },
+      { key: 'ci1', label: t('search.tomorrow'), date: toIso(addDays(today, 1)) },
+      { key: 'ci2', label: t('search.inDays', { count: 3 }), date: toIso(addDays(today, 3)) },
+      { key: 'ci3', label: t('search.inWeek'), date: toIso(addDays(today, 7)) },
+      { key: 'ci4', label: t('search.inWeeks', { count: 2 }), date: toIso(addDays(today, 14)) },
+    ],
+    [today, t],
+  );
+
+  const checkOutOptions = useMemo(() => {
+    const base = checkIn ? new Date(checkIn) : today;
+    return [
+      { key: 'co0', label: t('search.plusDay'), date: toIso(addDays(base, 1)) },
+      { key: 'co1', label: t('search.plusDays', { count: 2 }), date: toIso(addDays(base, 2)) },
+      { key: 'co2', label: t('search.plusDays', { count: 3 }), date: toIso(addDays(base, 3)) },
+      { key: 'co3', label: t('search.plusWeek'), date: toIso(addDays(base, 7)) },
+      { key: 'co4', label: t('search.plusWeeks', { count: 2 }), date: toIso(addDays(base, 14)) },
+    ];
+  }, [checkIn, today, t]);
+
+  const handleCheckIn = (dateIso: string) => {
+    setCheckIn(dateIso);
+    if (checkOut && checkOut <= dateIso) {
+      setCheckOut(null);
+    }
+  };
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.scrollContent}>
@@ -87,8 +132,12 @@ export default function SearchScreen() {
               size={18}
               color={palette.onSurfaceVariant}
             />
-            <Text variant="body" color={palette.onSurface} style={styles.fieldText}>
-              {destination}, {selectedCountry}
+            <Text
+              variant="body"
+              color={destination ? palette.onSurface : palette.onSurfaceVariant}
+              style={styles.fieldText}
+            >
+              {destination ? `${destination}, ${selectedCountry}` : t('search.heroSubtitle')}
             </Text>
             <MaterialCommunityIcons
               name="chevron-down"
@@ -107,8 +156,12 @@ export default function SearchScreen() {
                 size={18}
                 color={palette.onSurfaceVariant}
               />
-              <Text variant="body" color={palette.onSurface} style={styles.fieldText}>
-                {formatDate(checkIn, 'short')}
+              <Text
+                variant="body"
+                color={checkIn ? palette.onSurface : palette.onSurfaceVariant}
+                style={styles.fieldText}
+              >
+                {checkIn ? formatDate(checkIn, 'short') : t('search.selectDate')}
               </Text>
             </Pressable>
             <Pressable
@@ -120,8 +173,12 @@ export default function SearchScreen() {
                 size={18}
                 color={palette.onSurfaceVariant}
               />
-              <Text variant="body" color={palette.onSurface} style={styles.fieldText}>
-                {formatDate(checkOut, 'short')}
+              <Text
+                variant="body"
+                color={checkOut ? palette.onSurface : palette.onSurfaceVariant}
+                style={styles.fieldText}
+              >
+                {checkOut ? formatDate(checkOut, 'short') : t('search.selectDate')}
               </Text>
             </Pressable>
           </View>
@@ -164,7 +221,7 @@ export default function SearchScreen() {
           renderItem={({ item }) => (
             <Pressable onPress={() => setDestination(item.name)}>
               <LinearGradient
-                colors={[...item.gradient]}
+                colors={[...parseGradient(item.gradient)]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={[styles.destCard, item.name === destination && styles.destCardSelected]}
@@ -189,7 +246,7 @@ export default function SearchScreen() {
         visible={destModal}
         onClose={() => setDestModal(false)}
         options={destinationOptions}
-        selected={destination}
+        selected={destination ?? ''}
         onSelect={setDestination}
         title={t('search.heroSubtitle')}
       />
@@ -197,15 +254,15 @@ export default function SearchScreen() {
         visible={checkInModal}
         onClose={() => setCheckInModal(false)}
         options={checkInOptions}
-        selected={checkIn}
-        onSelect={setCheckIn}
+        selected={checkIn ?? ''}
+        onSelect={handleCheckIn}
         title={t('search.checkIn')}
       />
       <DatePickerModal
         visible={checkOutModal}
         onClose={() => setCheckOutModal(false)}
         options={checkOutOptions}
-        selected={checkOut}
+        selected={checkOut ?? ''}
         onSelect={setCheckOut}
         title={t('search.checkOut')}
       />

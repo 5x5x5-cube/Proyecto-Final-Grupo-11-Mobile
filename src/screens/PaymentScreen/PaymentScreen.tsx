@@ -6,7 +6,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '@/navigation/types';
 import { useCart } from '@/api/hooks/useCart';
-import { useTokenizeCard, useInitiatePayment, usePaymentStatus } from '@/api/hooks/usePayments';
+import { useTokenize, useInitiatePayment, usePaymentStatus } from '@/api/hooks/usePayments';
+import type { PaymentMethod as ApiPaymentMethod } from '@/api/hooks/usePayments';
 import { isValidLuhn } from '@/utils/luhn';
 import { useLocale } from '@/contexts/LocaleContext';
 import { palette } from '@/theme/palette';
@@ -77,12 +78,12 @@ export default function PaymentScreen() {
   const cvvRef = useRef<TextInput>(null);
 
   const { data: cart, isLoading: isCartLoading } = useCart();
-  const tokenizeCard = useTokenizeCard();
+  const tokenize = useTokenize();
   const initiatePayment = useInitiatePayment();
   const paymentStatus = usePaymentStatus(paymentId);
 
   const isPolling = !!paymentId && paymentStatus.data?.status === 'processing';
-  const loading = tokenizeCard.isPending || initiatePayment.isPending || isPolling;
+  const loading = tokenize.isPending || initiatePayment.isPending || isPolling;
 
   // React to polling result
   React.useEffect(() => {
@@ -116,8 +117,8 @@ export default function PaymentScreen() {
     );
   }
 
-  const { hotelName, checkIn, checkOut, priceBreakdown } = cart;
-  const total = priceBreakdown?.total ?? 0;
+  const { hotelName, checkIn, checkOut } = cart;
+  const total = Number(cart.pricing?.total ?? cart.priceBreakdown?.total ?? 0);
 
   const showCardForm = selected === 'credit' || selected === 'debit';
 
@@ -174,15 +175,17 @@ export default function PaymentScreen() {
 
     setFormEnabled(false);
 
-    tokenizeCard.mutate(
-      { cardNumber: rawCardNumber, cardHolder, expiry, cvv },
+    const apiMethod: ApiPaymentMethod = selected === 'debit' ? 'debit_card' : 'credit_card';
+
+    tokenize.mutate(
+      { method: apiMethod, cardNumber: rawCardNumber, cardHolder, expiry, cvv },
       {
         onSuccess: tokenData => {
           initiatePayment.mutate(
             {
               token: tokenData.token,
-              cartId: cart.id,
-              method: selected,
+              cartId: cart!.id,
+              method: apiMethod,
             },
             {
               onSuccess: initiateData => {

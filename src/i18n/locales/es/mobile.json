@@ -40,7 +40,20 @@
     "popularDestinations": "Destinos populares",
     "hotels": "{{count}} hoteles",
     "checkIn": "Check-in",
-    "checkOut": "Check-out"
+    "checkOut": "Check-out",
+    "selectDate": "Seleccionar",
+    "today": "Hoy",
+    "tomorrow": "Mañana",
+    "inDays": "En {{count}} dias",
+    "inWeek": "En 1 semana",
+    "inWeeks": "En {{count}} semanas",
+    "plusDay": "+1 dia",
+    "plusDays": "+{{count}} dias",
+    "plusWeek": "+1 semana",
+    "plusWeeks": "+{{count}} semanas",
+    "errorDestination": "Selecciona un destino",
+    "errorCheckIn": "Selecciona fecha de check-in",
+    "errorCheckOut": "Selecciona fecha de check-out"
   },
   "results": {
     "filterPrice": "Precio",
