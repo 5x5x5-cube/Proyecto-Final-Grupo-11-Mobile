@@ -126,5 +126,8 @@ export function useLocale() {
   return ctx;
 }
 
-export { currencyNames, languageNames };
+const LANGUAGES: Language[] = Object.keys(languageNames) as Language[];
+const CURRENCIES: Currency[] = Object.keys(currencyNames) as Currency[];
+
+export { currencyNames, languageNames, LANGUAGES, CURRENCIES };
 export type { Language, Currency, DateFormat };

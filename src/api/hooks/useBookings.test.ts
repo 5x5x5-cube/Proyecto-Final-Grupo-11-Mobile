@@ -51,7 +51,7 @@ describe('useBookings', () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
     expect(result.current.data).toEqual(mockData.data);
-    expect(mockGet).toHaveBeenCalledWith('/bookings');
+    expect(mockGet).toHaveBeenCalledWith('/bookings', undefined);
   });
 
   it('handles plain array response from mock fallback', async () => {

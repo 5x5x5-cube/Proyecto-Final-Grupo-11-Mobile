@@ -47,9 +47,7 @@ export default function ResultsScreen() {
   );
 
   const dateRange =
-    checkIn && checkOut
-      ? `${formatDate(checkIn, 'short')}-${formatDate(checkOut, 'short')}`
-      : '';
+    checkIn && checkOut ? `${formatDate(checkIn, 'short')}-${formatDate(checkOut, 'short')}` : '';
 
   const hotels = (hotelsData as any[]) ?? [];
   let displayList = [...hotels];
@@ -57,7 +55,8 @@ export default function ResultsScreen() {
   if (maxPrice != null) displayList = displayList.filter(h => h.pricePerNight <= maxPrice);
   if (selectedType) displayList = displayList.filter(h => h.type === selectedType);
   if (sortBy === 'priceLowToHigh') displayList.sort((a, b) => a.pricePerNight - b.pricePerNight);
-  else if (sortBy === 'priceHighToLow') displayList.sort((a, b) => b.pricePerNight - a.pricePerNight);
+  else if (sortBy === 'priceHighToLow')
+    displayList.sort((a, b) => b.pricePerNight - a.pricePerNight);
   else if (sortBy === 'rating') displayList.sort((a, b) => b.rating - a.rating);
 
   const sortOptions: { key: string; label: string }[] = [
@@ -99,7 +98,9 @@ export default function ResultsScreen() {
           <MaterialCommunityIcons name="arrow-left" size={22} color={palette.onSurface} />
         </Pressable>
         <Text variant="label" color={palette.onSurface} numberOfLines={1} style={styles.topBarText}>
-          {destination ?? ''}{dateRange ? ` · ${dateRange}` : ''}{guests ? ` · ${guests}` : ''}
+          {destination ?? ''}
+          {dateRange ? ` · ${dateRange}` : ''}
+          {guests ? ` · ${guests}` : ''}
         </Text>
       </View>
 
@@ -111,7 +112,11 @@ export default function ResultsScreen() {
           contentContainerStyle={styles.filtersContent}
         >
           <FilterChip
-            label={minPrice != null ? priceOptions.find(o => o.key === priceKey)?.label ?? t('results.filterPrice') : t('results.filterPrice')}
+            label={
+              minPrice != null
+                ? (priceOptions.find(o => o.key === priceKey)?.label ?? t('results.filterPrice'))
+                : t('results.filterPrice')
+            }
             selected={minPrice != null}
             onPress={() => setPricePickerVisible(true)}
           />

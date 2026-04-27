@@ -42,33 +42,18 @@ export function useBookingByPaymentId(paymentId: string | null) {
   });
 }
 
-export function useBookings() {
+export function useBookings(filters?: { status?: string; timeframe?: string }) {
   return useQuery<BookingData[]>({
-    queryKey: ['bookings'],
+    queryKey: ['bookings', filters ?? {}],
     queryFn: async () => {
-      const raw = await httpClient.get<BookingListResponse | BookingData[]>('/bookings');
-      return Array.isArray(raw) ? raw : ((raw as BookingListResponse).data ?? []);
-    },
-  });
-}
-
-export function usePastBookings() {
-  return useQuery<BookingData[]>({
-    queryKey: ['bookings', 'past'],
-    queryFn: async () => {
-      const raw = await httpClient.get<BookingListResponse | BookingData[]>('/bookings');
-      return Array.isArray(raw) ? raw : ((raw as BookingListResponse).data ?? []);
-    },
-  });
-}
-
-export function useCancelledBookings() {
-  return useQuery<BookingData[]>({
-    queryKey: ['bookings', 'cancelled'],
-    queryFn: async () => {
-      const raw = await httpClient.get<BookingListResponse | BookingData[]>('/bookings', {
-        params: { status: 'cancelled' },
-      });
+      const params: Record<string, string> = {};
+      if (filters?.status) params.status = filters.status;
+      if (filters?.timeframe) params.timeframe = filters.timeframe;
+      const hasParams = Object.keys(params).length > 0;
+      const raw = await httpClient.get<BookingListResponse | BookingData[]>(
+        '/bookings',
+        hasParams ? { params } : undefined
+      );
       return Array.isArray(raw) ? raw : ((raw as BookingListResponse).data ?? []);
     },
   });
@@ -158,7 +143,7 @@ export function useBookingQR(bookingId: number) {
     },
     staleTime: 1000 * 60 * 60 * 24 * 7, // 7 days
     gcTime: Infinity,
-    retry: 1,
+    retry: false,
   });
 }
 

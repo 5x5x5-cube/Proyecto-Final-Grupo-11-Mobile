@@ -254,9 +254,6 @@ export default function SearchScreen() {
                 <Text variant="caption" color="rgba(255,255,255,0.85)">
                   {item.country}
                 </Text>
-                <Text variant="captionSmall" color="rgba(255,255,255,0.7)" style={styles.destCount}>
-                  {t('search.hotels', { count: item.hotelCount })}
-                </Text>
               </LinearGradient>
             </Pressable>
           )}

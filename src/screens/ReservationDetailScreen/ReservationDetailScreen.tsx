@@ -55,8 +55,12 @@ export default function ReservationDetailScreen() {
   }
 
   const pb = mappedReservation.priceBreakdown;
-  const accommodationCop = pb ? Number(pb.basePrice) : Math.round(mappedReservation.totalPriceCop * 0.81);
-  const taxesCop = pb ? Number(pb.vat) + Number(pb.serviceFee || 0) : mappedReservation.totalPriceCop - accommodationCop;
+  const accommodationCop = pb
+    ? Number(pb.basePrice)
+    : Math.round(mappedReservation.totalPriceCop * 0.81);
+  const taxesCop = pb
+    ? Number(pb.vat) + Number(pb.serviceFee || 0)
+    : mappedReservation.totalPriceCop - accommodationCop;
 
   return (
     <View style={styles.container}>

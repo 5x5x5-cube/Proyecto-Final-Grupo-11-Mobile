@@ -147,7 +147,10 @@ describe('PropertyDetailScreen', () => {
 
   it('muestra la descripción del hotel desde la API cuando está disponible', () => {
     const useSearchMock = require('../../api/hooks/useSearch');
-    const hotelWithDescription = { ...mockHotel, description: 'Un hotel histórico en el corazón de Cartagena' };
+    const hotelWithDescription = {
+      ...mockHotel,
+      description: 'Un hotel histórico en el corazón de Cartagena',
+    };
     useSearchMock.useHotelDetail = () => ({ data: hotelWithDescription, isLoading: false });
     useSearchMock.useHotelRooms = () => ({
       data: { rooms: mockRooms, total: 2 },
