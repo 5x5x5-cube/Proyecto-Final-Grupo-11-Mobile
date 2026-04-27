@@ -217,7 +217,13 @@
     "title": "Check-in con codigo QR",
     "instruction": "Presenta este codigo en recepcion para realizar tu check-in de manera rapida y sin contacto.",
     "downloadQR": "Descargar QR",
-    "offlineMode": "Modo sin conexion"
+    "offlineMode": "Modo sin conexion",
+    "guests_one": "{{count}} huésped",
+    "guests_other": "{{count}} huéspedes",
+    "errorTitle": "Codigo QR no disponible",
+    "errorDateRange": "El codigo QR solo esta disponible dentro de los 3 dias antes o despues de tu fecha de check-in.",
+    "errorNotConfirmed": "El codigo QR solo esta disponible para reservas confirmadas.",
+    "errorGeneric": "No se pudo generar el codigo QR. Intentalo mas tarde."
   },
   "profile": {
     "personalInfo": "Informacion personal",

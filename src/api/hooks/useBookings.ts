@@ -143,7 +143,7 @@ export function useBookingQR(bookingId: number) {
     },
     staleTime: 1000 * 60 * 60 * 24 * 7, // 7 days
     gcTime: Infinity,
-    retry: 1,
+    retry: false,
   });
 }
 

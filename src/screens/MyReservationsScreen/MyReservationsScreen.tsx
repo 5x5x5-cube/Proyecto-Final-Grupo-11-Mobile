@@ -57,14 +57,11 @@ export default function MyReservationsScreen() {
 
   const reservations = rawBookings.map(mapReservation);
 
-  const tabs: { key: ReservationTab; label: string; count: number }[] = [
-    { key: 'active', label: t('myReservations.active'), count: reservations.length },
-    { key: 'past', label: t('myReservations.past'), count: 0 },
-    { key: 'cancelled', label: t('myReservations.cancelled'), count: 0 },
+  const tabs: { key: ReservationTab; label: string }[] = [
+    { key: 'active', label: t('myReservations.active') },
+    { key: 'past', label: t('myReservations.past') },
+    { key: 'cancelled', label: t('myReservations.cancelled') },
   ];
-  // Count for current tab only — others show 0 until selected
-  const currentTabIndex = tabs.findIndex(t => t.key === tab);
-  if (currentTabIndex >= 0) tabs[currentTabIndex].count = reservations.length;
 
   const renderCard = ({ item }: { item: Reservation }) => (
     <Pressable
@@ -126,7 +123,7 @@ export default function MyReservationsScreen() {
               color={tab === t.key ? palette.primary : palette.onSurfaceVariant}
               style={[styles.tabText, tab === t.key && styles.tabTextActive]}
             >
-              {t.label} ({t.count})
+              {t.label}
             </Text>
           </Pressable>
         ))}

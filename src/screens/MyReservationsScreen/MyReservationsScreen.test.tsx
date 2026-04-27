@@ -104,13 +104,14 @@ describe('MyReservationsScreen', () => {
     expect(getByText('Medellín, Colombia')).toBeTruthy();
   });
 
-  it('shows correct booking count in active tab', () => {
+  it('shows tab labels without counters', () => {
     const { getByText } = render(
       <LocaleProvider>
         <MyReservationsScreen />
       </LocaleProvider>
     );
-    // Tab label rendered as "myReservations.active (2)" via t() identity mock
-    expect(getByText('myReservations.active (2)')).toBeTruthy();
+    expect(getByText('myReservations.active')).toBeTruthy();
+    expect(getByText('myReservations.past')).toBeTruthy();
+    expect(getByText('myReservations.cancelled')).toBeTruthy();
   });
 });

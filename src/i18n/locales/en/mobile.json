@@ -217,7 +217,13 @@
     "title": "QR code check-in",
     "instruction": "Show this code at the front desk for a quick and contactless check-in.",
     "downloadQR": "Download QR",
-    "offlineMode": "Offline mode"
+    "offlineMode": "Offline mode",
+    "guests_one": "{{count}} guest",
+    "guests_other": "{{count}} guests",
+    "errorTitle": "QR code unavailable",
+    "errorDateRange": "The QR code is only available within 3 days before or after your check-in date.",
+    "errorNotConfirmed": "The QR code is only available for confirmed reservations.",
+    "errorGeneric": "Could not generate the QR code. Please try again later."
   },
   "profile": {
     "personalInfo": "Personal information",
