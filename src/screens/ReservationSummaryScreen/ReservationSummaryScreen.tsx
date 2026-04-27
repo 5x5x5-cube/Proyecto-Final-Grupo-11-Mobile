@@ -69,13 +69,15 @@ export default function ReservationSummaryScreen() {
       <TopBar title={t('summary.title')} onBack={() => navigation.goBack()} />
 
       {/* HoldCountdown only available once server cart is loaded (holdExpiresAt comes from server) */}
-      {hasServerCart && <HoldCountdown expiresAt={cart.holdExpiresAt} onExpired={handleExpired} />}
+      {hasServerCart && cart.holdExpiresAt && (
+        <HoldCountdown expiresAt={cart.holdExpiresAt} onExpired={handleExpired} />
+      )}
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         {hasServerCart && (
           <HotelSummaryCard
             hotelName={cart.hotelName}
-            location={cart.location}
+            location={cart.location ?? ''}
             roomName={cart.roomName}
           />
         )}
@@ -83,7 +85,7 @@ export default function ReservationSummaryScreen() {
         <BookingInfoGrid
           checkIn={cart?.checkIn ?? localSelection?.checkIn ?? ''}
           checkOut={cart?.checkOut ?? localSelection?.checkOut ?? ''}
-          nights={cart?.priceBreakdown?.nights ?? 0}
+          nights={cart?.pricing?.nights ?? cart?.priceBreakdown?.nights ?? 0}
           guests={cart?.guests ?? localSelection?.guests ?? 0}
         />
 
@@ -97,18 +99,18 @@ export default function ReservationSummaryScreen() {
               rows={[
                 {
                   label: t('summary.nightsBreakdown', {
-                    count: cart.priceBreakdown.nights,
-                    price: formatPrice(cart.priceBreakdown.pricePerNight),
+                    count: cart.pricing.nights,
+                    price: formatPrice(cart.pricing.pricePerNight),
                   }),
-                  value: formatPrice(cart.priceBreakdown.subtotal),
+                  value: formatPrice(cart.pricing.subtotal),
                 },
                 {
                   label: t('summary.taxes', { percent: 19 }),
-                  value: formatPrice(cart.priceBreakdown.vat),
+                  value: formatPrice(cart.pricing.taxes),
                 },
               ]}
               totalLabel={t('summary.total')}
-              totalValue={formatPrice(cart.priceBreakdown.total)}
+              totalValue={formatPrice(cart.pricing.total)}
             />
           </Card>
         )}

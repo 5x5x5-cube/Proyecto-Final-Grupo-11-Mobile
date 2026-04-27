@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { httpClient } from '../httpClient';
+import type { CreateBookingRequest } from '@/types/cart';
 
 export interface BookingData {
   id: string;
@@ -42,23 +43,34 @@ export function useBookingByPaymentId(paymentId: string | null) {
 }
 
 export function useBookings() {
-  return useQuery({
+  return useQuery<BookingData[]>({
     queryKey: ['bookings'],
-    queryFn: () => httpClient.get('/bookings'),
+    queryFn: async () => {
+      const raw = await httpClient.get<BookingListResponse | BookingData[]>('/bookings');
+      return Array.isArray(raw) ? raw : ((raw as BookingListResponse).data ?? []);
+    },
   });
 }
 
 export function usePastBookings() {
-  return useQuery({
+  return useQuery<BookingData[]>({
     queryKey: ['bookings', 'past'],
-    queryFn: () => httpClient.get('/bookings'), // Backend doesn't have past filter, fetch all and filter on client
+    queryFn: async () => {
+      const raw = await httpClient.get<BookingListResponse | BookingData[]>('/bookings');
+      return Array.isArray(raw) ? raw : ((raw as BookingListResponse).data ?? []);
+    },
   });
 }
 
 export function useCancelledBookings() {
-  return useQuery({
+  return useQuery<BookingData[]>({
     queryKey: ['bookings', 'cancelled'],
-    queryFn: () => httpClient.get('/bookings', { params: { status: 'cancelled' } }),
+    queryFn: async () => {
+      const raw = await httpClient.get<BookingListResponse | BookingData[]>('/bookings', {
+        params: { status: 'cancelled' },
+      });
+      return Array.isArray(raw) ? raw : ((raw as BookingListResponse).data ?? []);
+    },
   });
 }
 
@@ -154,6 +166,16 @@ export function useCancelBooking() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (bookingId: number) => httpClient.post(`/bookings/${bookingId}/cancel`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bookings'] });
+    },
+  });
+}
+
+export function useCreateBooking() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CreateBookingRequest) => httpClient.post('/bookings', { body: data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bookings'] });
     },

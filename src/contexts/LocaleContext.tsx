@@ -53,7 +53,7 @@ const languageNames: Record<Language, string> = {
 function buildRatesMap(
   apiRates: ExchangeRate[] | undefined
 ): Record<Currency, { rate: number; symbol: string; decimals: number }> {
-  if (!apiRates || apiRates.length === 0) return FALLBACK_RATES;
+  if (!Array.isArray(apiRates) || apiRates.length === 0) return FALLBACK_RATES;
   const map = { ...FALLBACK_RATES };
   for (const r of apiRates) {
     if (r.currency in map) {
