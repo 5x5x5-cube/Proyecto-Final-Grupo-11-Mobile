@@ -1,19 +1,28 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
-import OfflineBanner from './OfflineBanner';
+
+const mockIsConnected = jest.fn();
 
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
-describe('OfflineBanner', () => {
-  it('renders without crashing', () => {
-    const { toJSON } = render(<OfflineBanner />);
-    expect(toJSON()).toBeTruthy();
-  });
+jest.mock('@/hooks/useNetworkStatus', () => ({
+  useNetworkStatus: () => ({ isConnected: mockIsConnected() }),
+}));
 
-  it('renders the offline banner translation key', () => {
+import OfflineBanner from './OfflineBanner';
+
+describe('OfflineBanner', () => {
+  it('renders banner when offline', () => {
+    mockIsConnected.mockReturnValue(false);
     const { getByText } = render(<OfflineBanner />);
     expect(getByText('offline.banner')).toBeTruthy();
+  });
+
+  it('renders nothing when online', () => {
+    mockIsConnected.mockReturnValue(true);
+    const { toJSON } = render(<OfflineBanner />);
+    expect(toJSON()).toBeNull();
   });
 });

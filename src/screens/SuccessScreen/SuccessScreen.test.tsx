@@ -55,15 +55,20 @@ jest.mock('../../api/hooks/useSearch', () => ({
 
 import React from 'react';
 import { render } from '@testing-library/react-native';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LocaleProvider } from '../../contexts/LocaleContext';
 import SuccessScreen from './SuccessScreen';
+
+const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
 
 describe('SuccessScreen', () => {
   it('renders without crashing', () => {
     const { toJSON } = render(
-      <LocaleProvider>
-        <SuccessScreen />
-      </LocaleProvider>
+      <QueryClientProvider client={queryClient}>
+        <LocaleProvider>
+          <SuccessScreen />
+        </LocaleProvider>
+      </QueryClientProvider>
     );
     expect(toJSON()).toBeTruthy();
   });

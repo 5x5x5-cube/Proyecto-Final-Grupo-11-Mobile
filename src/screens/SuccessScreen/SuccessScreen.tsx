@@ -3,6 +3,7 @@ import { ActivityIndicator, View, Pressable, ScrollView } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '@/navigation/types';
 import { useLocale } from '@/contexts/LocaleContext';
@@ -17,6 +18,7 @@ import { styles } from './SuccessScreen.styles';
 
 export default function SuccessScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const queryClient = useQueryClient();
   const route = useRoute<NativeStackScreenProps<RootStackParamList, 'Success'>['route']>();
   const { t } = useTranslation('mobile');
   const { formatDate, formatPrice } = useLocale();
@@ -132,7 +134,10 @@ export default function SuccessScreen() {
       <View style={styles.primaryButtonWrapper}>
         <PrimaryButton
           title={t('success.viewReservations')}
-          onPress={() => navigation.navigate('MainTabs', { screen: 'MyReservations' })}
+          onPress={() => {
+            queryClient.invalidateQueries({ queryKey: ['bookings'] });
+            navigation.navigate('MainTabs', { screen: 'MyReservations' });
+          }}
         />
       </View>
 
