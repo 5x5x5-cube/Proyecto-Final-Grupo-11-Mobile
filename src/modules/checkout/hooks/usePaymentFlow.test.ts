@@ -14,6 +14,10 @@ jest.mock('react-i18next', () => ({
   }),
 }));
 
+jest.mock('@/contexts/LocaleContext', () => ({
+  useLocale: jest.fn(),
+}));
+
 jest.mock('@/api/hooks/useCart', () => ({
   useCart: jest.fn(),
 }));
@@ -27,6 +31,7 @@ jest.mock('@/api/hooks/usePayments', () => ({
 // ─── Import mocked modules ────────────────────────────────────────────────────
 
 import { useNavigation } from '@react-navigation/native';
+import { useLocale } from '@/contexts/LocaleContext';
 import { useCart } from '@/api/hooks/useCart';
 import { useTokenize, useInitiatePayment, usePaymentStatus } from '@/api/hooks/usePayments';
 
@@ -34,6 +39,7 @@ const mockNavigate = jest.fn();
 const mockGoBack = jest.fn();
 
 const mockUseNavigation = useNavigation as jest.Mock;
+const mockUseLocale = useLocale as jest.Mock;
 const mockUseCart = useCart as jest.Mock;
 const mockUseTokenize = useTokenize as jest.Mock;
 const mockUseInitiatePayment = useInitiatePayment as jest.Mock;
@@ -63,6 +69,7 @@ function buildStatusMock(data: null | { status: string } = null) {
 
 function setupDefaults() {
   mockUseNavigation.mockReturnValue({ navigate: mockNavigate, goBack: mockGoBack });
+  mockUseLocale.mockReturnValue({ currency: 'COP' });
   mockUseCart.mockReturnValue({ data: { id: 'cart-1' }, isLoading: false });
   mockUseTokenize.mockReturnValue(buildTokenizeMock());
   mockUseInitiatePayment.mockReturnValue(buildInitiateMock());
@@ -136,7 +143,30 @@ describe('usePaymentFlow', () => {
     });
 
     expect(initiateMutateMock).toHaveBeenCalledWith(
-      { token: 'tok_abc', cartId: 'cart-1', method: 'credit_card' },
+      { token: 'tok_abc', cartId: 'cart-1', method: 'credit_card', currency: 'COP' },
+      expect.any(Object)
+    );
+  });
+
+  it('sends the selected currency from locale in initiate request', () => {
+    mockUseLocale.mockReturnValue({ currency: 'MXN' });
+
+    const initiateMutateMock = jest.fn();
+    mockUseInitiatePayment.mockReturnValue(buildInitiateMock({ mutate: initiateMutateMock }));
+
+    const tokenizeMutateMock = jest.fn((_, callbacks) => {
+      callbacks.onSuccess({ token: 'tok_mxn' });
+    });
+    mockUseTokenize.mockReturnValue(buildTokenizeMock({ mutate: tokenizeMutateMock }));
+
+    const { result } = renderHook(() => usePaymentFlow());
+
+    act(() => {
+      result.current.submitPayment({ method: 'credit_card' } as any, 'credit_card');
+    });
+
+    expect(initiateMutateMock).toHaveBeenCalledWith(
+      { token: 'tok_mxn', cartId: 'cart-1', method: 'credit_card', currency: 'MXN' },
       expect.any(Object)
     );
   });
