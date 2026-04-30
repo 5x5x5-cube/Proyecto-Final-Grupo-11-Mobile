@@ -228,7 +228,7 @@ export default function PropertyDetailScreen() {
               color={palette.onSurfaceVariant}
             />
             {'  '}
-            {hotel.location}
+            {hotel.location || [hotel.city, hotel.country].filter(Boolean).join(', ')}
           </Text>
 
           {/* Rating + reseñas */}
@@ -423,12 +423,15 @@ export default function PropertyDetailScreen() {
       {/* ── Barra de acción fija ─────────────────────────────────────── */}
       <ActionBar>
         <View style={styles.actionBarContent}>
-          <View>
+          <View style={styles.actionPriceContainer}>
             <Text variant="h3" color={palette.primary} style={styles.actionPrice}>
               {formatPrice(total)}
             </Text>
             <Text variant="caption" color={palette.onSurfaceVariant}>
-              {t('summary.nights', { count: nights })} · {t('propertyDetail.taxes')}
+              {t('summary.nights', { count: nights })}
+            </Text>
+            <Text variant="caption" color={palette.onSurfaceVariant}>
+              {t('propertyDetail.taxes')}
             </Text>
           </View>
           <PrimaryButton

@@ -115,7 +115,7 @@ export default function ReservationSummaryScreen() {
           </Card>
         )}
 
-        <CancellationPolicyCard />
+        <CancellationPolicyCard checkIn={cart?.checkIn} />
       </ScrollView>
 
       <ActionBar>

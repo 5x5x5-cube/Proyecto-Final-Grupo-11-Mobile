@@ -10,14 +10,16 @@ import { RootStackParamList } from '@/navigation/types';
 import { palette } from '@/theme/palette';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useBookingDetail } from '@/api/hooks/useBookings';
+import { useHotelDetail } from '@/api/hooks/useSearch';
 import { usePaymentStatus } from '@/api/hooks/usePayments';
 import TopBar from '@/components/TopBar';
-import Divider from '@/components/Divider';
 import OfflineBanner from '@/components/OfflineBanner';
 import StatusChip from '@/components/StatusChip';
 import InfoGrid from '@/components/InfoGrid';
 import PriceBreakdown from '@/components/PriceBreakdown';
 import Text from '@/components/Text';
+import Card from '@/components/Card';
+import RatingBadge from '@/components/RatingBadge';
 import ReservationDetailScreenSkeleton from './ReservationDetailScreen.skeleton';
 import { styles } from './ReservationDetailScreen.styles';
 
@@ -31,6 +33,7 @@ export default function ReservationDetailScreen() {
 
   const { data: reservationData, isLoading } = useBookingDetail(route.params.id ?? 1);
   const reservation = reservationData as any;
+  const { data: hotelData } = useHotelDetail(reservation?.hotelId ?? '');
   const { data: payment } = usePaymentStatus(reservation?.paymentId ?? null);
 
   // Map backend fields to frontend format
@@ -98,6 +101,11 @@ export default function ReservationDetailScreen() {
             <Text variant="bodySmall" color={palette.onSurfaceVariant} style={styles.hotelLocation}>
               {mappedReservation.location}
             </Text>
+            {(hotelData as any)?.rating != null && (
+              <View style={styles.ratingRow}>
+                <RatingBadge rating={(hotelData as any).rating} showStars="single" />
+              </View>
+            )}
           </View>
         </View>
 
@@ -161,16 +169,40 @@ export default function ReservationDetailScreen() {
           </View>
         </View>
 
-        {/* Payment method */}
-        <View style={styles.card}>
-          <View style={styles.cardInner}>
-            <Text variant="body" color={palette.onSurface} style={styles.priceTitle}>
-              {t('reservationDetail.paymentMethod')}
-            </Text>
-            <Divider style={styles.paymentDivider} />
-            {payment ? (
-              <>
-                <View style={styles.paymentRow}>
+        {/* Payment history */}
+        <Card marginBottom={14}>
+          <Text variant="body" color={palette.onSurface} style={styles.paymentCardTitle}>
+            {t('reservationDetail.paymentHistory')}
+          </Text>
+          {payment ? (
+            <View style={styles.paymentCardRow}>
+              <View style={styles.paymentStatusIcon}>
+                <MaterialCommunityIcons
+                  name={
+                    payment.status === 'approved'
+                      ? 'check-circle'
+                      : payment.status === 'declined'
+                        ? 'close-circle'
+                        : 'clock-outline'
+                  }
+                  size={22}
+                  color={
+                    payment.status === 'approved'
+                      ? palette.success
+                      : payment.status === 'declined'
+                        ? palette.error
+                        : palette.warning
+                  }
+                />
+              </View>
+              <View style={styles.paymentCardDetails}>
+                <Text variant="button" color={palette.onSurface}>
+                  {t('reservationDetail.bookingPayment')}
+                </Text>
+                <Text variant="caption" color={palette.onSurfaceVariant}>
+                  {payment.processedAt ? formatDate(payment.processedAt, 'medium') : '—'}
+                </Text>
+                <View style={styles.paymentMethodRow}>
                   <MaterialCommunityIcons
                     name={
                       payment.paymentMethod?.methodType === 'digital_wallet'
@@ -179,70 +211,144 @@ export default function ReservationDetailScreen() {
                           ? 'swap-horizontal'
                           : 'credit-card'
                     }
-                    size={20}
-                    color={palette.primary}
+                    size={14}
+                    color={palette.onSurfaceVariant}
                   />
-                  <Text variant="body" color={palette.onSurface} style={styles.paymentLabel}>
+                  <Text variant="caption" color={palette.onSurfaceVariant}>
                     {payment.paymentMethod?.displayLabel ?? '—'}
                   </Text>
                 </View>
-                <View style={styles.paymentMetaRow}>
-                  <View style={styles.paymentMetaItem}>
-                    <Text variant="caption" color={palette.onSurfaceVariant}>
-                      {t('reservationDetail.paymentAmount')}
-                    </Text>
-                    <Text variant="bodySmall" color={palette.onSurface}>
-                      {fp(payment.amount ?? 0)}
-                    </Text>
-                  </View>
-                  {payment.processedAt ? (
-                    <View style={styles.paymentMetaItem}>
-                      <Text variant="caption" color={palette.onSurfaceVariant}>
-                        {t('reservationDetail.paymentDate')}
-                      </Text>
-                      <Text variant="bodySmall" color={palette.onSurface}>
-                        {formatDate(payment.processedAt, 'medium')}
-                      </Text>
-                    </View>
-                  ) : null}
-                  <View style={styles.paymentMetaItem}>
-                    <Text variant="caption" color={palette.onSurfaceVariant}>
-                      {t('reservationDetail.paymentMethod')}
-                    </Text>
-                    <Text
-                      variant="bodySmall"
-                      color={
+              </View>
+              <View style={styles.paymentCardRight}>
+                <Text variant="button" color={palette.onSurface}>
+                  {fp(payment.amount ?? 0)}
+                </Text>
+                <View
+                  style={[
+                    styles.paymentBadge,
+                    {
+                      backgroundColor:
                         payment.status === 'approved'
-                          ? palette.success
+                          ? palette.successContainer
                           : payment.status === 'declined'
-                            ? palette.error
-                            : palette.warning
-                      }
-                      style={styles.paymentStatusText}
-                    >
-                      {payment.status === 'approved'
-                        ? t('reservationDetail.paymentApproved')
-                        : payment.status === 'declined'
-                          ? t('reservationDetail.paymentDeclined')
-                          : t('reservationDetail.paymentProcessing')}
-                    </Text>
-                  </View>
-                </View>
-              </>
-            ) : (
-              <View style={styles.paymentRow}>
-                <MaterialCommunityIcons name="clock-outline" size={20} color={palette.outline} />
-                <Text
-                  variant="bodySmall"
-                  color={palette.onSurfaceVariant}
-                  style={styles.paymentLabel}
+                            ? palette.errorContainer
+                            : palette.warningContainer,
+                    },
+                  ]}
                 >
-                  {t('reservationDetail.paymentPending')}
+                  <Text
+                    variant="caption"
+                    color={
+                      payment.status === 'approved'
+                        ? palette.success
+                        : payment.status === 'declined'
+                          ? palette.error
+                          : palette.warning
+                    }
+                    style={styles.paymentBadgeText}
+                  >
+                    {payment.status === 'approved'
+                      ? t('reservationDetail.paymentApproved')
+                      : payment.status === 'declined'
+                        ? t('reservationDetail.paymentDeclined')
+                        : t('reservationDetail.paymentProcessing')}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          ) : (
+            <View style={styles.paymentCardRow}>
+              <View style={styles.paymentStatusIcon}>
+                <MaterialCommunityIcons name="clock-outline" size={22} color={palette.outline} />
+              </View>
+              <Text variant="bodySmall" color={palette.onSurfaceVariant}>
+                {t('reservationDetail.paymentPending')}
+              </Text>
+            </View>
+          )}
+        </Card>
+
+        {/* Next steps */}
+        <Card marginBottom={14}>
+          <Text variant="body" color={palette.onSurface} style={styles.nextStepsTitle}>
+            {t('reservationDetail.nextSteps.title')}
+          </Text>
+
+          {/* Email confirmation step — always shown for pending and confirmed */}
+          {(mappedReservation.status === 'pending' || mappedReservation.status === 'confirmed') && (
+            <View style={styles.nextStep}>
+              <MaterialCommunityIcons name="email-check" size={20} color={palette.success} />
+              <View style={styles.nextStepText}>
+                <Text variant="button" color={palette.onSurface}>
+                  {t('reservationDetail.nextSteps.emailSent')}
+                </Text>
+                <Text variant="bodySmall" color={palette.onSurfaceVariant}>
+                  {t('reservationDetail.nextSteps.emailDescription')}
                 </Text>
               </View>
-            )}
-          </View>
-        </View>
+            </View>
+          )}
+
+          {/* Status-specific step */}
+          {mappedReservation.status === 'pending' && (
+            <View style={styles.nextStep}>
+              <MaterialCommunityIcons name="clock-outline" size={20} color={palette.warning} />
+              <View style={styles.nextStepText}>
+                <Text variant="button" color={palette.onSurface}>
+                  {t('reservationDetail.nextSteps.pendingTitle')}
+                </Text>
+                <Text variant="bodySmall" color={palette.onSurfaceVariant}>
+                  {t('reservationDetail.nextSteps.pendingDescription')}
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {mappedReservation.status === 'confirmed' && (
+            <View style={styles.nextStep}>
+              <MaterialCommunityIcons name="door-open" size={20} color={palette.success} />
+              <View style={styles.nextStepText}>
+                <Text variant="button" color={palette.onSurface}>
+                  {t('reservationDetail.nextSteps.confirmedTitle')}
+                </Text>
+                <Text variant="bodySmall" color={palette.onSurfaceVariant}>
+                  {t('reservationDetail.nextSteps.confirmedDescription', {
+                    room: mappedReservation.room,
+                    hotel: mappedReservation.hotelName,
+                  })}
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {mappedReservation.status === 'rejected' && (
+            <View style={styles.nextStep}>
+              <MaterialCommunityIcons name="close-circle" size={20} color={palette.error} />
+              <View style={styles.nextStepText}>
+                <Text variant="button" color={palette.onSurface}>
+                  {t('reservationDetail.nextSteps.rejectedTitle')}
+                </Text>
+                <Text variant="bodySmall" color={palette.onSurfaceVariant}>
+                  {t('reservationDetail.nextSteps.rejectedDescription')}
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {mappedReservation.status === 'cancelled' && (
+            <View style={styles.nextStep}>
+              <MaterialCommunityIcons name="close-circle" size={20} color={palette.error} />
+              <View style={styles.nextStepText}>
+                <Text variant="button" color={palette.onSurface}>
+                  {t('reservationDetail.nextSteps.cancelledTitle')}
+                </Text>
+                <Text variant="bodySmall" color={palette.onSurfaceVariant}>
+                  {t('reservationDetail.nextSteps.cancelledDescription')}
+                </Text>
+              </View>
+            </View>
+          )}
+        </Card>
 
         {/* Action buttons */}
         <View style={styles.buttonsColumn}>
