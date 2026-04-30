@@ -228,7 +228,7 @@ export default function PropertyDetailScreen() {
               color={palette.onSurfaceVariant}
             />
             {'  '}
-            {hotel.location}
+            {hotel.location || [hotel.city, hotel.country].filter(Boolean).join(', ')}
           </Text>
 
           {/* Rating + reseñas */}
