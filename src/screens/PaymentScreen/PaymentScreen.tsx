@@ -28,7 +28,7 @@ const paymentMethods: { key: UIPaymentMethod; labelKey: string; icon: string }[]
 
 export default function PaymentScreen() {
   const { t } = useTranslation('mobile');
-  const { formatPrice, formatDate } = useLocale();
+  const { formatFixedPrice, formatDate } = useLocale();
 
   const flow = usePaymentFlow();
   const form = usePaymentMethodForm();
@@ -44,6 +44,9 @@ export default function PaymentScreen() {
 
   const { hotelName, checkIn, checkOut } = flow.cart;
   const total = Number(flow.cart.pricing?.total ?? flow.cart.priceBreakdown?.total ?? 0);
+  const cartCurrency =
+    flow.cart.pricing?.currency ??
+    (flow.cart.priceBreakdown as { currency?: string } | undefined)?.currency;
 
   const isPayDisabled = flow.isProcessing || !flow.formEnabled || !form.isFormValid;
 
@@ -157,7 +160,7 @@ export default function PaymentScreen() {
               {t('payment.total')}
             </Text>
             <Text variant="body" color={palette.onSurface} style={styles.summaryTotalValue}>
-              {formatPrice(total)}
+              {formatFixedPrice(total, cartCurrency)}
             </Text>
           </View>
         </Card>
@@ -176,7 +179,7 @@ export default function PaymentScreen() {
           title={
             flow.isProcessing
               ? t('payment.processingPayment')
-              : t('payment.payButton', { amount: formatPrice(total) })
+              : t('payment.payButton', { amount: formatFixedPrice(total, cartCurrency) })
           }
           onPress={handlePay}
           loading={flow.isProcessing}

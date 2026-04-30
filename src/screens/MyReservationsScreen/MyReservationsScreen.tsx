@@ -27,15 +27,15 @@ type Reservation = {
   room: string;
   status: 'confirmed' | 'pending' | 'cancelled' | 'past';
   code: string;
-  totalPrice: string;
   totalPriceCop: number;
+  bookingCurrency: string;
   gradient: readonly [string, string];
 };
 
 export default function MyReservationsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { t } = useTranslation('mobile');
-  const { formatPrice, formatDate } = useLocale();
+  const { formatFixedPrice, formatDate } = useLocale();
   const { tab, setTab, bookings: rawBookings, isLoading } = useReservationTabs();
 
   const mapReservation = (b: any): Reservation => ({
@@ -50,8 +50,8 @@ export default function MyReservationsScreen() {
     room: b.roomName ?? '',
     status: b.status,
     code: b.code,
-    totalPrice: `${b.totalPrice} ${b.currency}`,
     totalPriceCop: b.totalPrice,
+    bookingCurrency: b.currency ?? '',
     gradient: ['#006874', '#4A9FAA'] as const,
   });
 
@@ -95,7 +95,7 @@ export default function MyReservationsScreen() {
             {formatDate(item.checkOut, 'mediumWithDay')}
           </Text>
           <Text variant="bodySmall" color={palette.primary} style={styles.price}>
-            {formatPrice(item.totalPriceCop)}
+            {formatFixedPrice(item.totalPriceCop, item.bookingCurrency)}
           </Text>
         </View>
         <Text variant="captionSmall" color={palette.outline} style={styles.code}>

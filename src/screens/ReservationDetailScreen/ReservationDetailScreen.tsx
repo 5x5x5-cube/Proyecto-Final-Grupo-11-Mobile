@@ -25,7 +25,7 @@ export default function ReservationDetailScreen() {
   const route =
     useRoute<NativeStackScreenProps<RootStackParamList, 'ReservationDetail'>['route']>();
   const { t } = useTranslation('mobile');
-  const { formatPrice, formatDate } = useLocale();
+  const { formatFixedPrice, formatDate } = useLocale();
 
   const { data: reservationData, isLoading } = useBookingDetail(route.params.id ?? 1);
   const reservation = reservationData as any;
@@ -53,6 +53,8 @@ export default function ReservationDetailScreen() {
       </View>
     );
   }
+
+  const fp = (amount: number) => formatFixedPrice(amount, mappedReservation.currency);
 
   const pb = mappedReservation.priceBreakdown;
   const accommodationCop = pb
@@ -146,12 +148,12 @@ export default function ReservationDetailScreen() {
               rows={[
                 {
                   label: t('reservationDetail.accommodation', { count: mappedReservation.nights }),
-                  value: formatPrice(accommodationCop),
+                  value: fp(accommodationCop),
                 },
-                { label: t('reservationDetail.taxes'), value: formatPrice(taxesCop) },
+                { label: t('reservationDetail.taxes'), value: fp(taxesCop) },
               ]}
               totalLabel={t('reservationDetail.totalPaid')}
-              totalValue={formatPrice(mappedReservation.totalPriceCop)}
+              totalValue={fp(mappedReservation.totalPriceCop)}
             />
           </View>
         </View>

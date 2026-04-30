@@ -6,6 +6,7 @@ import type { ExchangeRate } from '@/api/hooks/useExchangeRates';
 
 type Language = 'ES' | 'EN';
 type Currency = 'COP' | 'USD' | 'MXN' | 'ARS' | 'CLP' | 'PEN';
+export const DEFAULT_CURRENCY: Currency = 'COP';
 type DateFormat = 'short' | 'shortWithDay' | 'medium' | 'mediumWithDay' | 'monthYear' | 'monthOnly';
 
 const dateFormatOptions: Record<DateFormat, Intl.DateTimeFormatOptions> = {
@@ -23,6 +24,7 @@ interface LocaleContextType {
   setLanguage: (lang: Language) => void;
   setCurrency: (cur: Currency) => void;
   formatPrice: (copAmount: number) => string;
+  formatFixedPrice: (amount: number, currency?: string | null) => string;
   formatDate: (date: string | Date, format: DateFormat) => string;
 }
 
@@ -111,9 +113,27 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
     return `${symbol} ${formatted}`;
   };
 
+  const formatFixedPrice = (amount: number, cur?: string | null): string => {
+    const code = (cur?.trim() || DEFAULT_CURRENCY) as Currency;
+    const info = rates[code] ?? { symbol: code, decimals: 0 };
+    const formatted = amount.toLocaleString('es-CO', {
+      minimumFractionDigits: info.decimals,
+      maximumFractionDigits: info.decimals,
+    });
+    return `${info.symbol} ${formatted}`;
+  };
+
   return (
     <LocaleContext.Provider
-      value={{ language, currency, setLanguage, setCurrency, formatPrice, formatDate }}
+      value={{
+        language,
+        currency,
+        setLanguage,
+        setCurrency,
+        formatPrice,
+        formatFixedPrice,
+        formatDate,
+      }}
     >
       {children}
     </LocaleContext.Provider>

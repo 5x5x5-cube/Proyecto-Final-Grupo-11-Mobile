@@ -21,7 +21,7 @@ export default function SuccessScreen() {
   const queryClient = useQueryClient();
   const route = useRoute<NativeStackScreenProps<RootStackParamList, 'Success'>['route']>();
   const { t } = useTranslation('mobile');
-  const { formatDate, formatPrice } = useLocale();
+  const { formatDate, formatFixedPrice } = useLocale();
 
   const { paymentId } = route.params;
   const { data: payment } = usePaymentStatus(paymentId);
@@ -124,7 +124,7 @@ export default function SuccessScreen() {
               {t('success.totalPaid')}
             </Text>
             <Text variant="label" color={palette.primary} style={styles.summaryValue}>
-              {formatPrice(payment.amount)}
+              {formatFixedPrice(payment.amount, payment?.currency ?? booking?.currency)}
             </Text>
           </View>
         )}

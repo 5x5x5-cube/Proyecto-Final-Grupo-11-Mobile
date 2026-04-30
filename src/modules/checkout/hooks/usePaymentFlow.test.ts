@@ -1,5 +1,7 @@
+import React from 'react';
 import { renderHook, act, waitFor } from '@testing-library/react-native';
 import { Alert } from 'react-native';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { usePaymentFlow } from './usePaymentFlow';
 
 // ─── Module mocks ─────────────────────────────────────────────────────────────
@@ -76,10 +78,17 @@ function setupDefaults() {
   mockUsePaymentStatus.mockReturnValue(buildStatusMock());
 }
 
+let testQueryClient: QueryClient;
+
+function TestQueryWrapper({ children }: { children: React.ReactNode }) {
+  return React.createElement(QueryClientProvider, { client: testQueryClient }, children);
+}
+
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
 beforeEach(() => {
   jest.clearAllMocks();
+  testQueryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   setupDefaults();
 });
 
@@ -87,7 +96,7 @@ describe('usePaymentFlow', () => {
   it('returns isCartLoading: true when cart is loading', () => {
     mockUseCart.mockReturnValue({ data: undefined, isLoading: true });
 
-    const { result } = renderHook(() => usePaymentFlow());
+    const { result } = renderHook(() => usePaymentFlow(), { wrapper: TestQueryWrapper });
 
     expect(result.current.isCartLoading).toBe(true);
   });
@@ -96,18 +105,18 @@ describe('usePaymentFlow', () => {
     const cart = { id: 'cart-42', pricing: {} };
     mockUseCart.mockReturnValue({ data: cart, isLoading: false });
 
-    const { result } = renderHook(() => usePaymentFlow());
+    const { result } = renderHook(() => usePaymentFlow(), { wrapper: TestQueryWrapper });
 
     expect(result.current.cart).toEqual(cart);
   });
 
   it('isProcessing is false initially', () => {
-    const { result } = renderHook(() => usePaymentFlow());
+    const { result } = renderHook(() => usePaymentFlow(), { wrapper: TestQueryWrapper });
     expect(result.current.isProcessing).toBe(false);
   });
 
   it('formEnabled is true initially', () => {
-    const { result } = renderHook(() => usePaymentFlow());
+    const { result } = renderHook(() => usePaymentFlow(), { wrapper: TestQueryWrapper });
     expect(result.current.formEnabled).toBe(true);
   });
 
@@ -115,7 +124,7 @@ describe('usePaymentFlow', () => {
     const tokenizeMutateMock = jest.fn();
     mockUseTokenize.mockReturnValue(buildTokenizeMock({ mutate: tokenizeMutateMock }));
 
-    const { result } = renderHook(() => usePaymentFlow());
+    const { result } = renderHook(() => usePaymentFlow(), { wrapper: TestQueryWrapper });
 
     const payload = { method: 'credit_card', cardNumber: '4111111111111111' };
 
@@ -136,7 +145,7 @@ describe('usePaymentFlow', () => {
     });
     mockUseTokenize.mockReturnValue(buildTokenizeMock({ mutate: tokenizeMutateMock }));
 
-    const { result } = renderHook(() => usePaymentFlow());
+    const { result } = renderHook(() => usePaymentFlow(), { wrapper: TestQueryWrapper });
 
     act(() => {
       result.current.submitPayment({ method: 'credit_card' } as any, 'credit_card');
@@ -159,7 +168,7 @@ describe('usePaymentFlow', () => {
     });
     mockUseTokenize.mockReturnValue(buildTokenizeMock({ mutate: tokenizeMutateMock }));
 
-    const { result } = renderHook(() => usePaymentFlow());
+    const { result } = renderHook(() => usePaymentFlow(), { wrapper: TestQueryWrapper });
 
     act(() => {
       result.current.submitPayment({ method: 'credit_card' } as any, 'credit_card');
@@ -179,7 +188,7 @@ describe('usePaymentFlow', () => {
     });
     mockUseTokenize.mockReturnValue(buildTokenizeMock({ mutate: tokenizeMutateMock }));
 
-    const { result } = renderHook(() => usePaymentFlow());
+    const { result } = renderHook(() => usePaymentFlow(), { wrapper: TestQueryWrapper });
 
     act(() => {
       result.current.submitPayment({ method: 'credit_card' } as any, 'credit_card');
@@ -189,7 +198,8 @@ describe('usePaymentFlow', () => {
     expect(Alert.alert).toHaveBeenCalled();
   });
 
-  it('on payment approved, navigates to Success screen', async () => {
+  it('on payment approved, invalidates bookings and navigates to Success screen', async () => {
+    const invalidateSpy = jest.spyOn(testQueryClient, 'invalidateQueries');
     mockUsePaymentStatus.mockReturnValue(buildStatusMock(null));
 
     const initiateMutateMock = jest.fn((_, callbacks) => {
@@ -209,7 +219,7 @@ describe('usePaymentFlow', () => {
       return buildStatusMock(null);
     });
 
-    const { result, rerender } = renderHook(() => usePaymentFlow());
+    const { result, rerender } = renderHook(() => usePaymentFlow(), { wrapper: TestQueryWrapper });
 
     act(() => {
       result.current.submitPayment({ method: 'credit_card' } as any, 'credit_card');
@@ -219,6 +229,7 @@ describe('usePaymentFlow', () => {
     rerender({});
 
     await waitFor(() => {
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['bookings'] });
       expect(mockNavigate).toHaveBeenCalledWith('Success', { paymentId: 'pay-999' });
     });
   });
@@ -241,7 +252,7 @@ describe('usePaymentFlow', () => {
       return buildStatusMock(null);
     });
 
-    const { result, rerender } = renderHook(() => usePaymentFlow());
+    const { result, rerender } = renderHook(() => usePaymentFlow(), { wrapper: TestQueryWrapper });
 
     act(() => {
       result.current.submitPayment({ method: 'credit_card' } as any, 'credit_card');
