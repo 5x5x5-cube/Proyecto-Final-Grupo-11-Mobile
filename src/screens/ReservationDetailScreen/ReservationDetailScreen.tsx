@@ -10,12 +10,15 @@ import { RootStackParamList } from '@/navigation/types';
 import { palette } from '@/theme/palette';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useBookingDetail } from '@/api/hooks/useBookings';
+import { useHotelDetail } from '@/api/hooks/useSearch';
 import TopBar from '@/components/TopBar';
 import OfflineBanner from '@/components/OfflineBanner';
 import StatusChip from '@/components/StatusChip';
 import InfoGrid from '@/components/InfoGrid';
 import PriceBreakdown from '@/components/PriceBreakdown';
 import Text from '@/components/Text';
+import Card from '@/components/Card';
+import RatingBadge from '@/components/RatingBadge';
 import ReservationDetailScreenSkeleton from './ReservationDetailScreen.skeleton';
 import { styles } from './ReservationDetailScreen.styles';
 
@@ -29,6 +32,7 @@ export default function ReservationDetailScreen() {
 
   const { data: reservationData, isLoading } = useBookingDetail(route.params.id ?? 1);
   const reservation = reservationData as any;
+  const { data: hotelData } = useHotelDetail(reservation?.hotelId ?? '');
 
   // Map backend fields to frontend format
   const mappedReservation = reservation
@@ -95,6 +99,11 @@ export default function ReservationDetailScreen() {
             <Text variant="bodySmall" color={palette.onSurfaceVariant} style={styles.hotelLocation}>
               {mappedReservation.location}
             </Text>
+            {(hotelData as any)?.rating != null && (
+              <View style={styles.ratingRow}>
+                <RatingBadge rating={(hotelData as any).rating} showStars="single" />
+              </View>
+            )}
           </View>
         </View>
 
@@ -157,6 +166,88 @@ export default function ReservationDetailScreen() {
             />
           </View>
         </View>
+
+        {/* Next steps */}
+        <Card marginBottom={14}>
+          <Text variant="body" color={palette.onSurface} style={styles.nextStepsTitle}>
+            {t('reservationDetail.nextSteps.title')}
+          </Text>
+
+          {/* Email confirmation step — always shown for pending and confirmed */}
+          {(mappedReservation.status === 'pending' || mappedReservation.status === 'confirmed') && (
+            <View style={styles.nextStep}>
+              <MaterialCommunityIcons name="email-check" size={20} color={palette.success} />
+              <View style={styles.nextStepText}>
+                <Text variant="button" color={palette.onSurface}>
+                  {t('reservationDetail.nextSteps.emailSent')}
+                </Text>
+                <Text variant="bodySmall" color={palette.onSurfaceVariant}>
+                  {t('reservationDetail.nextSteps.emailDescription')}
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Status-specific step */}
+          {mappedReservation.status === 'pending' && (
+            <View style={styles.nextStep}>
+              <MaterialCommunityIcons name="clock-outline" size={20} color={palette.warning} />
+              <View style={styles.nextStepText}>
+                <Text variant="button" color={palette.onSurface}>
+                  {t('reservationDetail.nextSteps.pendingTitle')}
+                </Text>
+                <Text variant="bodySmall" color={palette.onSurfaceVariant}>
+                  {t('reservationDetail.nextSteps.pendingDescription')}
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {mappedReservation.status === 'confirmed' && (
+            <View style={styles.nextStep}>
+              <MaterialCommunityIcons name="door-open" size={20} color={palette.success} />
+              <View style={styles.nextStepText}>
+                <Text variant="button" color={palette.onSurface}>
+                  {t('reservationDetail.nextSteps.confirmedTitle')}
+                </Text>
+                <Text variant="bodySmall" color={palette.onSurfaceVariant}>
+                  {t('reservationDetail.nextSteps.confirmedDescription', {
+                    room: mappedReservation.room,
+                    hotel: mappedReservation.hotelName,
+                  })}
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {mappedReservation.status === 'rejected' && (
+            <View style={styles.nextStep}>
+              <MaterialCommunityIcons name="close-circle" size={20} color={palette.error} />
+              <View style={styles.nextStepText}>
+                <Text variant="button" color={palette.onSurface}>
+                  {t('reservationDetail.nextSteps.rejectedTitle')}
+                </Text>
+                <Text variant="bodySmall" color={palette.onSurfaceVariant}>
+                  {t('reservationDetail.nextSteps.rejectedDescription')}
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {mappedReservation.status === 'cancelled' && (
+            <View style={styles.nextStep}>
+              <MaterialCommunityIcons name="close-circle" size={20} color={palette.error} />
+              <View style={styles.nextStepText}>
+                <Text variant="button" color={palette.onSurface}>
+                  {t('reservationDetail.nextSteps.cancelledTitle')}
+                </Text>
+                <Text variant="bodySmall" color={palette.onSurfaceVariant}>
+                  {t('reservationDetail.nextSteps.cancelledDescription')}
+                </Text>
+              </View>
+            </View>
+          )}
+        </Card>
 
         {/* Action buttons */}
         <View style={styles.buttonsColumn}>

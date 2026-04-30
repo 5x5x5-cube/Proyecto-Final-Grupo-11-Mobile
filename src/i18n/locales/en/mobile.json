@@ -199,7 +199,20 @@
     "taxes": "Taxes",
     "totalPaid": "Total paid",
     "showQR": "Show QR",
-    "cancelReservation": "Cancel reservation"
+    "cancelReservation": "Cancel reservation",
+    "nextSteps": {
+      "title": "Next steps",
+      "emailSent": "Confirmation sent by email",
+      "emailDescription": "We have sent an email with your reservation details.",
+      "pendingTitle": "Pending confirmation",
+      "pendingDescription": "Your reservation is being reviewed by the hotel.",
+      "confirmedTitle": "Room reserved",
+      "confirmedDescription": "Your {{room}} at {{hotel}} has been reserved.",
+      "rejectedTitle": "Reservation not confirmed",
+      "rejectedDescription": "The hotel could not confirm your reservation. A refund will be processed.",
+      "cancelledTitle": "Reservation cancelled",
+      "cancelledDescription": "Your reservation has been cancelled. The refund will be processed."
+    }
   },
   "cancelReservation": {
     "title": "Cancel reservation",

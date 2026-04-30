@@ -47,6 +47,9 @@ export const styles = StyleSheet.create({
     marginBottom: 4,
   },
   hotelLocation: {},
+  ratingRow: {
+    marginTop: 8,
+  },
   roomLabel: {
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -58,6 +61,20 @@ export const styles = StyleSheet.create({
   priceTitle: {
     fontWeight: '600',
     marginBottom: 12,
+  },
+  nextStepsTitle: {
+    fontWeight: '600',
+    marginBottom: 12,
+  },
+  nextStep: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    marginBottom: 12,
+  },
+  nextStepText: {
+    flex: 1,
+    gap: 2,
   },
   buttonsColumn: {
     gap: 10,

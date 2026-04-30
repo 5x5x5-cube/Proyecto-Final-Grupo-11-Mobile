@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { palette } from '@/theme/palette';
 import Text from './Text';
 
-type Status = 'confirmed' | 'pending' | 'cancelled' | 'past';
+type Status = 'confirmed' | 'pending' | 'cancelled' | 'rejected' | 'past';
 
 interface StatusChipProps {
   status: Status;
@@ -16,6 +16,7 @@ const statusConfig: Record<Status, { bg: string; color: string; icon: string | n
   confirmed: { bg: palette.successContainer, color: palette.success, icon: 'check-circle' },
   pending: { bg: palette.warningContainer, color: palette.warning, icon: 'clock-outline' },
   cancelled: { bg: palette.errorContainer, color: palette.error, icon: 'close-circle' },
+  rejected: { bg: palette.errorContainer, color: palette.error, icon: 'close-circle' },
   past: { bg: palette.outlineVariant, color: palette.onSurfaceVariant, icon: null },
 };
 

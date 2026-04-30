@@ -199,7 +199,20 @@
     "taxes": "Impuestos",
     "totalPaid": "Total pagado",
     "showQR": "Mostrar QR",
-    "cancelReservation": "Cancelar reserva"
+    "cancelReservation": "Cancelar reserva",
+    "nextSteps": {
+      "title": "Proximos pasos",
+      "emailSent": "Confirmacion enviada por correo",
+      "emailDescription": "Hemos enviado un email con los detalles de tu reserva.",
+      "pendingTitle": "Pendiente de confirmacion",
+      "pendingDescription": "Tu reserva esta siendo revisada por el hotel.",
+      "confirmedTitle": "Habitacion reservada",
+      "confirmedDescription": "Tu {{room}} en {{hotel}} ha sido reservada.",
+      "rejectedTitle": "Reserva no confirmada",
+      "rejectedDescription": "El hotel no pudo confirmar tu reserva. Se procedera con el reembolso.",
+      "cancelledTitle": "Reserva cancelada",
+      "cancelledDescription": "Tu reserva ha sido cancelada. El reembolso sera procesado."
+    }
   },
   "cancelReservation": {
     "title": "Cancelar reserva",
