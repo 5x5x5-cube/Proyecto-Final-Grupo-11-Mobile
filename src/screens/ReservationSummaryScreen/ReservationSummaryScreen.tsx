@@ -24,7 +24,7 @@ import { styles } from './ReservationSummaryScreen.styles';
 export default function ReservationSummaryScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { t } = useTranslation('mobile');
-  const { formatPrice } = useLocale();
+  const { formatFixedPrice } = useLocale();
 
   const [localSelection, setLocalSelection] = useState<CartSelection | null>(null);
   const { data: cart, isLoading, isError } = useCart();
@@ -100,17 +100,17 @@ export default function ReservationSummaryScreen() {
                 {
                   label: t('summary.nightsBreakdown', {
                     count: cart.pricing.nights,
-                    price: formatPrice(cart.pricing.pricePerNight),
+                    price: formatFixedPrice(cart.pricing.pricePerNight, cart.pricing.currency),
                   }),
-                  value: formatPrice(cart.pricing.subtotal),
+                  value: formatFixedPrice(cart.pricing.subtotal, cart.pricing.currency),
                 },
                 {
                   label: t('summary.taxes', { percent: 19 }),
-                  value: formatPrice(cart.pricing.taxes),
+                  value: formatFixedPrice(cart.pricing.taxes, cart.pricing.currency),
                 },
               ]}
               totalLabel={t('summary.total')}
-              totalValue={formatPrice(cart.pricing.total)}
+              totalValue={formatFixedPrice(cart.pricing.total, cart.pricing.currency)}
             />
           </Card>
         )}

@@ -71,14 +71,19 @@ jest.mock('../../modules/checkout/HoldCountdown', () => {
 
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LocaleProvider } from '../../contexts/LocaleContext';
 import PaymentScreen from './PaymentScreen';
 
+const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+
 function renderScreen() {
   return render(
-    <LocaleProvider>
-      <PaymentScreen />
-    </LocaleProvider>
+    <QueryClientProvider client={queryClient}>
+      <LocaleProvider>
+        <PaymentScreen />
+      </LocaleProvider>
+    </QueryClientProvider>
   );
 }
 
@@ -99,7 +104,14 @@ jest.mock('../../api/hooks/useCart', () => ({
       checkIn: '2026-05-01',
       checkOut: '2026-05-03',
       holdExpiresAt: null,
-      pricing: { total: 250 },
+      pricing: {
+        pricePerNight: 125,
+        nights: 2,
+        subtotal: 250,
+        taxes: 0,
+        total: 250,
+        currency: 'COP',
+      },
       priceBreakdown: null,
     },
     isLoading: false,

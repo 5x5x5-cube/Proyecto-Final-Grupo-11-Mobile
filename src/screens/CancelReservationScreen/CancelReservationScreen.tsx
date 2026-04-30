@@ -21,11 +21,13 @@ export default function CancelReservationScreen() {
   const route =
     useRoute<NativeStackScreenProps<RootStackParamList, 'CancelReservation'>['route']>();
   const { t } = useTranslation('mobile');
-  const { formatPrice } = useLocale();
+  const { formatFixedPrice } = useLocale();
 
   const { data: reservationData } = useBookingDetail(route.params.id ?? 1);
   const cancelBooking = useCancelBooking();
-  const reservation = (reservationData as any) ?? { code: '', totalPriceCop: 0 };
+  const reservation = (reservationData as any) ?? { code: '', totalPrice: 0 };
+  const refundAmount = Number(reservation?.totalPrice ?? reservation?.totalPriceCop ?? 0);
+  const fp = (amount: number) => formatFixedPrice(amount, reservation?.currency);
 
   return (
     <View style={styles.container}>
@@ -64,7 +66,7 @@ export default function CancelReservationScreen() {
               {t('cancelReservation.amountPaid')}
             </Text>
             <Text variant="body" color={palette.onSurface}>
-              {formatPrice(reservation.totalPriceCop)}
+              {fp(refundAmount)}
             </Text>
           </View>
           <View style={styles.refundRow}>
@@ -72,7 +74,7 @@ export default function CancelReservationScreen() {
               {t('cancelReservation.refund', { percent: 100 })}
             </Text>
             <Text variant="body" color={palette.onSurface}>
-              {formatPrice(reservation.totalPriceCop)}
+              {fp(refundAmount)}
             </Text>
           </View>
           <Divider style={styles.dividerSpacing} />
@@ -81,7 +83,7 @@ export default function CancelReservationScreen() {
               {t('cancelReservation.totalRefund')}
             </Text>
             <Text variant="body" style={styles.totalValue}>
-              {formatPrice(reservation.totalPriceCop)}
+              {fp(refundAmount)}
             </Text>
           </View>
         </Card>
