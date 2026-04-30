@@ -47,6 +47,7 @@ interface InitiatePaymentRequest {
   token: string;
   cartId: string;
   method: PaymentMethod;
+  currency: string;
 }
 
 interface InitiatePaymentResponse {

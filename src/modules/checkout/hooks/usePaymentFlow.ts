@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '@/navigation/types';
+import { useLocale } from '@/contexts/LocaleContext';
 import { useCart } from '@/api/hooks/useCart';
 import { useTokenize, useInitiatePayment, usePaymentStatus } from '@/api/hooks/usePayments';
 import type { PaymentMethod as ApiPaymentMethod } from '@/api/hooks/usePayments';
@@ -12,6 +13,7 @@ export function usePaymentFlow() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { t } = useTranslation('mobile');
 
+  const { currency } = useLocale();
   const { data: cart, isLoading: isCartLoading } = useCart();
   const tokenize = useTokenize();
   const initiatePayment = useInitiatePayment();
@@ -60,7 +62,7 @@ export function usePaymentFlow() {
     tokenize.mutate(tokenizePayload as any, {
       onSuccess: tokenData => {
         initiatePayment.mutate(
-          { token: tokenData.token, cartId: cart!.id, method: apiMethod },
+          { token: tokenData.token, cartId: cart!.id, method: apiMethod, currency },
           {
             onSuccess: initiateData => setPaymentId(initiateData.paymentId),
             onError: () => {
