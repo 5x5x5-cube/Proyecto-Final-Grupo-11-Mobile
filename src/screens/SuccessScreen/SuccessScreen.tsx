@@ -119,14 +119,26 @@ export default function SuccessScreen() {
           </Text>
         </View>
         {payment && (
-          <View style={styles.summaryRow}>
-            <Text variant="bodySmall" color={palette.onSurfaceVariant}>
-              {t('success.totalPaid')}
-            </Text>
-            <Text variant="label" color={palette.primary} style={styles.summaryValue}>
-              {formatFixedPrice(payment.amount, payment?.currency ?? booking?.currency)}
-            </Text>
-          </View>
+          <>
+            <View style={styles.summaryRow}>
+              <Text variant="bodySmall" color={palette.onSurfaceVariant}>
+                {t('success.totalPaid')}
+              </Text>
+              <Text variant="label" color={palette.primary} style={styles.summaryValue}>
+                {formatFixedPrice(payment.amount, payment?.currency ?? booking?.currency)}
+              </Text>
+            </View>
+            {payment.paymentMethod?.displayLabel ? (
+              <View style={styles.summaryRow}>
+                <Text variant="bodySmall" color={palette.onSurfaceVariant}>
+                  {t('success.paymentMethod')}
+                </Text>
+                <Text variant="label" color={palette.onSurface} style={styles.summaryValue}>
+                  {payment.paymentMethod.displayLabel}
+                </Text>
+              </View>
+            ) : null}
+          </>
         )}
       </Card>
 
