@@ -423,7 +423,7 @@ export default function PropertyDetailScreen() {
       {/* ── Barra de acción fija ─────────────────────────────────────── */}
       <ActionBar>
         <View style={styles.actionBarContent}>
-          <View>
+          <View style={styles.actionPriceContainer}>
             <Text variant="h3" color={palette.primary} style={styles.actionPrice}>
               {formatPrice(total)}
             </Text>
