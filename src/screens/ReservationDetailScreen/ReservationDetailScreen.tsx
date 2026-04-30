@@ -13,7 +13,6 @@ import { useBookingDetail } from '@/api/hooks/useBookings';
 import { useHotelDetail } from '@/api/hooks/useSearch';
 import { usePaymentStatus } from '@/api/hooks/usePayments';
 import TopBar from '@/components/TopBar';
-import Divider from '@/components/Divider';
 import OfflineBanner from '@/components/OfflineBanner';
 import StatusChip from '@/components/StatusChip';
 import InfoGrid from '@/components/InfoGrid';
@@ -170,16 +169,40 @@ export default function ReservationDetailScreen() {
           </View>
         </View>
 
-        {/* Payment method */}
-        <View style={styles.card}>
-          <View style={styles.cardInner}>
-            <Text variant="body" color={palette.onSurface} style={styles.priceTitle}>
-              {t('reservationDetail.paymentMethod')}
-            </Text>
-            <Divider style={styles.paymentDivider} />
-            {payment ? (
-              <>
-                <View style={styles.paymentRow}>
+        {/* Payment history */}
+        <Card marginBottom={14}>
+          <Text variant="body" color={palette.onSurface} style={styles.paymentCardTitle}>
+            {t('reservationDetail.paymentHistory')}
+          </Text>
+          {payment ? (
+            <View style={styles.paymentCardRow}>
+              <View style={styles.paymentStatusIcon}>
+                <MaterialCommunityIcons
+                  name={
+                    payment.status === 'approved'
+                      ? 'check-circle'
+                      : payment.status === 'declined'
+                        ? 'close-circle'
+                        : 'clock-outline'
+                  }
+                  size={22}
+                  color={
+                    payment.status === 'approved'
+                      ? palette.success
+                      : payment.status === 'declined'
+                        ? palette.error
+                        : palette.warning
+                  }
+                />
+              </View>
+              <View style={styles.paymentCardDetails}>
+                <Text variant="button" color={palette.onSurface}>
+                  {t('reservationDetail.bookingPayment')}
+                </Text>
+                <Text variant="caption" color={palette.onSurfaceVariant}>
+                  {payment.processedAt ? formatDate(payment.processedAt, 'medium') : '—'}
+                </Text>
+                <View style={styles.paymentMethodRow}>
                   <MaterialCommunityIcons
                     name={
                       payment.paymentMethod?.methodType === 'digital_wallet'
@@ -188,67 +211,62 @@ export default function ReservationDetailScreen() {
                           ? 'swap-horizontal'
                           : 'credit-card'
                     }
-                    size={20}
-                    color={palette.primary}
+                    size={14}
+                    color={palette.onSurfaceVariant}
                   />
-                  <Text variant="body" color={palette.onSurface} style={styles.paymentLabel}>
+                  <Text variant="caption" color={palette.onSurfaceVariant}>
                     {payment.paymentMethod?.displayLabel ?? '—'}
                   </Text>
                 </View>
-                <View style={styles.paymentMetaRow}>
-                  <View style={styles.paymentMetaItem}>
-                    <Text variant="caption" color={palette.onSurfaceVariant}>
-                      {t('reservationDetail.paymentAmount')}
-                    </Text>
-                    <Text variant="bodySmall" color={palette.onSurface}>
-                      {fp(payment.amount ?? 0)}
-                    </Text>
-                  </View>
-                  {payment.processedAt ? (
-                    <View style={styles.paymentMetaItem}>
-                      <Text variant="caption" color={palette.onSurfaceVariant}>
-                        {t('reservationDetail.paymentDate')}
-                      </Text>
-                      <Text variant="bodySmall" color={palette.onSurface}>
-                        {formatDate(payment.processedAt, 'medium')}
-                      </Text>
-                    </View>
-                  ) : null}
-                  <View style={styles.paymentMetaItem}>
-                    <Text
-                      variant="bodySmall"
-                      color={
-                        payment.status === 'approved'
-                          ? palette.success
-                          : payment.status === 'declined'
-                            ? palette.error
-                            : palette.warning
-                      }
-                      style={styles.paymentStatusText}
-                    >
-                      {payment.status === 'approved'
-                        ? t('reservationDetail.paymentApproved')
-                        : payment.status === 'declined'
-                          ? t('reservationDetail.paymentDeclined')
-                          : t('reservationDetail.paymentProcessing')}
-                    </Text>
-                  </View>
-                </View>
-              </>
-            ) : (
-              <View style={styles.paymentRow}>
-                <MaterialCommunityIcons name="clock-outline" size={20} color={palette.outline} />
-                <Text
-                  variant="bodySmall"
-                  color={palette.onSurfaceVariant}
-                  style={styles.paymentLabel}
-                >
-                  {t('reservationDetail.paymentPending')}
-                </Text>
               </View>
-            )}
-          </View>
-        </View>
+              <View style={styles.paymentCardRight}>
+                <Text variant="button" color={palette.onSurface}>
+                  {fp(payment.amount ?? 0)}
+                </Text>
+                <View
+                  style={[
+                    styles.paymentBadge,
+                    {
+                      backgroundColor:
+                        payment.status === 'approved'
+                          ? palette.successContainer
+                          : payment.status === 'declined'
+                            ? palette.errorContainer
+                            : palette.warningContainer,
+                    },
+                  ]}
+                >
+                  <Text
+                    variant="caption"
+                    color={
+                      payment.status === 'approved'
+                        ? palette.success
+                        : payment.status === 'declined'
+                          ? palette.error
+                          : palette.warning
+                    }
+                    style={styles.paymentBadgeText}
+                  >
+                    {payment.status === 'approved'
+                      ? t('reservationDetail.paymentApproved')
+                      : payment.status === 'declined'
+                        ? t('reservationDetail.paymentDeclined')
+                        : t('reservationDetail.paymentProcessing')}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          ) : (
+            <View style={styles.paymentCardRow}>
+              <View style={styles.paymentStatusIcon}>
+                <MaterialCommunityIcons name="clock-outline" size={22} color={palette.outline} />
+              </View>
+              <Text variant="bodySmall" color={palette.onSurfaceVariant}>
+                {t('reservationDetail.paymentPending')}
+              </Text>
+            </View>
+          )}
+        </Card>
 
         {/* Next steps */}
         <Card marginBottom={14}>

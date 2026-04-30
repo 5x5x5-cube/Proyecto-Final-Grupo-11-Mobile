@@ -103,28 +103,44 @@ export const styles = StyleSheet.create({
   errorButtonText: {
     fontWeight: '600',
   },
-  paymentDivider: {
-    marginVertical: 12,
+  paymentCardTitle: {
+    fontWeight: '600',
+    marginBottom: 14,
   },
-  paymentRow: {
+  paymentCardRow: {
     flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+  },
+  paymentStatusIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: palette.surfaceContainer,
     alignItems: 'center',
-    gap: 10,
-    marginBottom: 12,
+    justifyContent: 'center',
   },
-  paymentLabel: {
+  paymentCardDetails: {
     flex: 1,
-    fontWeight: '500',
-  },
-  paymentMetaRow: {
-    flexDirection: 'row',
-    gap: 16,
-    flexWrap: 'wrap',
-  },
-  paymentMetaItem: {
     gap: 2,
   },
-  paymentStatusText: {
+  paymentMethodRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 2,
+  },
+  paymentCardRight: {
+    alignItems: 'flex-end',
+    gap: 6,
+  },
+  paymentBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 100,
+  },
+  paymentBadgeText: {
     fontWeight: '600',
+    fontSize: 11,
   },
 });

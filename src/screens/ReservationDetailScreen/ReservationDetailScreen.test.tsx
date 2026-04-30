@@ -251,15 +251,17 @@ describe('ReservationDetailScreen', () => {
     expect(getByText('reservationDetail.paymentDeclined')).toBeTruthy();
   });
 
-  it('renders credit-card icon section header for card payments', () => {
+  it('renders payment history card with method label and status badge', () => {
     mockUsePaymentStatus.mockReturnValue({ data: mockPayment });
     const { getByText } = render(
       <LocaleProvider>
         <ReservationDetailScreen />
       </LocaleProvider>
     );
-    // Section header key is rendered twice (title + meta label) — both should be present
-    expect(getByText('reservationDetail.paymentAmount')).toBeTruthy();
+    expect(getByText('reservationDetail.paymentHistory')).toBeTruthy();
+    expect(getByText('reservationDetail.bookingPayment')).toBeTruthy();
+    expect(getByText('Visa **** 4242')).toBeTruthy();
+    expect(getByText('reservationDetail.paymentApproved')).toBeTruthy();
   });
 
   it('always shows cancel button regardless of status', () => {

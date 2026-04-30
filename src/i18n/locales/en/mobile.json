@@ -204,6 +204,8 @@
     "totalPaid": "Total paid",
     "showQR": "Show QR",
     "cancelReservation": "Cancel reservation",
+    "paymentHistory": "Payment history",
+    "bookingPayment": "Booking payment",
     "paymentMethod": "Payment method",
     "paymentPending": "Payment pending",
     "paymentApproved": "Approved",
