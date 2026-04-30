@@ -33,6 +33,9 @@ async function request<T>(method: Method, path: string, config?: RequestConfig):
   const token = await AsyncStorage.getItem('auth_token');
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
+  const lang = await AsyncStorage.getItem('language');
+  headers['Accept-Language'] = lang === 'EN' ? 'en' : 'es';
+
   const fetchOptions: RequestInit = {
     method,
     headers,
