@@ -177,6 +177,7 @@
     "nights": "Nights",
     "nightsValue": "{{count}} nights",
     "totalPaid": "Total paid",
+    "paymentMethod": "Payment method",
     "viewReservations": "View my reservations",
     "backToHome": "Back to home"
   },
@@ -199,7 +200,14 @@
     "taxes": "Taxes",
     "totalPaid": "Total paid",
     "showQR": "Show QR",
-    "cancelReservation": "Cancel reservation"
+    "cancelReservation": "Cancel reservation",
+    "paymentMethod": "Payment method",
+    "paymentPending": "Payment pending",
+    "paymentApproved": "Approved",
+    "paymentProcessing": "Processing",
+    "paymentDeclined": "Declined",
+    "paymentDate": "Payment date",
+    "paymentAmount": "Amount"
   },
   "cancelReservation": {
     "title": "Cancel reservation",
