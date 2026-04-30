@@ -428,7 +428,10 @@ export default function PropertyDetailScreen() {
               {formatPrice(total)}
             </Text>
             <Text variant="caption" color={palette.onSurfaceVariant}>
-              {t('summary.nights', { count: nights })} · {t('propertyDetail.taxes')}
+              {t('summary.nights', { count: nights })}
+            </Text>
+            <Text variant="caption" color={palette.onSurfaceVariant}>
+              {t('propertyDetail.taxes')}
             </Text>
           </View>
           <PrimaryButton
