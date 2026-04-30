@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { emitSessionExpired } from './authEvents';
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
@@ -45,6 +46,10 @@ async function request<T>(method: Method, path: string, config?: RequestConfig):
   const response = await fetch(url, fetchOptions);
 
   if (!response.ok) {
+    if (response.status === 401) {
+      await AsyncStorage.multiRemove(['auth_token', 'user_id', 'user_name', 'user_email']);
+      emitSessionExpired();
+    }
     const errorData = await response.json().catch(() => ({ message: response.statusText }));
     throw { status: response.status, data: errorData, ...errorData };
   }

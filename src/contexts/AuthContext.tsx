@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { onSessionExpired } from '@/api/authEvents';
 
 export interface AuthUser {
   id: string;
@@ -58,6 +59,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
     loadAuthState();
+  }, []);
+
+  useEffect(() => {
+    return onSessionExpired(() => setUser(null));
   }, []);
 
   async function login(
