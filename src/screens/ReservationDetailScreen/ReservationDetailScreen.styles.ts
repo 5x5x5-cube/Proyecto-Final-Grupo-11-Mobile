@@ -86,4 +86,28 @@ export const styles = StyleSheet.create({
   errorButtonText: {
     fontWeight: '600',
   },
+  paymentDivider: {
+    marginVertical: 12,
+  },
+  paymentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 12,
+  },
+  paymentLabel: {
+    flex: 1,
+    fontWeight: '500',
+  },
+  paymentMetaRow: {
+    flexDirection: 'row',
+    gap: 16,
+    flexWrap: 'wrap',
+  },
+  paymentMetaItem: {
+    gap: 2,
+  },
+  paymentStatusText: {
+    fontWeight: '600',
+  },
 });

@@ -177,6 +177,7 @@
     "nights": "Noches",
     "nightsValue": "{{count}} noches",
     "totalPaid": "Total pagado",
+    "paymentMethod": "Metodo de pago",
     "viewReservations": "Ver mis reservas",
     "backToHome": "Volver al inicio"
   },
@@ -199,7 +200,14 @@
     "taxes": "Impuestos",
     "totalPaid": "Total pagado",
     "showQR": "Mostrar QR",
-    "cancelReservation": "Cancelar reserva"
+    "cancelReservation": "Cancelar reserva",
+    "paymentMethod": "Metodo de pago",
+    "paymentPending": "Pago pendiente",
+    "paymentApproved": "Aprobado",
+    "paymentProcessing": "Procesando",
+    "paymentDeclined": "Rechazado",
+    "paymentDate": "Fecha de pago",
+    "paymentAmount": "Monto"
   },
   "cancelReservation": {
     "title": "Cancelar reserva",
