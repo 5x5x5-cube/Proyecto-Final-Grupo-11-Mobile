@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { httpClient } from '../httpClient';
+import type { CreateBookingRequest } from '@/types/cart';
 
 export interface BookingData {
   id: string;
@@ -41,24 +42,22 @@ export function useBookingByPaymentId(paymentId: string | null) {
   });
 }
 
-export function useBookings() {
-  return useQuery({
-    queryKey: ['bookings'],
-    queryFn: () => httpClient.get('/bookings'),
-  });
-}
-
-export function usePastBookings() {
-  return useQuery({
-    queryKey: ['bookings', 'past'],
-    queryFn: () => httpClient.get('/bookings'), // Backend doesn't have past filter, fetch all and filter on client
-  });
-}
-
-export function useCancelledBookings() {
-  return useQuery({
-    queryKey: ['bookings', 'cancelled'],
-    queryFn: () => httpClient.get('/bookings', { params: { status: 'cancelled' } }),
+export function useBookings(filters?: { status?: string; timeframe?: string }) {
+  return useQuery<BookingData[]>({
+    queryKey: ['bookings', filters ?? {}],
+    queryFn: async () => {
+      const params: Record<string, string> = {};
+      if (filters?.status) params.status = filters.status;
+      if (filters?.timeframe) params.timeframe = filters.timeframe;
+      const hasParams = Object.keys(params).length > 0;
+      const raw = await httpClient.get<BookingListResponse | BookingData[]>(
+        '/bookings',
+        hasParams ? { params } : undefined
+      );
+      return Array.isArray(raw) ? raw : ((raw as BookingListResponse).data ?? []);
+    },
+    networkMode: 'offlineFirst',
+    gcTime: 1000 * 60 * 60 * 24, // 24h — keep cached data for offline browsing
   });
 }
 
@@ -66,6 +65,8 @@ export function useBookingDetail(bookingId: number) {
   return useQuery({
     queryKey: ['bookings', bookingId],
     queryFn: () => httpClient.get(`/bookings/${bookingId}`),
+    networkMode: 'offlineFirst',
+    gcTime: 1000 * 60 * 60 * 24,
   });
 }
 
@@ -146,7 +147,7 @@ export function useBookingQR(bookingId: number) {
     },
     staleTime: 1000 * 60 * 60 * 24 * 7, // 7 days
     gcTime: Infinity,
-    retry: 1,
+    retry: false,
   });
 }
 
@@ -154,6 +155,16 @@ export function useCancelBooking() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (bookingId: number) => httpClient.post(`/bookings/${bookingId}/cancel`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bookings'] });
+    },
+  });
+}
+
+export function useCreateBooking() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CreateBookingRequest) => httpClient.post('/bookings', { body: data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bookings'] });
     },

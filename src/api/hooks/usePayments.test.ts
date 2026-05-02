@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
-import { useTokenizeCard, useInitiatePayment, usePaymentStatus } from './usePayments';
+import { useTokenize, useInitiatePayment, usePaymentStatus } from './usePayments';
 
 jest.mock('../httpClient', () => ({
   httpClient: {
@@ -32,7 +32,7 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-describe('useTokenizeCard', () => {
+describe('useTokenize', () => {
   it('posts card data to /gateway/tokenize and returns token', async () => {
     const mockResponse = {
       token: 'tok_mock_xxxx',
@@ -42,9 +42,10 @@ describe('useTokenizeCard', () => {
     };
     mockPost.mockResolvedValueOnce(mockResponse);
 
-    const { result } = renderHook(() => useTokenizeCard(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useTokenize(), { wrapper: createWrapper() });
 
     result.current.mutate({
+      method: 'credit_card',
       cardNumber: '4111111111114242',
       cardHolder: 'Carlos Martinez',
       expiry: '12/28',
@@ -55,6 +56,7 @@ describe('useTokenizeCard', () => {
 
     expect(mockPost).toHaveBeenCalledWith('/gateway/tokenize', {
       body: {
+        method: 'credit_card',
         cardNumber: '4111111111114242',
         cardHolder: 'Carlos Martinez',
         expiry: '12/28',
@@ -67,9 +69,10 @@ describe('useTokenizeCard', () => {
   it('surfaces errors from the API', async () => {
     mockPost.mockRejectedValueOnce({ status: 422, data: { message: 'Invalid card' } });
 
-    const { result } = renderHook(() => useTokenizeCard(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useTokenize(), { wrapper: createWrapper() });
 
     result.current.mutate({
+      method: 'credit_card',
       cardNumber: '0000000000000000',
       cardHolder: 'Test User',
       expiry: '01/25',
@@ -92,7 +95,7 @@ describe('useInitiatePayment', () => {
     result.current.mutate({
       token: 'tok_mock_xxxx',
       cartId: 'cart-mock-001',
-      method: 'credit',
+      method: 'credit_card',
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -101,7 +104,7 @@ describe('useInitiatePayment', () => {
       body: {
         token: 'tok_mock_xxxx',
         cartId: 'cart-mock-001',
-        method: 'credit',
+        method: 'credit_card',
       },
     });
     expect(result.current.data).toEqual(mockResponse);
@@ -115,7 +118,7 @@ describe('useInitiatePayment', () => {
     result.current.mutate({
       token: 'tok_abc',
       cartId: 'cart-mock-002',
-      method: 'debit',
+      method: 'debit_card',
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));

@@ -10,12 +10,16 @@ import { RootStackParamList } from '@/navigation/types';
 import { palette } from '@/theme/palette';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useBookingDetail } from '@/api/hooks/useBookings';
+import { useHotelDetail } from '@/api/hooks/useSearch';
+import { usePaymentStatus } from '@/api/hooks/usePayments';
 import TopBar from '@/components/TopBar';
 import OfflineBanner from '@/components/OfflineBanner';
 import StatusChip from '@/components/StatusChip';
 import InfoGrid from '@/components/InfoGrid';
 import PriceBreakdown from '@/components/PriceBreakdown';
 import Text from '@/components/Text';
+import Card from '@/components/Card';
+import RatingBadge from '@/components/RatingBadge';
 import ReservationDetailScreenSkeleton from './ReservationDetailScreen.skeleton';
 import { styles } from './ReservationDetailScreen.styles';
 
@@ -25,21 +29,23 @@ export default function ReservationDetailScreen() {
   const route =
     useRoute<NativeStackScreenProps<RootStackParamList, 'ReservationDetail'>['route']>();
   const { t } = useTranslation('mobile');
-  const { formatPrice, formatDate } = useLocale();
+  const { formatFixedPrice, formatDate } = useLocale();
 
   const { data: reservationData, isLoading } = useBookingDetail(route.params.id ?? 1);
   const reservation = reservationData as any;
+  const { data: hotelData } = useHotelDetail(reservation?.hotelId ?? '');
+  const { data: payment } = usePaymentStatus(reservation?.paymentId ?? null);
 
   // Map backend fields to frontend format
   const mappedReservation = reservation
     ? {
         ...reservation,
-        gradient: ['#006874', '#4A9FAA'] as const, // Default gradient
+        gradient: ['#006874', '#4A9FAA'] as const,
         hotelType: 'Hotel',
-        hotelName: `Hotel ${reservation.hotelId}`,
-        location: 'Unknown',
-        nights: 0, // Calculate if needed
-        room: `Room ${reservation.roomId}`,
+        hotelName: reservation.hotelName ?? reservation.code,
+        location: reservation.location ?? '',
+        nights: reservation.nights ?? 0,
+        room: reservation.roomName ?? '',
         totalPriceCop: reservation.totalPrice,
       }
     : null;
@@ -54,8 +60,15 @@ export default function ReservationDetailScreen() {
     );
   }
 
-  const accommodationCop = Math.round(mappedReservation.totalPriceCop * 0.81);
-  const taxesCop = mappedReservation.totalPriceCop - accommodationCop;
+  const fp = (amount: number) => formatFixedPrice(amount, mappedReservation.currency);
+
+  const pb = mappedReservation.priceBreakdown;
+  const accommodationCop = pb
+    ? Number(pb.basePrice)
+    : Math.round(mappedReservation.totalPriceCop * 0.81);
+  const taxesCop = pb
+    ? Number(pb.vat) + Number(pb.serviceFee || 0)
+    : mappedReservation.totalPriceCop - accommodationCop;
 
   return (
     <View style={styles.container}>
@@ -88,6 +101,11 @@ export default function ReservationDetailScreen() {
             <Text variant="bodySmall" color={palette.onSurfaceVariant} style={styles.hotelLocation}>
               {mappedReservation.location}
             </Text>
+            {(hotelData as any)?.rating != null && (
+              <View style={styles.ratingRow}>
+                <RatingBadge rating={(hotelData as any).rating} showStars="single" />
+              </View>
+            )}
           </View>
         </View>
 
@@ -141,27 +159,210 @@ export default function ReservationDetailScreen() {
               rows={[
                 {
                   label: t('reservationDetail.accommodation', { count: mappedReservation.nights }),
-                  value: formatPrice(accommodationCop),
+                  value: fp(accommodationCop),
                 },
-                { label: t('reservationDetail.taxes'), value: formatPrice(taxesCop) },
+                { label: t('reservationDetail.taxes'), value: fp(taxesCop) },
               ]}
               totalLabel={t('reservationDetail.totalPaid')}
-              totalValue={formatPrice(mappedReservation.totalPriceCop)}
+              totalValue={fp(mappedReservation.totalPriceCop)}
             />
           </View>
         </View>
 
+        {/* Payment history */}
+        <Card marginBottom={14}>
+          <Text variant="body" color={palette.onSurface} style={styles.paymentCardTitle}>
+            {t('reservationDetail.paymentHistory')}
+          </Text>
+          {payment ? (
+            <View style={styles.paymentCardRow}>
+              <View style={styles.paymentStatusIcon}>
+                <MaterialCommunityIcons
+                  name={
+                    payment.status === 'approved'
+                      ? 'check-circle'
+                      : payment.status === 'declined'
+                        ? 'close-circle'
+                        : 'clock-outline'
+                  }
+                  size={22}
+                  color={
+                    payment.status === 'approved'
+                      ? palette.success
+                      : payment.status === 'declined'
+                        ? palette.error
+                        : palette.warning
+                  }
+                />
+              </View>
+              <View style={styles.paymentCardDetails}>
+                <Text variant="button" color={palette.onSurface}>
+                  {t('reservationDetail.bookingPayment')}
+                </Text>
+                <Text variant="caption" color={palette.onSurfaceVariant}>
+                  {payment.processedAt ? formatDate(payment.processedAt, 'medium') : '—'}
+                </Text>
+                <View style={styles.paymentMethodRow}>
+                  <MaterialCommunityIcons
+                    name={
+                      payment.paymentMethod?.methodType === 'digital_wallet'
+                        ? 'wallet'
+                        : payment.paymentMethod?.methodType === 'transfer'
+                          ? 'swap-horizontal'
+                          : 'credit-card'
+                    }
+                    size={14}
+                    color={palette.onSurfaceVariant}
+                  />
+                  <Text variant="caption" color={palette.onSurfaceVariant}>
+                    {payment.paymentMethod?.displayLabel ?? '—'}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.paymentCardRight}>
+                <Text variant="button" color={palette.onSurface}>
+                  {fp(payment.amount ?? 0)}
+                </Text>
+                <View
+                  style={[
+                    styles.paymentBadge,
+                    {
+                      backgroundColor:
+                        payment.status === 'approved'
+                          ? palette.successContainer
+                          : payment.status === 'declined'
+                            ? palette.errorContainer
+                            : palette.warningContainer,
+                    },
+                  ]}
+                >
+                  <Text
+                    variant="caption"
+                    color={
+                      payment.status === 'approved'
+                        ? palette.success
+                        : payment.status === 'declined'
+                          ? palette.error
+                          : palette.warning
+                    }
+                    style={styles.paymentBadgeText}
+                  >
+                    {payment.status === 'approved'
+                      ? t('reservationDetail.paymentApproved')
+                      : payment.status === 'declined'
+                        ? t('reservationDetail.paymentDeclined')
+                        : t('reservationDetail.paymentProcessing')}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          ) : (
+            <View style={styles.paymentCardRow}>
+              <View style={styles.paymentStatusIcon}>
+                <MaterialCommunityIcons name="clock-outline" size={22} color={palette.outline} />
+              </View>
+              <Text variant="bodySmall" color={palette.onSurfaceVariant}>
+                {t('reservationDetail.paymentPending')}
+              </Text>
+            </View>
+          )}
+        </Card>
+
+        {/* Next steps */}
+        <Card marginBottom={14}>
+          <Text variant="body" color={palette.onSurface} style={styles.nextStepsTitle}>
+            {t('reservationDetail.nextSteps.title')}
+          </Text>
+
+          {/* Email confirmation step — always shown for pending and confirmed */}
+          {(mappedReservation.status === 'pending' || mappedReservation.status === 'confirmed') && (
+            <View style={styles.nextStep}>
+              <MaterialCommunityIcons name="email-check" size={20} color={palette.success} />
+              <View style={styles.nextStepText}>
+                <Text variant="button" color={palette.onSurface}>
+                  {t('reservationDetail.nextSteps.emailSent')}
+                </Text>
+                <Text variant="bodySmall" color={palette.onSurfaceVariant}>
+                  {t('reservationDetail.nextSteps.emailDescription')}
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Status-specific step */}
+          {mappedReservation.status === 'pending' && (
+            <View style={styles.nextStep}>
+              <MaterialCommunityIcons name="clock-outline" size={20} color={palette.warning} />
+              <View style={styles.nextStepText}>
+                <Text variant="button" color={palette.onSurface}>
+                  {t('reservationDetail.nextSteps.pendingTitle')}
+                </Text>
+                <Text variant="bodySmall" color={palette.onSurfaceVariant}>
+                  {t('reservationDetail.nextSteps.pendingDescription')}
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {mappedReservation.status === 'confirmed' && (
+            <View style={styles.nextStep}>
+              <MaterialCommunityIcons name="door-open" size={20} color={palette.success} />
+              <View style={styles.nextStepText}>
+                <Text variant="button" color={palette.onSurface}>
+                  {t('reservationDetail.nextSteps.confirmedTitle')}
+                </Text>
+                <Text variant="bodySmall" color={palette.onSurfaceVariant}>
+                  {t('reservationDetail.nextSteps.confirmedDescription', {
+                    room: mappedReservation.room,
+                    hotel: mappedReservation.hotelName,
+                  })}
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {mappedReservation.status === 'rejected' && (
+            <View style={styles.nextStep}>
+              <MaterialCommunityIcons name="close-circle" size={20} color={palette.error} />
+              <View style={styles.nextStepText}>
+                <Text variant="button" color={palette.onSurface}>
+                  {t('reservationDetail.nextSteps.rejectedTitle')}
+                </Text>
+                <Text variant="bodySmall" color={palette.onSurfaceVariant}>
+                  {t('reservationDetail.nextSteps.rejectedDescription')}
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {mappedReservation.status === 'cancelled' && (
+            <View style={styles.nextStep}>
+              <MaterialCommunityIcons name="close-circle" size={20} color={palette.error} />
+              <View style={styles.nextStepText}>
+                <Text variant="button" color={palette.onSurface}>
+                  {t('reservationDetail.nextSteps.cancelledTitle')}
+                </Text>
+                <Text variant="bodySmall" color={palette.onSurfaceVariant}>
+                  {t('reservationDetail.nextSteps.cancelledDescription')}
+                </Text>
+              </View>
+            </View>
+          )}
+        </Card>
+
         {/* Action buttons */}
         <View style={styles.buttonsColumn}>
-          <Pressable
-            style={styles.primaryButton}
-            onPress={() => navigation.navigate('QRCheckIn', { id: mappedReservation.id })}
-          >
-            <MaterialCommunityIcons name="qrcode" size={20} color={palette.onPrimary} />
-            <Text variant="button" color={palette.onPrimary} style={styles.primaryButtonText}>
-              {t('reservationDetail.showQR')}
-            </Text>
-          </Pressable>
+          {mappedReservation.status === 'confirmed' && (
+            <Pressable
+              style={styles.primaryButton}
+              onPress={() => navigation.navigate('QRCheckIn', { id: mappedReservation.id })}
+            >
+              <MaterialCommunityIcons name="qrcode" size={20} color={palette.onPrimary} />
+              <Text variant="button" color={palette.onPrimary} style={styles.primaryButtonText}>
+                {t('reservationDetail.showQR')}
+              </Text>
+            </Pressable>
+          )}
           <Pressable
             style={styles.errorButton}
             onPress={() => navigation.navigate('CancelReservation', { id: mappedReservation.id })}

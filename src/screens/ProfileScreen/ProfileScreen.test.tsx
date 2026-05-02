@@ -1,3 +1,21 @@
+const mockLogout = jest.fn();
+
+jest.mock('../../contexts/AuthContext', () => ({
+  useAuth: () => ({
+    logout: mockLogout,
+    login: jest.fn(),
+    isAuthenticated: true,
+    isLoading: false,
+    user: {
+      id: 'user-1',
+      name: 'Test User',
+      email: 'test@test.com',
+      phone: '+1 555 0000',
+      initials: 'TU',
+    },
+  }),
+}));
+
 jest.mock('expo-constants', () => ({
   __esModule: true,
   default: {
@@ -27,16 +45,16 @@ jest.mock('../../i18n', () => ({
   changeLanguage: jest.fn(),
 }));
 
-jest.mock('../../api/hooks/useAuth', () => ({
-  useCurrentUser: () => ({ data: { name: 'Test User', email: 'test@test.com', initials: 'T' } }),
-}));
-
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { render, fireEvent } from '@testing-library/react-native';
 import { LocaleProvider } from '../../contexts/LocaleContext';
 import ProfileScreen from './ProfileScreen';
 
 describe('ProfileScreen', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('renders without crashing', () => {
     const { toJSON } = render(
       <LocaleProvider>
@@ -44,5 +62,17 @@ describe('ProfileScreen', () => {
       </LocaleProvider>
     );
     expect(toJSON()).toBeTruthy();
+  });
+
+  it('calls auth.logout when logout button is pressed', () => {
+    const { getByText } = render(
+      <LocaleProvider>
+        <ProfileScreen />
+      </LocaleProvider>
+    );
+
+    fireEvent.press(getByText('profile.logout'));
+
+    expect(mockLogout).toHaveBeenCalledTimes(1);
   });
 });

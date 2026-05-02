@@ -6,7 +6,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '@/navigation/types';
-import { useHotelDetail, useHotelRooms } from '@/api/hooks/useSearch';
+import { useHotelDetail, useHotelReviews, useHotelRooms } from '@/api/hooks/useSearch';
 import { useSetCart } from '@/api/hooks/useCart';
 import { useLocale } from '@/contexts/LocaleContext';
 import { saveCartSelection } from '@/storage/cartStorage';
@@ -18,23 +18,18 @@ import PrimaryButton from '@/components/PrimaryButton';
 import PropertyDetailScreenSkeleton from './PropertyDetailScreen.skeleton';
 import { styles } from './PropertyDetailScreen.styles';
 
-// Habitación con campos que devuelve la API de search-service
-interface ApiRoom {
+interface NormalizedRoom {
   id: string;
-  room_type: string;
+  roomType: string;
+  roomNumber: string;
   capacity: number;
-  price_per_night: number;
-  amenities?: string[];
-  free_cancellation?: boolean;
+  pricePerNight: number;
+  taxRate: number;
+  description: string;
+  amenities: Array<{ key: string; icon: string; label: string }>;
 }
 
 const TAX_RATE = 0.19;
-
-const reviews = [
-  { name: 'Maria G.', initials: 'MG', rating: 5, textKey: 'propertyDetail.reviewTexts.review1' },
-  { name: 'Carlos M.', initials: 'CM', rating: 4, textKey: 'propertyDetail.reviewTexts.review2' },
-  { name: 'Ana L.', initials: 'AL', rating: 5, textKey: 'propertyDetail.reviewTexts.review3' },
-];
 
 // Paleta de degradados para los slides de la galería
 const GALLERY_GRADIENTS: [string, string][] = [
@@ -65,8 +60,16 @@ export default function PropertyDetailScreen() {
 
   const { data: hotelData, isLoading: isLoadingHotel } = useHotelDetail(hotelId);
   const { data: roomsData, isLoading: isLoadingRooms } = useHotelRooms(hotelId);
+  const { data: reviewsData, isLoading: isLoadingReviews } = useHotelReviews(hotelId);
   const hotel = (hotelData as any) ?? null;
-  const rooms: ApiRoom[] = (roomsData as any)?.rooms ?? [];
+  const rooms: NormalizedRoom[] = Array.isArray(roomsData) ? roomsData : [];
+
+  const reviews = (Array.isArray(reviewsData) ? reviewsData : []).map((r: any) => ({
+    name: r.name ?? '',
+    initials: r.initial ?? r.name?.charAt(0) ?? '',
+    rating: r.stars ?? r.rating ?? 5,
+    text: r.text ?? r.comment ?? '',
+  }));
 
   const setCart = useSetCart();
   const [selectedRoomIndex, setSelectedRoomIndex] = useState(0);
@@ -105,15 +108,25 @@ export default function PropertyDetailScreen() {
   const selectedRoom = rooms[selectedRoomIndex] ?? null;
 
   // Cálculo del desglose de precio según la habitación seleccionada
-  const subtotal = selectedRoom ? selectedRoom.price_per_night * nights : 0;
+  const subtotal = selectedRoom ? selectedRoom.pricePerNight * nights : 0;
   const taxes = Math.round(subtotal * TAX_RATE);
   const total = subtotal + taxes;
 
-  // Determina si el hotel o la habitación ofrece cancelación gratuita
-  const hasFreeCancellation =
-    hotel.freeCancellation === true ||
-    selectedRoom?.free_cancellation === true ||
-    rooms.some(r => r.free_cancellation);
+  // Aggregate unique amenities from all rooms (same pattern as web)
+  const hotelAmenities = (() => {
+    const map = new Map<string, { key: string; icon: string; label: string }>();
+    for (const room of rooms) {
+      for (const amenity of room.amenities) {
+        if (!map.has(amenity.label)) {
+          map.set(amenity.label, amenity);
+        }
+      }
+    }
+    return Array.from(map.values());
+  })();
+
+  // Determina si el hotel ofrece cancelación gratuita
+  const hasFreeCancellation = hotel.freeCancellation === true;
 
   async function handleReserve() {
     if (!selectedRoom) return;
@@ -215,35 +228,36 @@ export default function PropertyDetailScreen() {
               color={palette.onSurfaceVariant}
             />
             {'  '}
-            {hotel.location}
+            {hotel.location || [hotel.city, hotel.country].filter(Boolean).join(', ')}
           </Text>
 
           {/* Rating + reseñas */}
           <View style={styles.ratingRow}>
-            <View style={styles.ratingBadge}>
-              <Text variant="bodySmall" color={palette.onPrimary} style={styles.ratingBadgeText}>
-                {hotel.rating}
-              </Text>
-            </View>
+            <MaterialCommunityIcons name="star" size={16} color={palette.star} />
+            <Text variant="bodySmall" color={palette.onSurface} style={styles.ratingBadgeText}>
+              {hotel.rating}
+            </Text>
             <Text variant="bodySmall" color={palette.onSurfaceVariant} style={styles.reviewCount}>
-              {t('propertyDetail.reviews', { count: hotel.reviewCount })}
+              ({t('propertyDetail.reviews', { count: reviews.length })})
             </Text>
           </View>
 
           {/* Descripción */}
           <Text variant="bodySmall" color={palette.onSurface} style={styles.description}>
-            {t('propertyDetail.description')}
+            {hotel.description || t('propertyDetail.description')}
           </Text>
 
           {/* ── Servicios incluidos ──────────────────────────────────── */}
           <Text variant="button" color={palette.onSurface} style={styles.sectionTitle}>
             {t('propertyDetail.includedServices')}
           </Text>
-          <View style={styles.amenitiesRow}>
-            {hotel.amenities.map((amenity: any, index: number) => (
-              <AmenityTag key={index} icon={amenity.icon} label={amenity.label} />
-            ))}
-          </View>
+          {hotelAmenities.length > 0 && (
+            <View style={styles.amenitiesRow}>
+              {hotelAmenities.map(amenity => (
+                <AmenityTag key={amenity.key} icon={amenity.icon} label={amenity.label} />
+              ))}
+            </View>
+          )}
 
           {/* ── Política de cancelación ──────────────────────────────── */}
           {hasFreeCancellation && (
@@ -290,7 +304,7 @@ export default function PropertyDetailScreen() {
                 />
                 <View style={styles.roomInfo}>
                   <Text variant="body" color={palette.onSurface} style={styles.roomName}>
-                    {room.room_type}
+                    {room.roomType}
                   </Text>
                   <View style={styles.roomMeta}>
                     <MaterialCommunityIcons
@@ -304,7 +318,7 @@ export default function PropertyDetailScreen() {
                     </Text>
                   </View>
                   <Text variant="body" color={palette.primary} style={styles.roomPrice}>
-                    {formatPrice(room.price_per_night)}
+                    {formatPrice(room.pricePerNight)}
                     <Text variant="caption" color={palette.onSurfaceVariant}>
                       {t('propertyDetail.perNight')}
                     </Text>
@@ -333,7 +347,7 @@ export default function PropertyDetailScreen() {
                 <Text variant="bodySmall" color={palette.onSurfaceVariant}>
                   {t('propertyDetail.nightsBreakdown', {
                     count: nights,
-                    price: formatPrice(selectedRoom.price_per_night),
+                    price: formatPrice(selectedRoom.pricePerNight),
                   })}
                 </Text>
                 <Text variant="bodySmall" color={palette.onSurface}>
@@ -360,40 +374,48 @@ export default function PropertyDetailScreen() {
           )}
 
           {/* ── Reseñas de huéspedes ─────────────────────────────────── */}
-          <Text variant="button" color={palette.onSurface} style={styles.sectionTitle}>
-            {t('propertyDetail.guestReviews')}
-          </Text>
+          {!isLoadingReviews && reviews.length === 0 ? null : (
+            <Text variant="button" color={palette.onSurface} style={styles.sectionTitle}>
+              {t('propertyDetail.guestReviews')}
+            </Text>
+          )}
         </View>
 
-        <FlatList
-          horizontal
-          data={reviews}
-          keyExtractor={(_, index) => index.toString()}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.reviewsList}
-          renderItem={({ item }) => (
-            <View style={styles.reviewCard}>
-              <View style={styles.reviewHeader}>
-                <View style={styles.avatar}>
-                  <Text variant="captionSmall" color={palette.onPrimaryContainer}>
-                    {item.initials}
+        {isLoadingReviews ? (
+          <Text variant="caption" color={palette.onSurfaceVariant} style={styles.reviewsList}>
+            {t('propertyDetail.loadingReviews', 'Cargando reseñas...')}
+          </Text>
+        ) : reviews.length > 0 ? (
+          <FlatList
+            horizontal
+            data={reviews}
+            keyExtractor={(_, index) => index.toString()}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.reviewsList}
+            renderItem={({ item }) => (
+              <View style={styles.reviewCard}>
+                <View style={styles.reviewHeader}>
+                  <View style={styles.avatar}>
+                    <Text variant="captionSmall" color={palette.onPrimaryContainer}>
+                      {item.initials}
+                    </Text>
+                  </View>
+                  <Text variant="bodySmall" color={palette.onSurface} style={styles.reviewName}>
+                    {item.name}
                   </Text>
                 </View>
-                <Text variant="bodySmall" color={palette.onSurface} style={styles.reviewName}>
-                  {item.name}
+                <View style={styles.starsRowSmall}>
+                  {Array.from({ length: item.rating }).map((_, i) => (
+                    <MaterialCommunityIcons key={i} name="star" size={14} color={palette.star} />
+                  ))}
+                </View>
+                <Text variant="caption" color={palette.onSurfaceVariant}>
+                  {item.text}
                 </Text>
               </View>
-              <View style={styles.starsRowSmall}>
-                {Array.from({ length: item.rating }).map((_, i) => (
-                  <MaterialCommunityIcons key={i} name="star" size={14} color={palette.star} />
-                ))}
-              </View>
-              <Text variant="caption" color={palette.onSurfaceVariant}>
-                {t(item.textKey)}
-              </Text>
-            </View>
-          )}
-        />
+            )}
+          />
+        ) : null}
 
         <View style={styles.scrollSpacer} />
       </ScrollView>
@@ -401,12 +423,15 @@ export default function PropertyDetailScreen() {
       {/* ── Barra de acción fija ─────────────────────────────────────── */}
       <ActionBar>
         <View style={styles.actionBarContent}>
-          <View>
+          <View style={styles.actionPriceContainer}>
             <Text variant="h3" color={palette.primary} style={styles.actionPrice}>
               {formatPrice(total)}
             </Text>
             <Text variant="caption" color={palette.onSurfaceVariant}>
-              {t('summary.nights', { count: nights })} · {t('propertyDetail.taxes')}
+              {t('summary.nights', { count: nights })}
+            </Text>
+            <Text variant="caption" color={palette.onSurfaceVariant}>
+              {t('propertyDetail.taxes')}
             </Text>
           </View>
           <PrimaryButton

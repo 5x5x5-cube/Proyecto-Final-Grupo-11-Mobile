@@ -24,18 +24,12 @@ jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
 
+const mockUseBookingDetail = jest.fn();
+const mockUseBookingQR = jest.fn();
+
 jest.mock('../../api/hooks/useBookings', () => ({
-  useBookingDetail: () => ({
-    data: {
-      code: 'TH-001',
-      hotelName: 'Test',
-      checkIn: '2026-03-20',
-      checkOut: '2026-03-25',
-      room: 'Suite',
-      guests: '2',
-    },
-  }),
-  useBookingQR: () => ({ data: { qrCode: 'QR-DATA' } }),
+  useBookingDetail: (...args: any[]) => mockUseBookingDetail(...args),
+  useBookingQR: (...args: any[]) => mockUseBookingQR(...args),
 }));
 
 jest.mock('react-native-qrcode-svg', () => {
@@ -52,13 +46,112 @@ import { render } from '@testing-library/react-native';
 import { LocaleProvider } from '../../contexts/LocaleContext';
 import QRCheckInScreen from './QRCheckInScreen';
 
+const reservation = {
+  code: 'TH-001',
+  hotelName: 'Test Hotel',
+  checkIn: '2026-03-20',
+  checkOut: '2026-03-25',
+  room: 'Suite',
+  guests: 2,
+};
+
+function renderScreen() {
+  return render(
+    <LocaleProvider>
+      <QRCheckInScreen />
+    </LocaleProvider>
+  );
+}
+
 describe('QRCheckInScreen', () => {
-  it('renders without crashing', () => {
-    const { toJSON } = render(
-      <LocaleProvider>
-        <QRCheckInScreen />
-      </LocaleProvider>
-    );
-    expect(toJSON()).toBeTruthy();
+  beforeEach(() => {
+    mockUseBookingDetail.mockReturnValue({ data: reservation });
+    mockUseBookingQR.mockReturnValue({
+      data: { qrCode: 'QR-DATA', isFromCache: false },
+      error: null,
+      isLoading: false,
+    });
+  });
+
+  it('renders QR code when data is available', () => {
+    const { getByTestId, getByText } = renderScreen();
+    expect(getByTestId('qr-code')).toBeTruthy();
+    expect(getByText('TH-001')).toBeTruthy();
+    expect(getByText('Test Hotel')).toBeTruthy();
+  });
+
+  it('shows error state when QR fetch fails with date range error', () => {
+    mockUseBookingQR.mockReturnValue({
+      data: null,
+      error: {
+        detail: 'QR code can only be generated within 3 days before or after check-in date',
+      },
+      isLoading: false,
+    });
+
+    const { getByText, queryByTestId } = renderScreen();
+    expect(queryByTestId('qr-code')).toBeNull();
+    expect(getByText('qrCheckIn.errorTitle')).toBeTruthy();
+    expect(getByText('qrCheckIn.errorDateRange')).toBeTruthy();
+  });
+
+  it('shows error state when QR fetch fails with not confirmed error', () => {
+    mockUseBookingQR.mockReturnValue({
+      data: null,
+      error: {
+        detail: 'QR code can only be generated for confirmed bookings. Current status: pending',
+      },
+      isLoading: false,
+    });
+
+    const { getByText, queryByTestId } = renderScreen();
+    expect(queryByTestId('qr-code')).toBeNull();
+    expect(getByText('qrCheckIn.errorNotConfirmed')).toBeTruthy();
+  });
+
+  it('shows generic error for unknown errors', () => {
+    mockUseBookingQR.mockReturnValue({
+      data: null,
+      error: { message: 'Network error' },
+      isLoading: false,
+    });
+
+    const { getByText } = renderScreen();
+    expect(getByText('qrCheckIn.errorGeneric')).toBeTruthy();
+  });
+
+  it('shows offline badge when QR is from cache', () => {
+    mockUseBookingQR.mockReturnValue({
+      data: { qrCode: 'QR-CACHED', isFromCache: true },
+      error: null,
+      isLoading: false,
+    });
+
+    const { getByText } = renderScreen();
+    expect(getByText('qrCheckIn.offlineMode')).toBeTruthy();
+  });
+
+  it('hides instruction card when error is shown', () => {
+    mockUseBookingQR.mockReturnValue({
+      data: null,
+      error: {
+        detail: 'QR code can only be generated within 3 days before or after check-in date',
+      },
+      isLoading: false,
+    });
+
+    const { queryByText } = renderScreen();
+    expect(queryByText('qrCheckIn.instruction')).toBeNull();
+  });
+
+  it('still shows hotel info when error is shown', () => {
+    mockUseBookingQR.mockReturnValue({
+      data: null,
+      error: { detail: 'some error' },
+      isLoading: false,
+    });
+
+    const { getByText } = renderScreen();
+    expect(getByText('Test Hotel')).toBeTruthy();
   });
 });

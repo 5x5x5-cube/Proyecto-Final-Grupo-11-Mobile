@@ -65,15 +65,27 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 19,
   },
-  downloadButton: {
-    flexDirection: 'row',
+  errorCard: {
+    alignItems: 'center',
+    backgroundColor: palette.surfaceContainer,
+    borderRadius: 16,
+    paddingHorizontal: 24,
+    paddingVertical: 32,
+    marginBottom: 20,
+    alignSelf: 'stretch',
+    gap: 12,
+  },
+  errorTitle: {
+    textAlign: 'center',
+  },
+  errorMessage: {
+    textAlign: 'center',
+    lineHeight: 19,
+  },
+  qrPlaceholder: {
+    width: 240,
+    height: 240,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    borderWidth: 1.5,
-    borderColor: palette.primary,
-    borderRadius: 12,
-    paddingVertical: 13,
-    alignSelf: 'stretch',
   },
 });

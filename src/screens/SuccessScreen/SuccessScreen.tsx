@@ -3,6 +3,7 @@ import { ActivityIndicator, View, Pressable, ScrollView } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '@/navigation/types';
 import { useLocale } from '@/contexts/LocaleContext';
@@ -17,9 +18,10 @@ import { styles } from './SuccessScreen.styles';
 
 export default function SuccessScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const queryClient = useQueryClient();
   const route = useRoute<NativeStackScreenProps<RootStackParamList, 'Success'>['route']>();
   const { t } = useTranslation('mobile');
-  const { formatDate, formatPrice } = useLocale();
+  const { formatDate, formatFixedPrice } = useLocale();
 
   const { paymentId } = route.params;
   const { data: payment } = usePaymentStatus(paymentId);
@@ -117,14 +119,26 @@ export default function SuccessScreen() {
           </Text>
         </View>
         {payment && (
-          <View style={styles.summaryRow}>
-            <Text variant="bodySmall" color={palette.onSurfaceVariant}>
-              {t('success.totalPaid')}
-            </Text>
-            <Text variant="label" color={palette.primary} style={styles.summaryValue}>
-              {formatPrice(payment.amount)}
-            </Text>
-          </View>
+          <>
+            <View style={styles.summaryRow}>
+              <Text variant="bodySmall" color={palette.onSurfaceVariant}>
+                {t('success.totalPaid')}
+              </Text>
+              <Text variant="label" color={palette.primary} style={styles.summaryValue}>
+                {formatFixedPrice(payment.amount, payment?.currency ?? booking?.currency)}
+              </Text>
+            </View>
+            {payment.paymentMethod?.displayLabel ? (
+              <View style={styles.summaryRow}>
+                <Text variant="bodySmall" color={palette.onSurfaceVariant}>
+                  {t('success.paymentMethod')}
+                </Text>
+                <Text variant="label" color={palette.onSurface} style={styles.summaryValue}>
+                  {payment.paymentMethod.displayLabel}
+                </Text>
+              </View>
+            ) : null}
+          </>
         )}
       </Card>
 
@@ -132,7 +146,10 @@ export default function SuccessScreen() {
       <View style={styles.primaryButtonWrapper}>
         <PrimaryButton
           title={t('success.viewReservations')}
-          onPress={() => navigation.navigate('MainTabs', { screen: 'MyReservations' })}
+          onPress={() => {
+            queryClient.invalidateQueries({ queryKey: ['bookings'] });
+            navigation.navigate('MainTabs', { screen: 'MyReservations' });
+          }}
         />
       </View>
 

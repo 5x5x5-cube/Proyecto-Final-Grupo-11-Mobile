@@ -20,10 +20,44 @@ jest.mock('../../i18n', () => ({
   changeLanguage: jest.fn(),
 }));
 
-jest.mock('../../api/hooks/useBookings', () => ({
-  useBookings: () => ({ data: [], isLoading: false }),
-  usePastBookings: () => ({ data: [], isLoading: false }),
-  useCancelledBookings: () => ({ data: [], isLoading: false }),
+const mockActiveBookings = [
+  {
+    id: 1,
+    code: 'RES-001',
+    hotelName: 'Grand Hyatt Bogotá',
+    roomName: 'Deluxe King Room',
+    location: 'Bogotá, Colombia',
+    nights: 3,
+    checkIn: '2024-06-01',
+    checkOut: '2024-06-04',
+    guests: '2 adults',
+    status: 'confirmed' as const,
+    totalPrice: 900000,
+    currency: 'COP',
+  },
+  {
+    id: 2,
+    code: 'RES-002',
+    hotelName: 'Hotel Dann Carlton',
+    roomName: 'Superior Twin Room',
+    location: 'Medellín, Colombia',
+    nights: 2,
+    checkIn: '2024-07-10',
+    checkOut: '2024-07-12',
+    guests: '1 adult',
+    status: 'pending' as const,
+    totalPrice: 450000,
+    currency: 'COP',
+  },
+];
+
+jest.mock('./useReservationTabs', () => ({
+  useReservationTabs: () => ({
+    tab: 'active',
+    setTab: jest.fn(),
+    bookings: mockActiveBookings,
+    isLoading: false,
+  }),
 }));
 
 jest.mock('expo-linear-gradient', () => {
@@ -48,5 +82,36 @@ describe('MyReservationsScreen', () => {
       </LocaleProvider>
     );
     expect(toJSON()).toBeTruthy();
+  });
+
+  it('renders hotel name from API data', () => {
+    const { getByText } = render(
+      <LocaleProvider>
+        <MyReservationsScreen />
+      </LocaleProvider>
+    );
+    expect(getByText('Grand Hyatt Bogotá')).toBeTruthy();
+    expect(getByText('Hotel Dann Carlton')).toBeTruthy();
+  });
+
+  it('renders location from API data', () => {
+    const { getByText } = render(
+      <LocaleProvider>
+        <MyReservationsScreen />
+      </LocaleProvider>
+    );
+    expect(getByText('Bogotá, Colombia')).toBeTruthy();
+    expect(getByText('Medellín, Colombia')).toBeTruthy();
+  });
+
+  it('shows tab labels without counters', () => {
+    const { getByText } = render(
+      <LocaleProvider>
+        <MyReservationsScreen />
+      </LocaleProvider>
+    );
+    expect(getByText('myReservations.active')).toBeTruthy();
+    expect(getByText('myReservations.past')).toBeTruthy();
+    expect(getByText('myReservations.cancelled')).toBeTruthy();
   });
 });
