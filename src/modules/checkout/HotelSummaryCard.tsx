@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { styles } from './HotelSummaryCard.styles';
 import Text from '@/components/Text';
@@ -10,6 +10,7 @@ interface HotelSummaryCardProps {
   hotelName: string;
   location: string;
   roomName: string;
+  imageUrl?: string | null;
   gradient?: readonly [string, string];
 }
 
@@ -17,17 +18,22 @@ export default function HotelSummaryCard({
   hotelName,
   location,
   roomName,
+  imageUrl,
   gradient = ['#006874', '#4A9FAA'],
 }: HotelSummaryCardProps) {
   return (
     <View style={styles.card}>
       <View style={styles.hotelRow}>
-        <LinearGradient
-          colors={gradient as [string, string]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.hotelGradient}
-        />
+        {imageUrl ? (
+          <Image source={{ uri: imageUrl }} style={styles.hotelGradient} resizeMode="cover" />
+        ) : (
+          <LinearGradient
+            colors={gradient as [string, string]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.hotelGradient}
+          />
+        )}
         <View style={styles.hotelInfo}>
           <Text
             variant="button"

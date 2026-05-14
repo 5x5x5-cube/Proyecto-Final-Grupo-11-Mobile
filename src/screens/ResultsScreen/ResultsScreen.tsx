@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Pressable, FlatList, ScrollView } from 'react-native';
+import { View, Pressable, FlatList, ImageBackground, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -166,30 +166,56 @@ export default function ResultsScreen() {
                 })
               }
             >
-              <LinearGradient
-                colors={item.gradient as [string, string]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.cardImage}
-              >
-                <View style={styles.badgeRow}>
-                  <View style={styles.typeBadge}>
-                    <Text variant="captionSmall" color={palette.onPrimary}>
-                      {item.type}
-                    </Text>
+              {item.image_url ? (
+                <ImageBackground
+                  source={{ uri: item.image_url }}
+                  style={styles.cardImage}
+                  resizeMode="cover"
+                >
+                  <View style={styles.badgeRow}>
+                    <View style={styles.typeBadge}>
+                      <Text variant="captionSmall" color={palette.onPrimary}>
+                        {item.type}
+                      </Text>
+                    </View>
+                    <View style={styles.photoBadge}>
+                      <MaterialCommunityIcons
+                        name="camera-outline"
+                        size={12}
+                        color={palette.onPrimary}
+                      />
+                      <Text variant="captionSmall" color={palette.onPrimary}>
+                        {item.photoCount}
+                      </Text>
+                    </View>
                   </View>
-                  <View style={styles.photoBadge}>
-                    <MaterialCommunityIcons
-                      name="camera-outline"
-                      size={12}
-                      color={palette.onPrimary}
-                    />
-                    <Text variant="captionSmall" color={palette.onPrimary}>
-                      {item.photoCount}
-                    </Text>
+                </ImageBackground>
+              ) : (
+                <LinearGradient
+                  colors={item.gradient as [string, string]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.cardImage}
+                >
+                  <View style={styles.badgeRow}>
+                    <View style={styles.typeBadge}>
+                      <Text variant="captionSmall" color={palette.onPrimary}>
+                        {item.type}
+                      </Text>
+                    </View>
+                    <View style={styles.photoBadge}>
+                      <MaterialCommunityIcons
+                        name="camera-outline"
+                        size={12}
+                        color={palette.onPrimary}
+                      />
+                      <Text variant="captionSmall" color={palette.onPrimary}>
+                        {item.photoCount}
+                      </Text>
+                    </View>
                   </View>
-                </View>
-              </LinearGradient>
+                </LinearGradient>
+              )}
 
               <View style={styles.cardBody}>
                 <Text variant="button" color={palette.onSurface}>

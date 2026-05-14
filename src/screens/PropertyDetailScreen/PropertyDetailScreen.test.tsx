@@ -63,6 +63,8 @@ const mockHotel = {
   photoCount: 3,
   freeCancellation: true,
   gradient: ['#006874', '#4A9FAA'],
+  image_url: null,
+  images: [],
   amenities: [
     { icon: 'wifi', label: 'Wi-Fi' },
     { icon: 'pool', label: 'Piscina' },
@@ -76,6 +78,7 @@ const mockRooms = [
     capacity: 2,
     price_per_night: 480000,
     free_cancellation: true,
+    images: [],
   },
   {
     id: 'b1000000-0000-0000-0000-000000000002',
@@ -83,6 +86,7 @@ const mockRooms = [
     capacity: 4,
     price_per_night: 520000,
     free_cancellation: true,
+    images: [],
   },
 ];
 
@@ -249,5 +253,79 @@ describe('PropertyDetailScreen', () => {
     expect(getByText('propertyDetail.loadingReviews')).toBeTruthy();
     expect(queryByText('Maria G.')).toBeNull();
     expect(queryByText('Carlos M.')).toBeNull();
+  });
+
+  it('usa Image en la galería cuando hotel.images tiene URLs', () => {
+    const { Image } = require('react-native');
+    const useSearchMock = require('../../api/hooks/useSearch');
+    const hotelWithImages = {
+      ...mockHotel,
+      images: ['https://example.com/hotel1.jpg', 'https://example.com/hotel2.jpg'],
+    };
+    useSearchMock.useHotelDetail = () => ({ data: hotelWithImages, isLoading: false });
+    useSearchMock.useHotelRooms = () => ({
+      data: { rooms: mockRooms, total: 2 },
+      isLoading: false,
+    });
+    useSearchMock.useHotelReviews = () => ({ data: [], isLoading: false });
+
+    const { UNSAFE_getAllByType } = render(
+      <LocaleProvider>
+        <PropertyDetailScreen />
+      </LocaleProvider>
+    );
+
+    const images = UNSAFE_getAllByType(Image);
+    const galleryImages = images.filter((img: { props: { source?: { uri?: string } } }) =>
+      img.props.source?.uri?.startsWith('https://example.com/hotel')
+    );
+    expect(galleryImages.length).toBe(2);
+  });
+
+  it('usa Image en la tarjeta de habitación cuando room.images tiene URLs', () => {
+    const { Image } = require('react-native');
+    const useSearchMock = require('../../api/hooks/useSearch');
+    useSearchMock.useHotelDetail = () => ({ data: mockHotel, isLoading: false });
+    useSearchMock.useHotelRooms = () => ({
+      data: [
+        {
+          id: 'b1000000-0000-0000-0000-000000000001',
+          roomType: 'Superior',
+          roomNumber: '101',
+          capacity: 2,
+          pricePerNight: 480000,
+          taxRate: 0.19,
+          description: '',
+          amenities: [],
+          images: ['https://example.com/room1.jpg'],
+        },
+        {
+          id: 'b1000000-0000-0000-0000-000000000002',
+          roomType: 'Doble',
+          roomNumber: '102',
+          capacity: 4,
+          pricePerNight: 520000,
+          taxRate: 0.19,
+          description: '',
+          amenities: [],
+          images: [],
+        },
+      ],
+      isLoading: false,
+    });
+    useSearchMock.useHotelReviews = () => ({ data: [], isLoading: false });
+
+    const { UNSAFE_getAllByType } = render(
+      <LocaleProvider>
+        <PropertyDetailScreen />
+      </LocaleProvider>
+    );
+
+    const images = UNSAFE_getAllByType(Image);
+    const roomImages = images.filter(
+      (img: { props: { source?: { uri?: string } } }) =>
+        img.props.source?.uri === 'https://example.com/room1.jpg'
+    );
+    expect(roomImages.length).toBe(1);
   });
 });
