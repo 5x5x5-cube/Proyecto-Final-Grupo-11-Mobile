@@ -23,6 +23,7 @@ jest.mock('../../i18n', () => ({
 const mockActiveBookings = [
   {
     id: 1,
+    hotelId: 'hotel-1',
     code: 'RES-001',
     hotelName: 'Grand Hyatt Bogotá',
     roomName: 'Deluxe King Room',
@@ -37,6 +38,7 @@ const mockActiveBookings = [
   },
   {
     id: 2,
+    hotelId: 'hotel-2',
     code: 'RES-002',
     hotelName: 'Hotel Dann Carlton',
     roomName: 'Superior Twin Room',
@@ -68,6 +70,15 @@ jest.mock('expo-linear-gradient', () => {
       React.createElement(View, props, children),
   };
 });
+
+jest.mock('../../api/hooks/useSearch', () => ({
+  useHotelDetail: (hotelId: string) => ({
+    data:
+      hotelId === 'hotel-1'
+        ? { image_url: 'https://example.com/hotel1.jpg', name: 'Grand Hyatt Bogotá' }
+        : { name: 'Hotel Dann Carlton' },
+  }),
+}));
 
 import React from 'react';
 import { render } from '@testing-library/react-native';

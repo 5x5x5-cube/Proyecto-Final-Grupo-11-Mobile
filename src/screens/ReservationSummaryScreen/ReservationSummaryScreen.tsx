@@ -5,6 +5,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '@/navigation/types';
 import { useCart } from '@/api/hooks/useCart';
+import { useHotelDetail } from '@/api/hooks/useSearch';
 import { useLocale } from '@/contexts/LocaleContext';
 import { getCartSelection, CartSelection } from '@/storage/cartStorage';
 import { palette } from '@/theme/palette';
@@ -28,6 +29,8 @@ export default function ReservationSummaryScreen() {
 
   const [localSelection, setLocalSelection] = useState<CartSelection | null>(null);
   const { data: cart, isLoading, isError } = useCart();
+  const { data: hotelData } = useHotelDetail(cart?.hotelId ?? '');
+  const hotelImageUrl = (hotelData as any)?.image_url as string | null | undefined;
 
   // Load local selection from AsyncStorage on mount for immediate display
   useEffect(() => {
@@ -79,6 +82,7 @@ export default function ReservationSummaryScreen() {
             hotelName={cart.hotelName}
             location={cart.location ?? ''}
             roomName={cart.roomName}
+            imageUrl={hotelImageUrl}
           />
         )}
 
