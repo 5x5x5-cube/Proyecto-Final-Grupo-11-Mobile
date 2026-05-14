@@ -67,6 +67,8 @@ interface BackendHotel {
   rating: number;
   available_rooms_count: number;
   min_price: number;
+  image_url?: string;
+  images?: string[];
 }
 
 interface HotelsSearchResponse {
@@ -108,7 +110,9 @@ export function useSearchHotels(params?: HotelSearchParams) {
         starsText: '\u2605'.repeat(Math.round(h.rating ?? 0)),
         pricePerNight: h.min_price ?? 0,
         gradient: gradientForCity(h.city),
-        photoCount: 0,
+        photoCount: h.images?.length ?? (h.image_url ? 1 : 0),
+        image_url: h.image_url ?? null,
+        images: h.images ?? [],
       }));
     },
   });
@@ -133,6 +137,7 @@ interface BackendRoom {
   description: string;
   amenities?: Record<string, boolean>;
   total_quantity: number;
+  images?: string[];
 }
 
 interface HotelRoomsResponse {
@@ -161,6 +166,7 @@ export function useHotelRooms(hotelId: string, checkIn?: string) {
         taxRate: r.tax_rate,
         description: r.description,
         amenities: mapAmenities(r.amenities),
+        images: r.images ?? [],
       }));
     },
     enabled: !!hotelId,
