@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { View, Pressable, ScrollView, FlatList, Alert } from 'react-native';
+import { View, Pressable, ScrollView, FlatList, Alert, ImageBackground } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -242,19 +242,36 @@ export default function SearchScreen() {
           contentContainerStyle={styles.destinationsList}
           renderItem={({ item }) => (
             <Pressable onPress={() => setDestination(item.name)}>
-              <LinearGradient
-                colors={[...parseGradient(item.gradient)]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={[styles.destCard, item.name === destination && styles.destCardSelected]}
-              >
-                <Text variant="button" color={palette.onPrimary}>
-                  {item.name}
-                </Text>
-                <Text variant="caption" color="rgba(255,255,255,0.85)">
-                  {item.country}
-                </Text>
-              </LinearGradient>
+              {item.imageUrl ? (
+                <ImageBackground
+                  source={{ uri: item.imageUrl }}
+                  style={[styles.destCard, item.name === destination && styles.destCardSelected]}
+                  imageStyle={{ borderRadius: 14 }}
+                >
+                  <View style={styles.destCardOverlay}>
+                    <Text variant="button" color={palette.onPrimary}>
+                      {item.name}
+                    </Text>
+                    <Text variant="caption" color="rgba(255,255,255,0.85)">
+                      {item.country}
+                    </Text>
+                  </View>
+                </ImageBackground>
+              ) : (
+                <LinearGradient
+                  colors={[...parseGradient(item.gradient)]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={[styles.destCard, item.name === destination && styles.destCardSelected]}
+                >
+                  <Text variant="button" color={palette.onPrimary}>
+                    {item.name}
+                  </Text>
+                  <Text variant="caption" color="rgba(255,255,255,0.85)">
+                    {item.country}
+                  </Text>
+                </LinearGradient>
+              )}
             </Pressable>
           )}
         />

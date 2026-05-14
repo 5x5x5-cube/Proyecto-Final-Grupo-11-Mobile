@@ -80,6 +80,13 @@ export const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: palette.onPrimary,
   },
+  destCardOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    padding: 14,
+    borderRadius: 14,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+  },
   destCount: {
     marginTop: 2,
   },
