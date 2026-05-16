@@ -45,9 +45,38 @@ const mockReservation = {
 };
 
 const mockUseBookingDetail = jest.fn(() => ({ data: mockReservation, isLoading: false }));
+const mockUseHotelDetail = jest.fn(() => ({ data: { rating: 4.5 }, isLoading: false }));
 
 jest.mock('../../api/hooks/useBookings', () => ({
   useBookingDetail: (...args: unknown[]) => mockUseBookingDetail(...args),
+}));
+
+jest.mock('../../api/hooks/useSearch', () => ({
+  useHotelDetail: (...args: unknown[]) => mockUseHotelDetail(...args),
+}));
+
+const mockPayment = {
+  paymentId: 'pay-123',
+  status: 'approved' as const,
+  paymentMethod: {
+    id: 'pm-1',
+    methodType: 'credit_card',
+    displayLabel: 'Visa **** 4242',
+    cardLast4: '4242',
+    cardBrand: 'Visa',
+  },
+  amount: 900000,
+  currency: 'COP',
+  transactionId: 'txn-abc',
+  message: null,
+  createdAt: '2024-06-01T10:00:00Z',
+  processedAt: '2024-06-01T10:01:00Z',
+};
+
+const mockUsePaymentStatus = jest.fn(() => ({ data: undefined }));
+
+jest.mock('../../api/hooks/usePayments', () => ({
+  usePaymentStatus: (...args: unknown[]) => mockUsePaymentStatus(...args),
 }));
 
 jest.mock('expo-linear-gradient', () => {
@@ -67,6 +96,7 @@ import ReservationDetailScreen from './ReservationDetailScreen';
 describe('ReservationDetailScreen', () => {
   beforeEach(() => {
     mockUseBookingDetail.mockReturnValue({ data: mockReservation, isLoading: false });
+    mockUsePaymentStatus.mockReturnValue({ data: undefined });
   });
 
   it('renders without crashing', () => {
@@ -166,6 +196,74 @@ describe('ReservationDetailScreen', () => {
     expect(queryByText('reservationDetail.showQR')).toBeNull();
   });
 
+  // Payment section tests
+  it('shows payment pending when no payment data is available', () => {
+    mockUsePaymentStatus.mockReturnValue({ data: undefined });
+    const { getByText } = render(
+      <LocaleProvider>
+        <ReservationDetailScreen />
+      </LocaleProvider>
+    );
+    expect(getByText('reservationDetail.paymentPending')).toBeTruthy();
+  });
+
+  it('renders payment method display label when payment data is available', () => {
+    mockUsePaymentStatus.mockReturnValue({ data: mockPayment });
+    const { getByText } = render(
+      <LocaleProvider>
+        <ReservationDetailScreen />
+      </LocaleProvider>
+    );
+    expect(getByText('Visa **** 4242')).toBeTruthy();
+  });
+
+  it('shows approved status text when payment is approved', () => {
+    mockUsePaymentStatus.mockReturnValue({ data: mockPayment });
+    const { getByText } = render(
+      <LocaleProvider>
+        <ReservationDetailScreen />
+      </LocaleProvider>
+    );
+    expect(getByText('reservationDetail.paymentApproved')).toBeTruthy();
+  });
+
+  it('shows processing status text when payment is processing', () => {
+    mockUsePaymentStatus.mockReturnValue({
+      data: { ...mockPayment, status: 'processing' as const, processedAt: null },
+    });
+    const { getByText } = render(
+      <LocaleProvider>
+        <ReservationDetailScreen />
+      </LocaleProvider>
+    );
+    expect(getByText('reservationDetail.paymentProcessing')).toBeTruthy();
+  });
+
+  it('shows declined status text when payment is declined', () => {
+    mockUsePaymentStatus.mockReturnValue({
+      data: { ...mockPayment, status: 'declined' as const },
+    });
+    const { getByText } = render(
+      <LocaleProvider>
+        <ReservationDetailScreen />
+      </LocaleProvider>
+    );
+    expect(getByText('reservationDetail.paymentDeclined')).toBeTruthy();
+  });
+
+  it('renders payment history card with method label and status badge', () => {
+    mockUsePaymentStatus.mockReturnValue({ data: mockPayment });
+    const { getByText } = render(
+      <LocaleProvider>
+        <ReservationDetailScreen />
+      </LocaleProvider>
+    );
+    expect(getByText('reservationDetail.paymentHistory')).toBeTruthy();
+    expect(getByText('reservationDetail.bookingPayment')).toBeTruthy();
+    expect(getByText('Visa **** 4242')).toBeTruthy();
+    expect(getByText('reservationDetail.paymentApproved')).toBeTruthy();
+  });
+
   it('always shows cancel button regardless of status', () => {
     const statuses = ['confirmed', 'pending', 'cancelled'] as const;
 
@@ -181,6 +279,98 @@ describe('ReservationDetailScreen', () => {
       );
       expect(getByText('reservationDetail.cancelReservation')).toBeTruthy();
       unmount();
+    });
+  });
+
+  // Next steps section tests
+  describe('BookingNextSteps section', () => {
+    it('renders next steps title', () => {
+      const { getByText } = render(
+        <LocaleProvider>
+          <ReservationDetailScreen />
+        </LocaleProvider>
+      );
+      expect(getByText('reservationDetail.nextSteps.title')).toBeTruthy();
+    });
+
+    it('shows email and confirmed step for confirmed status', () => {
+      mockUseBookingDetail.mockReturnValue({
+        data: { ...mockReservation, status: 'confirmed' as const },
+        isLoading: false,
+      });
+      const { getByText } = render(
+        <LocaleProvider>
+          <ReservationDetailScreen />
+        </LocaleProvider>
+      );
+      expect(getByText('reservationDetail.nextSteps.emailSent')).toBeTruthy();
+      expect(getByText('reservationDetail.nextSteps.confirmedTitle')).toBeTruthy();
+    });
+
+    it('shows email and pending step for pending status', () => {
+      mockUseBookingDetail.mockReturnValue({
+        data: { ...mockReservation, status: 'pending' as const },
+        isLoading: false,
+      });
+      const { getByText } = render(
+        <LocaleProvider>
+          <ReservationDetailScreen />
+        </LocaleProvider>
+      );
+      expect(getByText('reservationDetail.nextSteps.emailSent')).toBeTruthy();
+      expect(getByText('reservationDetail.nextSteps.pendingTitle')).toBeTruthy();
+    });
+
+    it('shows rejected step for rejected status', () => {
+      mockUseBookingDetail.mockReturnValue({
+        data: { ...mockReservation, status: 'rejected' as const },
+        isLoading: false,
+      });
+      const { getByText } = render(
+        <LocaleProvider>
+          <ReservationDetailScreen />
+        </LocaleProvider>
+      );
+      expect(getByText('reservationDetail.nextSteps.rejectedTitle')).toBeTruthy();
+    });
+
+    it('shows cancelled step for cancelled status', () => {
+      mockUseBookingDetail.mockReturnValue({
+        data: { ...mockReservation, status: 'cancelled' as const },
+        isLoading: false,
+      });
+      const { getByText } = render(
+        <LocaleProvider>
+          <ReservationDetailScreen />
+        </LocaleProvider>
+      );
+      expect(getByText('reservationDetail.nextSteps.cancelledTitle')).toBeTruthy();
+    });
+
+    it('does not show email step for rejected status', () => {
+      mockUseBookingDetail.mockReturnValue({
+        data: { ...mockReservation, status: 'rejected' as const },
+        isLoading: false,
+      });
+      const { queryByText } = render(
+        <LocaleProvider>
+          <ReservationDetailScreen />
+        </LocaleProvider>
+      );
+      expect(queryByText('reservationDetail.nextSteps.emailSent')).toBeNull();
+    });
+
+    it('does not show email step for cancelled status', () => {
+      mockUseBookingDetail.mockReturnValue({
+        data: { ...mockReservation, status: 'cancelled' as const },
+        isLoading: false,
+      });
+      const { queryByText } = render(
+        <LocaleProvider>
+          <ReservationDetailScreen />
+        </LocaleProvider>
+      );
+      expect(queryByText('reservationDetail.nextSteps.emailSent')).toBeNull();
     });
   });
 });

@@ -4,14 +4,18 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '@/navigation/types';
+import { useQueryClient } from '@tanstack/react-query';
+import { useLocale } from '@/contexts/LocaleContext';
 import { useCart } from '@/api/hooks/useCart';
 import { useTokenize, useInitiatePayment, usePaymentStatus } from '@/api/hooks/usePayments';
 import type { PaymentMethod as ApiPaymentMethod } from '@/api/hooks/usePayments';
 
 export function usePaymentFlow() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const queryClient = useQueryClient();
   const { t } = useTranslation('mobile');
 
+  const { currency } = useLocale();
   const { data: cart, isLoading: isCartLoading } = useCart();
   const tokenize = useTokenize();
   const initiatePayment = useInitiatePayment();
@@ -36,6 +40,7 @@ export function usePaymentFlow() {
       const pid = paymentId;
       // Defer state updates to avoid cascading renders within effect
       setTimeout(() => {
+        void queryClient.invalidateQueries({ queryKey: ['bookings'] });
         setPaymentId(null);
         navigation.navigate('Success', { paymentId: pid });
       }, 0);
@@ -46,7 +51,7 @@ export function usePaymentFlow() {
         Alert.alert(t('payment.paymentError'), t('payment.declinedMessage'));
       }, 0);
     }
-  }, [paymentStatus.data?.status]);
+  }, [paymentStatus.data?.status, paymentId, navigation, queryClient, t]);
 
   const handleExpired = () => {
     Alert.alert(t('summary.holdExpired'), t('summary.holdExpiredMessage'), [
@@ -54,16 +59,13 @@ export function usePaymentFlow() {
     ]);
   };
 
-  function submitPayment(
-    tokenizePayload: Record<string, unknown>,
-    apiMethod: ApiPaymentMethod
-  ) {
+  function submitPayment(tokenizePayload: Record<string, unknown>, apiMethod: ApiPaymentMethod) {
     setFormEnabled(false);
 
     tokenize.mutate(tokenizePayload as any, {
       onSuccess: tokenData => {
         initiatePayment.mutate(
-          { token: tokenData.token, cartId: cart!.id, method: apiMethod },
+          { token: tokenData.token, cartId: cart!.id, method: apiMethod, currency },
           {
             onSuccess: initiateData => setPaymentId(initiateData.paymentId),
             onError: () => {

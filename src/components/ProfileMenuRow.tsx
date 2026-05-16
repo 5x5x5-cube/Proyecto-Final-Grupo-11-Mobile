@@ -23,7 +23,9 @@ export default function ProfileMenuRow({ icon, label, value, onPress }: ProfileM
           {value}
         </Text>
       )}
-      <MaterialCommunityIcons name="chevron-right" size={20} color={palette.onSurfaceVariant} />
+      {onPress && (
+        <MaterialCommunityIcons name="chevron-right" size={20} color={palette.onSurfaceVariant} />
+      )}
     </Pressable>
   );
 }
@@ -34,6 +36,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     paddingVertical: 12,
+    paddingHorizontal: 12,
   },
   iconWrap: {
     width: 24,

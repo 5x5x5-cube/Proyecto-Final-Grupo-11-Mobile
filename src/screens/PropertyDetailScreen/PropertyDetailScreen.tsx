@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { FlatList, Pressable, ScrollView, View, ViewToken } from 'react-native';
+import { FlatList, Image, Pressable, ScrollView, View, ViewToken } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -27,10 +27,10 @@ interface NormalizedRoom {
   taxRate: number;
   description: string;
   amenities: Array<{ key: string; icon: string; label: string }>;
+  images: string[];
 }
 
 const TAX_RATE = 0.19;
-
 
 // Paleta de degradados para los slides de la galería
 const GALLERY_GRADIENTS: [string, string][] = [
@@ -99,9 +99,10 @@ export default function PropertyDetailScreen() {
   }
 
   // Construye los slides de la galería usando imágenes del hotel o degradados por defecto
-  const gallerySlides: { gradient: [string, string] }[] =
-    hotel.images?.length > 0
-      ? hotel.images
+  type GallerySlide = { uri: string } | { gradient: [string, string] };
+  const gallerySlides: GallerySlide[] =
+    Array.isArray(hotel.images) && hotel.images.length > 0
+      ? (hotel.images as string[]).map((uri: string) => ({ uri }))
       : GALLERY_GRADIENTS.slice(0, hotel.photoCount ?? GALLERY_GRADIENTS.length).map(g => ({
           gradient: g,
         }));
@@ -167,14 +168,18 @@ export default function PropertyDetailScreen() {
             showsHorizontalScrollIndicator={false}
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
-            renderItem={({ item }) => (
-              <LinearGradient
-                colors={item.gradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.gallerySlide}
-              />
-            )}
+            renderItem={({ item }) =>
+              'uri' in item ? (
+                <Image source={{ uri: item.uri }} style={styles.gallerySlide} resizeMode="cover" />
+              ) : (
+                <LinearGradient
+                  colors={item.gradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.gallerySlide}
+                />
+              )
+            }
           />
 
           {/* Botón volver */}
@@ -229,7 +234,7 @@ export default function PropertyDetailScreen() {
               color={palette.onSurfaceVariant}
             />
             {'  '}
-            {hotel.location}
+            {hotel.location || [hotel.city, hotel.country].filter(Boolean).join(', ')}
           </Text>
 
           {/* Rating + reseñas */}
@@ -294,15 +299,23 @@ export default function PropertyDetailScreen() {
                 accessibilityRole="radio"
                 accessibilityState={{ selected: isSelected }}
               >
-                <LinearGradient
-                  colors={
-                    (hotel.gradient as [string, string]) ??
-                    GALLERY_GRADIENTS[index % GALLERY_GRADIENTS.length]
-                  }
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.roomGradient}
-                />
+                {room.images?.length > 0 ? (
+                  <Image
+                    source={{ uri: room.images[0] }}
+                    style={styles.roomGradient}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <LinearGradient
+                    colors={
+                      (hotel.gradient as [string, string]) ??
+                      GALLERY_GRADIENTS[index % GALLERY_GRADIENTS.length]
+                    }
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.roomGradient}
+                  />
+                )}
                 <View style={styles.roomInfo}>
                   <Text variant="body" color={palette.onSurface} style={styles.roomName}>
                     {room.roomType}
@@ -424,12 +437,15 @@ export default function PropertyDetailScreen() {
       {/* ── Barra de acción fija ─────────────────────────────────────── */}
       <ActionBar>
         <View style={styles.actionBarContent}>
-          <View>
+          <View style={styles.actionPriceContainer}>
             <Text variant="h3" color={palette.primary} style={styles.actionPrice}>
               {formatPrice(total)}
             </Text>
             <Text variant="caption" color={palette.onSurfaceVariant}>
-              {t('summary.nights', { count: nights })} · {t('propertyDetail.taxes')}
+              {t('summary.nights', { count: nights })}
+            </Text>
+            <Text variant="caption" color={palette.onSurfaceVariant}>
+              {t('propertyDetail.taxes')}
             </Text>
           </View>
           <PrimaryButton

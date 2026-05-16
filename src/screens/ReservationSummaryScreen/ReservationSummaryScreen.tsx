@@ -5,6 +5,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '@/navigation/types';
 import { useCart } from '@/api/hooks/useCart';
+import { useHotelDetail } from '@/api/hooks/useSearch';
 import { useLocale } from '@/contexts/LocaleContext';
 import { getCartSelection, CartSelection } from '@/storage/cartStorage';
 import { palette } from '@/theme/palette';
@@ -24,10 +25,12 @@ import { styles } from './ReservationSummaryScreen.styles';
 export default function ReservationSummaryScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { t } = useTranslation('mobile');
-  const { formatPrice } = useLocale();
+  const { formatFixedPrice } = useLocale();
 
   const [localSelection, setLocalSelection] = useState<CartSelection | null>(null);
   const { data: cart, isLoading, isError } = useCart();
+  const { data: hotelData } = useHotelDetail(cart?.hotelId ?? '');
+  const hotelImageUrl = (hotelData as any)?.image_url as string | null | undefined;
 
   // Load local selection from AsyncStorage on mount for immediate display
   useEffect(() => {
@@ -79,6 +82,7 @@ export default function ReservationSummaryScreen() {
             hotelName={cart.hotelName}
             location={cart.location ?? ''}
             roomName={cart.roomName}
+            imageUrl={hotelImageUrl}
           />
         )}
 
@@ -100,22 +104,22 @@ export default function ReservationSummaryScreen() {
                 {
                   label: t('summary.nightsBreakdown', {
                     count: cart.pricing.nights,
-                    price: formatPrice(cart.pricing.pricePerNight),
+                    price: formatFixedPrice(cart.pricing.pricePerNight, cart.pricing.currency),
                   }),
-                  value: formatPrice(cart.pricing.subtotal),
+                  value: formatFixedPrice(cart.pricing.subtotal, cart.pricing.currency),
                 },
                 {
                   label: t('summary.taxes', { percent: 19 }),
-                  value: formatPrice(cart.pricing.taxes),
+                  value: formatFixedPrice(cart.pricing.taxes, cart.pricing.currency),
                 },
               ]}
               totalLabel={t('summary.total')}
-              totalValue={formatPrice(cart.pricing.total)}
+              totalValue={formatFixedPrice(cart.pricing.total, cart.pricing.currency)}
             />
           </Card>
         )}
 
-        <CancellationPolicyCard />
+        <CancellationPolicyCard checkIn={cart?.checkIn} />
       </ScrollView>
 
       <ActionBar>

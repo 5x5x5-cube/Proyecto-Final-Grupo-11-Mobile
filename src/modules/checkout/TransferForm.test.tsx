@@ -86,16 +86,12 @@ describe('TransferForm', () => {
   });
 
   it('renders with an existing bank selected', () => {
-    const { getByText } = render(
-      <TransferForm {...defaultProps} bankCode="davivienda" />
-    );
+    const { getByText } = render(<TransferForm {...defaultProps} bankCode="davivienda" />);
     expect(getByText('Davivienda')).toBeTruthy();
   });
 
   it('does not open picker when disabled', () => {
-    const { getByTestId } = render(
-      <TransferForm {...defaultProps} disabled />
-    );
+    const { getByTestId } = render(<TransferForm {...defaultProps} disabled />);
     expect(getByTestId('transfer-bank-picker')).toBeTruthy();
   });
 });

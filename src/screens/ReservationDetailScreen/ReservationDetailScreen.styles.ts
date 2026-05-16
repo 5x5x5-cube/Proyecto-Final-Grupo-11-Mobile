@@ -47,6 +47,9 @@ export const styles = StyleSheet.create({
     marginBottom: 4,
   },
   hotelLocation: {},
+  ratingRow: {
+    marginTop: 8,
+  },
   roomLabel: {
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -58,6 +61,20 @@ export const styles = StyleSheet.create({
   priceTitle: {
     fontWeight: '600',
     marginBottom: 12,
+  },
+  nextStepsTitle: {
+    fontWeight: '600',
+    marginBottom: 12,
+  },
+  nextStep: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    marginBottom: 12,
+  },
+  nextStepText: {
+    flex: 1,
+    gap: 2,
   },
   buttonsColumn: {
     gap: 10,
@@ -85,5 +102,45 @@ export const styles = StyleSheet.create({
   },
   errorButtonText: {
     fontWeight: '600',
+  },
+  paymentCardTitle: {
+    fontWeight: '600',
+    marginBottom: 14,
+  },
+  paymentCardRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+  },
+  paymentStatusIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: palette.surfaceContainer,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  paymentCardDetails: {
+    flex: 1,
+    gap: 2,
+  },
+  paymentMethodRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 2,
+  },
+  paymentCardRight: {
+    alignItems: 'flex-end',
+    gap: 6,
+  },
+  paymentBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 100,
+  },
+  paymentBadgeText: {
+    fontWeight: '600',
+    fontSize: 11,
   },
 });

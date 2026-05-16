@@ -63,11 +63,7 @@ export default function WalletForm({
           >
             {selectedLabel}
           </Text>
-          <MaterialCommunityIcons
-            name="chevron-down"
-            size={18}
-            color={palette.onSurfaceVariant}
-          />
+          <MaterialCommunityIcons name="chevron-down" size={18} color={palette.onSurfaceVariant} />
         </Pressable>
 
         <Divider />

@@ -4,10 +4,10 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RootStackParamList } from '@/navigation/types';
 import { palette } from '@/theme/palette';
 import { useLogin } from '@/api/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 import Brand from '@/components/Brand';
 import LanguagePill from '@/components/LanguagePill';
 import PrimaryButton from '@/components/PrimaryButton';
@@ -22,6 +22,7 @@ export default function LoginScreen() {
   const navigation = useNavigation<Nav>();
   const { t } = useTranslation('mobile');
   const passwordRef = useRef<TextInput>(null);
+  const auth = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -59,12 +60,11 @@ export default function LoginScreen() {
       {
         onSuccess: async (data: any) => {
           if (data?.access_token) {
-            await AsyncStorage.setItem('auth_token', data.access_token);
+            await auth.login(data.access_token, data.user_id, {
+              name: data.name,
+              email: data.email,
+            });
           }
-          if (data?.user_id) {
-            await AsyncStorage.setItem('user_id', String(data.user_id));
-          }
-          navigation.navigate('MainTabs');
         },
       }
     );

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Pressable, FlatList, ScrollView } from 'react-native';
+import { View, Pressable, FlatList, ImageBackground, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -47,9 +47,7 @@ export default function ResultsScreen() {
   );
 
   const dateRange =
-    checkIn && checkOut
-      ? `${formatDate(checkIn, 'short')}-${formatDate(checkOut, 'short')}`
-      : '';
+    checkIn && checkOut ? `${formatDate(checkIn, 'short')}-${formatDate(checkOut, 'short')}` : '';
 
   const hotels = (hotelsData as any[]) ?? [];
   let displayList = [...hotels];
@@ -57,7 +55,8 @@ export default function ResultsScreen() {
   if (maxPrice != null) displayList = displayList.filter(h => h.pricePerNight <= maxPrice);
   if (selectedType) displayList = displayList.filter(h => h.type === selectedType);
   if (sortBy === 'priceLowToHigh') displayList.sort((a, b) => a.pricePerNight - b.pricePerNight);
-  else if (sortBy === 'priceHighToLow') displayList.sort((a, b) => b.pricePerNight - a.pricePerNight);
+  else if (sortBy === 'priceHighToLow')
+    displayList.sort((a, b) => b.pricePerNight - a.pricePerNight);
   else if (sortBy === 'rating') displayList.sort((a, b) => b.rating - a.rating);
 
   const sortOptions: { key: string; label: string }[] = [
@@ -99,7 +98,9 @@ export default function ResultsScreen() {
           <MaterialCommunityIcons name="arrow-left" size={22} color={palette.onSurface} />
         </Pressable>
         <Text variant="label" color={palette.onSurface} numberOfLines={1} style={styles.topBarText}>
-          {destination ?? ''}{dateRange ? ` · ${dateRange}` : ''}{guests ? ` · ${guests}` : ''}
+          {destination ?? ''}
+          {dateRange ? ` · ${dateRange}` : ''}
+          {guests ? ` · ${guests}` : ''}
         </Text>
       </View>
 
@@ -111,7 +112,11 @@ export default function ResultsScreen() {
           contentContainerStyle={styles.filtersContent}
         >
           <FilterChip
-            label={minPrice != null ? priceOptions.find(o => o.key === priceKey)?.label ?? t('results.filterPrice') : t('results.filterPrice')}
+            label={
+              minPrice != null
+                ? (priceOptions.find(o => o.key === priceKey)?.label ?? t('results.filterPrice'))
+                : t('results.filterPrice')
+            }
             selected={minPrice != null}
             onPress={() => setPricePickerVisible(true)}
           />
@@ -161,30 +166,56 @@ export default function ResultsScreen() {
                 })
               }
             >
-              <LinearGradient
-                colors={item.gradient as [string, string]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.cardImage}
-              >
-                <View style={styles.badgeRow}>
-                  <View style={styles.typeBadge}>
-                    <Text variant="captionSmall" color={palette.onPrimary}>
-                      {item.type}
-                    </Text>
+              {item.image_url ? (
+                <ImageBackground
+                  source={{ uri: item.image_url }}
+                  style={styles.cardImage}
+                  resizeMode="cover"
+                >
+                  <View style={styles.badgeRow}>
+                    <View style={styles.typeBadge}>
+                      <Text variant="captionSmall" color={palette.onPrimary}>
+                        {item.type}
+                      </Text>
+                    </View>
+                    <View style={styles.photoBadge}>
+                      <MaterialCommunityIcons
+                        name="camera-outline"
+                        size={12}
+                        color={palette.onPrimary}
+                      />
+                      <Text variant="captionSmall" color={palette.onPrimary}>
+                        {item.photoCount}
+                      </Text>
+                    </View>
                   </View>
-                  <View style={styles.photoBadge}>
-                    <MaterialCommunityIcons
-                      name="camera-outline"
-                      size={12}
-                      color={palette.onPrimary}
-                    />
-                    <Text variant="captionSmall" color={palette.onPrimary}>
-                      {item.photoCount}
-                    </Text>
+                </ImageBackground>
+              ) : (
+                <LinearGradient
+                  colors={item.gradient as [string, string]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.cardImage}
+                >
+                  <View style={styles.badgeRow}>
+                    <View style={styles.typeBadge}>
+                      <Text variant="captionSmall" color={palette.onPrimary}>
+                        {item.type}
+                      </Text>
+                    </View>
+                    <View style={styles.photoBadge}>
+                      <MaterialCommunityIcons
+                        name="camera-outline"
+                        size={12}
+                        color={palette.onPrimary}
+                      />
+                      <Text variant="captionSmall" color={palette.onPrimary}>
+                        {item.photoCount}
+                      </Text>
+                    </View>
                   </View>
-                </View>
-              </LinearGradient>
+                </LinearGradient>
+              )}
 
               <View style={styles.cardBody}>
                 <Text variant="button" color={palette.onSurface}>

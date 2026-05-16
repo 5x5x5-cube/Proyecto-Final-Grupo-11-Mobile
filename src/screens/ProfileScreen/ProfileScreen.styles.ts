@@ -34,10 +34,17 @@ export const styles = StyleSheet.create({
   sectionTitle: {
     paddingTop: 14,
     paddingBottom: 4,
+    paddingHorizontal: 16,
   },
   separator: {
     borderTopWidth: 1,
     borderTopColor: palette.outlineVariant,
+  },
+  versionText: {
+    fontSize: 12,
+    color: palette.outline,
+    textAlign: 'center',
+    marginTop: 16,
   },
   logoutButton: {
     flexDirection: 'row',

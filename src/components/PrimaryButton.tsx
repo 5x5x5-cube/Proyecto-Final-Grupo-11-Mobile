@@ -47,7 +47,9 @@ const styles = StyleSheet.create({
     backgroundColor: palette.primary,
     borderRadius: 12,
     paddingVertical: 14,
+    paddingHorizontal: 24,
     alignItems: 'center',
+    flexShrink: 0,
   },
   fullWidth: {
     width: '100%',

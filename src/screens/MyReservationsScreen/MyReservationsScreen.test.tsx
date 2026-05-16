@@ -23,6 +23,7 @@ jest.mock('../../i18n', () => ({
 const mockActiveBookings = [
   {
     id: 1,
+    hotelId: 'hotel-1',
     code: 'RES-001',
     hotelName: 'Grand Hyatt Bogotá',
     roomName: 'Deluxe King Room',
@@ -37,6 +38,7 @@ const mockActiveBookings = [
   },
   {
     id: 2,
+    hotelId: 'hotel-2',
     code: 'RES-002',
     hotelName: 'Hotel Dann Carlton',
     roomName: 'Superior Twin Room',
@@ -51,10 +53,13 @@ const mockActiveBookings = [
   },
 ];
 
-jest.mock('../../api/hooks/useBookings', () => ({
-  useBookings: () => ({ data: mockActiveBookings, isLoading: false }),
-  usePastBookings: () => ({ data: [], isLoading: false }),
-  useCancelledBookings: () => ({ data: [], isLoading: false }),
+jest.mock('./useReservationTabs', () => ({
+  useReservationTabs: () => ({
+    tab: 'active',
+    setTab: jest.fn(),
+    bookings: mockActiveBookings,
+    isLoading: false,
+  }),
 }));
 
 jest.mock('expo-linear-gradient', () => {
@@ -65,6 +70,15 @@ jest.mock('expo-linear-gradient', () => {
       React.createElement(View, props, children),
   };
 });
+
+jest.mock('../../api/hooks/useSearch', () => ({
+  useHotelDetail: (hotelId: string) => ({
+    data:
+      hotelId === 'hotel-1'
+        ? { image_url: 'https://example.com/hotel1.jpg', name: 'Grand Hyatt Bogotá' }
+        : { name: 'Hotel Dann Carlton' },
+  }),
+}));
 
 import React from 'react';
 import { render } from '@testing-library/react-native';
@@ -101,13 +115,14 @@ describe('MyReservationsScreen', () => {
     expect(getByText('Medellín, Colombia')).toBeTruthy();
   });
 
-  it('shows correct booking count in active tab', () => {
+  it('shows tab labels without counters', () => {
     const { getByText } = render(
       <LocaleProvider>
         <MyReservationsScreen />
       </LocaleProvider>
     );
-    // Tab label rendered as "myReservations.active (2)" via t() identity mock
-    expect(getByText('myReservations.active (2)')).toBeTruthy();
+    expect(getByText('myReservations.active')).toBeTruthy();
+    expect(getByText('myReservations.past')).toBeTruthy();
+    expect(getByText('myReservations.cancelled')).toBeTruthy();
   });
 });

@@ -83,3 +83,29 @@ describe('LocaleContext – buildRatesMap', () => {
     expect(getByTestId('price').props.children).toMatch(/COP/);
   });
 });
+
+function FixedPriceConsumer({ amount, currency }: { amount: number; currency?: string | null }) {
+  const { formatFixedPrice } = useLocale();
+  return <Text testID="fixed">{formatFixedPrice(amount, currency)}</Text>;
+}
+
+describe('LocaleContext – formatFixedPrice', () => {
+  it('defaults to COP when currency is omitted or blank', () => {
+    mockUseExchangeRates.mockReturnValue({ data: undefined });
+
+    const { getByTestId, rerender } = render(
+      <LocaleProvider>
+        <FixedPriceConsumer amount={500} currency={undefined} />
+      </LocaleProvider>
+    );
+
+    expect(getByTestId('fixed').props.children).toMatch(/COP\s+500/);
+
+    rerender(
+      <LocaleProvider>
+        <FixedPriceConsumer amount={500} currency="   " />
+      </LocaleProvider>
+    );
+    expect(getByTestId('fixed').props.children).toMatch(/COP\s+500/);
+  });
+});

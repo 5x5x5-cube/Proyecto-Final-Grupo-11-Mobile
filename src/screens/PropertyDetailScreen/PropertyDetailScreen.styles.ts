@@ -241,6 +241,11 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
+    gap: 12,
+  },
+  actionPriceContainer: {
+    flex: 1,
+    flexShrink: 1,
   },
   actionPrice: {},
   scrollSpacer: {

@@ -37,12 +37,14 @@ jest.mock('../../api/hooks/usePayments', () => ({
 jest.mock('../../api/hooks/useBookings', () => ({
   useBookingByPaymentId: () => ({
     data: {
+      id: 'bk-1',
       code: 'BK-12345678',
       hotelId: 'hotel-1',
       checkIn: '2026-05-01',
       checkOut: '2026-05-03',
       guests: 2,
       totalPrice: 595000,
+      currency: 'COP',
     },
   }),
 }));
@@ -54,17 +56,33 @@ jest.mock('../../api/hooks/useSearch', () => ({
 }));
 
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { render, screen } from '@testing-library/react-native';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LocaleProvider } from '../../contexts/LocaleContext';
 import SuccessScreen from './SuccessScreen';
+
+const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
 
 describe('SuccessScreen', () => {
   it('renders without crashing', () => {
     const { toJSON } = render(
-      <LocaleProvider>
-        <SuccessScreen />
-      </LocaleProvider>
+      <QueryClientProvider client={queryClient}>
+        <LocaleProvider>
+          <SuccessScreen />
+        </LocaleProvider>
+      </QueryClientProvider>
     );
     expect(toJSON()).toBeTruthy();
+  });
+
+  it('shows total paid in payment currency (formatFixedPrice, not locale conversion)', () => {
+    render(
+      <QueryClientProvider client={queryClient}>
+        <LocaleProvider>
+          <SuccessScreen />
+        </LocaleProvider>
+      </QueryClientProvider>
+    );
+    expect(screen.getByText(/COP\s+595[.,]000/)).toBeTruthy();
   });
 });

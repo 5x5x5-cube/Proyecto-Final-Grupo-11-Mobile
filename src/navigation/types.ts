@@ -1,8 +1,11 @@
 import { NavigatorScreenParams } from '@react-navigation/native';
 
-export type RootStackParamList = {
+export type AuthStackParamList = {
   Login: undefined;
   Register: undefined;
+};
+
+export type AppStackParamList = {
   MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
   Results: {
     destination: string;
@@ -26,6 +29,9 @@ export type RootStackParamList = {
   CancelReservation: { id: number };
   QRCheckIn: { id: number };
 };
+
+// Alias kept for backward compatibility with existing screen imports
+export type RootStackParamList = AuthStackParamList & AppStackParamList;
 
 export type MainTabParamList = {
   Search: undefined;

@@ -3879,6 +3879,11 @@ expo-modules-core@55.0.17:
   dependencies:
     invariant "^2.2.4"
 
+expo-network@~55.0.13:
+  version "55.0.13"
+  resolved "https://registry.yarnpkg.com/expo-network/-/expo-network-55.0.13.tgz#296c53b70e88d13d04e5ebc4316f7db924127550"
+  integrity sha512-7u+npCmCPRpVrjkUlQtUetPnTN1gRyj7z13bBM5w9w1AHMb4PfoxtIys5EB9ukzNYBg/gaZ/y5dtxomGpc6BKw==
+
 expo-notifications@^55.0.20:
   version "55.0.20"
   resolved "https://registry.yarnpkg.com/expo-notifications/-/expo-notifications-55.0.20.tgz#1b40c80236237291e11aa8136b9c2e7b9946792f"

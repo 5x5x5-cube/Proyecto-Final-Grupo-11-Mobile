@@ -123,6 +123,9 @@
     "total": "Total",
     "freeCancellation": "Cancelacion gratuita",
     "cancellationPolicy": "Cancelacion gratuita hasta 48 horas antes del check-in. Despues se cobra el 50% de la primera noche.",
+    "freeCancellationUntil": "Cancelacion gratuita hasta",
+    "halfChargeLabel": "Cargo del {{percent}}% entre",
+    "noRefundFrom": "Sin reembolso desde",
     "continueToPayment": "Continuar al pago",
     "holdCountdown": "Tu habitacion esta reservada por {{time}}",
     "holdExpired": "Reserva expirada",
@@ -177,6 +180,7 @@
     "nights": "Noches",
     "nightsValue": "{{count}} noches",
     "totalPaid": "Total pagado",
+    "paymentMethod": "Metodo de pago",
     "viewReservations": "Ver mis reservas",
     "backToHome": "Volver al inicio"
   },
@@ -199,7 +203,29 @@
     "taxes": "Impuestos",
     "totalPaid": "Total pagado",
     "showQR": "Mostrar QR",
-    "cancelReservation": "Cancelar reserva"
+    "cancelReservation": "Cancelar reserva",
+    "paymentHistory": "Historial de pagos",
+    "bookingPayment": "Pago de reserva",
+    "paymentMethod": "Metodo de pago",
+    "paymentPending": "Pago pendiente",
+    "paymentApproved": "Aprobado",
+    "paymentProcessing": "Procesando",
+    "paymentDeclined": "Rechazado",
+    "paymentDate": "Fecha de pago",
+    "paymentAmount": "Monto",
+    "nextSteps": {
+      "title": "Proximos pasos",
+      "emailSent": "Confirmacion enviada por correo",
+      "emailDescription": "Hemos enviado un email con los detalles de tu reserva.",
+      "pendingTitle": "Pendiente de confirmacion",
+      "pendingDescription": "Tu reserva esta siendo revisada por el hotel.",
+      "confirmedTitle": "Habitacion reservada",
+      "confirmedDescription": "Tu {{room}} en {{hotel}} ha sido reservada.",
+      "rejectedTitle": "Reserva no confirmada",
+      "rejectedDescription": "El hotel no pudo confirmar tu reserva. Se procedera con el reembolso.",
+      "cancelledTitle": "Reserva cancelada",
+      "cancelledDescription": "Tu reserva ha sido cancelada. El reembolso sera procesado."
+    }
   },
   "cancelReservation": {
     "title": "Cancelar reserva",
@@ -217,7 +243,13 @@
     "title": "Check-in con codigo QR",
     "instruction": "Presenta este codigo en recepcion para realizar tu check-in de manera rapida y sin contacto.",
     "downloadQR": "Descargar QR",
-    "offlineMode": "Modo sin conexion"
+    "offlineMode": "Modo sin conexion",
+    "guests_one": "{{count}} huésped",
+    "guests_other": "{{count}} huéspedes",
+    "errorTitle": "Codigo QR no disponible",
+    "errorDateRange": "El codigo QR solo esta disponible dentro de los 3 dias antes o despues de tu fecha de check-in.",
+    "errorNotConfirmed": "El codigo QR solo esta disponible para reservas confirmadas.",
+    "errorGeneric": "No se pudo generar el codigo QR. Intentalo mas tarde."
   },
   "profile": {
     "personalInfo": "Informacion personal",

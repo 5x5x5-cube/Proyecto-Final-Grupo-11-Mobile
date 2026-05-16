@@ -37,4 +37,22 @@ describe('ProfileMenuRow', () => {
     const { toJSON } = render(<ProfileMenuRow icon={icon} label="Static Row" />);
     expect(toJSON()).toBeTruthy();
   });
+
+  it('shows chevron arrow when onPress is provided', () => {
+    const { toJSON } = render(<ProfileMenuRow icon={icon} label="Language" onPress={() => {}} />);
+    const tree = JSON.stringify(toJSON());
+    expect(tree).toContain('chevron-right');
+  });
+
+  it('hides chevron arrow when onPress is not provided', () => {
+    const { toJSON } = render(<ProfileMenuRow icon={icon} label="Name" />);
+    const tree = JSON.stringify(toJSON());
+    expect(tree).not.toContain('chevron-right');
+  });
+
+  it('has horizontal padding inside rows', () => {
+    const { toJSON } = render(<ProfileMenuRow icon={icon} label="Test" />);
+    const tree = JSON.stringify(toJSON());
+    expect(tree).toContain('paddingHorizontal');
+  });
 });

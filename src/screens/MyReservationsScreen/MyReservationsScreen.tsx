@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, FlatList, Pressable } from 'react-native';
+import React from 'react';
+import { View, FlatList, Pressable, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -7,17 +7,18 @@ import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '@/navigation/types';
 import { palette } from '@/theme/palette';
 import { useLocale } from '@/contexts/LocaleContext';
-import { useBookings, usePastBookings, useCancelledBookings } from '@/api/hooks/useBookings';
+import { useHotelDetail } from '@/api/hooks/useSearch';
+import { useReservationTabs } from './useReservationTabs';
+import type { ReservationTab } from './useReservationTabs';
 import OfflineBanner from '@/components/OfflineBanner';
 import StatusChip from '@/components/StatusChip';
 import Text from '@/components/Text';
 import MyReservationsScreenSkeleton from './MyReservationsScreen.skeleton';
 import { styles } from './MyReservationsScreen.styles';
 
-type Tab = 'active' | 'past' | 'cancelled';
-
 type Reservation = {
   id: number;
+  hotelId: string;
   hotelType: string;
   hotelName: string;
   location: string;
@@ -28,28 +29,44 @@ type Reservation = {
   room: string;
   status: 'confirmed' | 'pending' | 'cancelled' | 'past';
   code: string;
-  totalPrice: string;
   totalPriceCop: number;
+  bookingCurrency: string;
   gradient: readonly [string, string];
 };
+
+function HotelCardImage({
+  hotelId,
+  gradient,
+}: {
+  hotelId: string;
+  gradient: readonly [string, string];
+}) {
+  const { data: hotelData } = useHotelDetail(hotelId);
+  const imageUrl = (hotelData as any)?.image_url as string | null | undefined;
+
+  if (imageUrl) {
+    return <Image source={{ uri: imageUrl }} style={styles.cardGradient} resizeMode="cover" />;
+  }
+
+  return (
+    <LinearGradient
+      colors={[gradient[0], gradient[1]]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.cardGradient}
+    />
+  );
+}
 
 export default function MyReservationsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { t } = useTranslation('mobile');
-  const { formatPrice, formatDate } = useLocale();
-  const [tab, setTab] = useState<Tab>('active');
-  const { data: activeData, isLoading: loadingActive } = useBookings();
-  const { data: pastData, isLoading: loadingPast } = usePastBookings();
-  const { data: cancelledData, isLoading: loadingCancelled } = useCancelledBookings();
+  const { formatFixedPrice, formatDate } = useLocale();
+  const { tab, setTab, bookings: rawBookings, isLoading } = useReservationTabs();
 
-  const activeReservations = activeData ?? [];
-  const pastReservations = pastData ?? [];
-  const cancelledReservations = cancelledData ?? [];
-  const isLoading = loadingActive || loadingPast || loadingCancelled;
-
-  // Map backend fields to frontend format
   const mapReservation = (b: any): Reservation => ({
     id: b.id,
+    hotelId: b.hotelId ?? '',
     hotelType: 'Hotel',
     hotelName: b.hotelName ?? b.code,
     location: b.location ?? '',
@@ -60,42 +77,25 @@ export default function MyReservationsScreen() {
     room: b.roomName ?? '',
     status: b.status,
     code: b.code,
-    totalPrice: `${b.totalPrice} ${b.currency}`,
     totalPriceCop: b.totalPrice,
+    bookingCurrency: b.currency ?? '',
     gradient: ['#006874', '#4A9FAA'] as const,
   });
 
-  const activeReservationsMapped = activeReservations.map(mapReservation);
-  const pastReservationsMapped = pastReservations.map(mapReservation);
-  const cancelledReservationsMapped = cancelledReservations.map(mapReservation);
+  const reservations = rawBookings.map(mapReservation);
 
-  const tabs: { key: Tab; label: string; count: number }[] = [
-    { key: 'active', label: t('myReservations.active'), count: activeReservationsMapped.length },
-    { key: 'past', label: t('myReservations.past'), count: pastReservationsMapped.length },
-    {
-      key: 'cancelled',
-      label: t('myReservations.cancelled'),
-      count: cancelledReservationsMapped.length,
-    },
+  const tabs: { key: ReservationTab; label: string }[] = [
+    { key: 'active', label: t('myReservations.active') },
+    { key: 'past', label: t('myReservations.past') },
+    { key: 'cancelled', label: t('myReservations.cancelled') },
   ];
-
-  const dataMap: Record<Tab, Reservation[]> = {
-    active: activeReservationsMapped,
-    past: pastReservationsMapped,
-    cancelled: cancelledReservationsMapped,
-  };
 
   const renderCard = ({ item }: { item: Reservation }) => (
     <Pressable
       style={styles.card}
       onPress={() => navigation.navigate('ReservationDetail', { id: item.id })}
     >
-      <LinearGradient
-        colors={[item.gradient[0], item.gradient[1]]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.cardGradient}
-      />
+      <HotelCardImage hotelId={item.hotelId} gradient={item.gradient} />
       <View style={styles.cardBody}>
         <View style={styles.cardHeaderRow}>
           <Text variant="body" color={palette.onSurface} style={styles.hotelName} numberOfLines={1}>
@@ -117,7 +117,7 @@ export default function MyReservationsScreen() {
             {formatDate(item.checkOut, 'mediumWithDay')}
           </Text>
           <Text variant="bodySmall" color={palette.primary} style={styles.price}>
-            {formatPrice(item.totalPriceCop)}
+            {formatFixedPrice(item.totalPriceCop, item.bookingCurrency)}
           </Text>
         </View>
         <Text variant="captionSmall" color={palette.outline} style={styles.code}>
@@ -145,7 +145,7 @@ export default function MyReservationsScreen() {
               color={tab === t.key ? palette.primary : palette.onSurfaceVariant}
               style={[styles.tabText, tab === t.key && styles.tabTextActive]}
             >
-              {t.label} ({t.count})
+              {t.label}
             </Text>
           </Pressable>
         ))}
@@ -154,7 +154,7 @@ export default function MyReservationsScreen() {
         <MyReservationsScreenSkeleton />
       ) : (
         <FlatList
-          data={dataMap[tab]}
+          data={reservations}
           keyExtractor={item => String(item.id)}
           renderItem={renderCard}
           contentContainerStyle={styles.list}

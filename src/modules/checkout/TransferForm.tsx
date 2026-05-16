@@ -47,13 +47,11 @@ export default function TransferForm({
 
   const bankOptions = BANKS.map(b => ({ key: b.code, label: b.name }));
 
-  const selectedBankLabel =
-    BANKS.find(b => b.code === bankCode)?.name ?? t('payment.selectBank');
+  const selectedBankLabel = BANKS.find(b => b.code === bankCode)?.name ?? t('payment.selectBank');
 
   const isAccountValid =
     accountNumber.length >= MIN_ACCOUNT_DIGITS && accountNumber.length <= MAX_ACCOUNT_DIGITS;
-  const showAccountError =
-    accountTouched && accountNumber.length > 0 && !isAccountValid;
+  const showAccountError = accountTouched && accountNumber.length > 0 && !isAccountValid;
 
   function handleAccountNumberChange(text: string) {
     const digits = text.replace(/\D/g, '').slice(0, MAX_ACCOUNT_DIGITS);
@@ -79,22 +77,14 @@ export default function TransferForm({
           >
             {selectedBankLabel}
           </Text>
-          <MaterialCommunityIcons
-            name="chevron-down"
-            size={18}
-            color={palette.onSurfaceVariant}
-          />
+          <MaterialCommunityIcons name="chevron-down" size={18} color={palette.onSurfaceVariant} />
         </Pressable>
 
         <Divider />
 
         {/* Account number */}
         <View style={styles.fieldRow}>
-          <MaterialCommunityIcons
-            name="numeric"
-            size={20}
-            color={palette.onSurfaceVariant}
-          />
+          <MaterialCommunityIcons name="numeric" size={20} color={palette.onSurfaceVariant} />
           <TextInput
             style={styles.fieldInput}
             value={accountNumber}
