@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ScrollView, Pressable } from 'react-native';
+import { View, ScrollView, Pressable, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -23,7 +23,7 @@ export default function CancelReservationScreen() {
   const { t } = useTranslation('mobile');
   const { formatFixedPrice } = useLocale();
 
-  const { data: reservationData } = useBookingDetail(route.params.id ?? 1);
+  const { data: reservationData } = useBookingDetail(route.params.id ?? '');
   const cancelBooking = useCancelBooking();
   const reservation = (reservationData as any) ?? { code: '', totalPrice: 0 };
   const refundAmount = Number(reservation?.totalPrice ?? reservation?.totalPriceCop ?? 0);
@@ -117,8 +117,13 @@ export default function CancelReservationScreen() {
           <Pressable
             style={[styles.errorFilledButton, cancelBooking.isPending && { opacity: 0.6 }]}
             onPress={() => {
-              cancelBooking.mutate(route.params.id ?? 1, {
+              cancelBooking.mutate(route.params.id ?? '', {
                 onSuccess: () => navigation.navigate('MainTabs'),
+                onError: () =>
+                  Alert.alert(
+                    t('cancelReservation.errorTitle'),
+                    t('cancelReservation.errorMessage')
+                  ),
               });
             }}
             disabled={cancelBooking.isPending}

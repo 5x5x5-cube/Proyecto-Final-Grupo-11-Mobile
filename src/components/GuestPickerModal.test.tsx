@@ -1,5 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
+import { render } from '@testing-library/react-native';
 
 jest.mock('@expo/vector-icons', () => ({
   MaterialCommunityIcons: 'MaterialCommunityIcons',
@@ -10,7 +10,7 @@ import GuestPickerModal from './GuestPickerModal';
 describe('GuestPickerModal', () => {
   it('renders without crashing when visible', () => {
     expect(() =>
-      renderer.create(
+      render(
         <GuestPickerModal
           visible
           onClose={jest.fn()}
@@ -25,7 +25,7 @@ describe('GuestPickerModal', () => {
 
   it('renders without crashing when not visible', () => {
     expect(() =>
-      renderer.create(
+      render(
         <GuestPickerModal visible={false} onClose={jest.fn()} value={2} onChange={jest.fn()} />
       )
     ).not.toThrow();

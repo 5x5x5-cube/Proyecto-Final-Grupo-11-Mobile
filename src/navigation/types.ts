@@ -25,9 +25,9 @@ export type AppStackParamList = {
   Success: {
     paymentId: string;
   };
-  ReservationDetail: { id: number };
-  CancelReservation: { id: number };
-  QRCheckIn: { id: number };
+  ReservationDetail: { id: string };
+  CancelReservation: { id: string };
+  QRCheckIn: { id: string };
 };
 
 // Alias kept for backward compatibility with existing screen imports
