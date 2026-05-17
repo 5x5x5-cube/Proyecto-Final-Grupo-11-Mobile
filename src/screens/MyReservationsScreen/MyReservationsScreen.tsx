@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, FlatList, Pressable } from 'react-native';
+import { View, FlatList, Pressable, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '@/navigation/types';
 import { palette } from '@/theme/palette';
 import { useLocale } from '@/contexts/LocaleContext';
+import { useHotelDetail } from '@/api/hooks/useSearch';
 import { useReservationTabs } from './useReservationTabs';
 import type { ReservationTab } from './useReservationTabs';
 import OfflineBanner from '@/components/OfflineBanner';
@@ -17,6 +18,7 @@ import { styles } from './MyReservationsScreen.styles';
 
 type Reservation = {
   id: number;
+  hotelId: string;
   hotelType: string;
   hotelName: string;
   location: string;
@@ -32,6 +34,30 @@ type Reservation = {
   gradient: readonly [string, string];
 };
 
+function HotelCardImage({
+  hotelId,
+  gradient,
+}: {
+  hotelId: string;
+  gradient: readonly [string, string];
+}) {
+  const { data: hotelData } = useHotelDetail(hotelId);
+  const imageUrl = (hotelData as any)?.image_url as string | null | undefined;
+
+  if (imageUrl) {
+    return <Image source={{ uri: imageUrl }} style={styles.cardGradient} resizeMode="cover" />;
+  }
+
+  return (
+    <LinearGradient
+      colors={[gradient[0], gradient[1]]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.cardGradient}
+    />
+  );
+}
+
 export default function MyReservationsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { t } = useTranslation('mobile');
@@ -40,6 +66,7 @@ export default function MyReservationsScreen() {
 
   const mapReservation = (b: any): Reservation => ({
     id: b.id,
+    hotelId: b.hotelId ?? '',
     hotelType: 'Hotel',
     hotelName: b.hotelName ?? b.code,
     location: b.location ?? '',
@@ -68,12 +95,7 @@ export default function MyReservationsScreen() {
       style={styles.card}
       onPress={() => navigation.navigate('ReservationDetail', { id: item.id })}
     >
-      <LinearGradient
-        colors={[item.gradient[0], item.gradient[1]]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.cardGradient}
-      />
+      <HotelCardImage hotelId={item.hotelId} gradient={item.gradient} />
       <View style={styles.cardBody}>
         <View style={styles.cardHeaderRow}>
           <Text variant="body" color={palette.onSurface} style={styles.hotelName} numberOfLines={1}>

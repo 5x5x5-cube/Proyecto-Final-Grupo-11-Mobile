@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, ScrollView, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -35,6 +36,7 @@ export default function ReservationDetailScreen() {
   const reservation = reservationData as any;
   const { data: hotelData } = useHotelDetail(reservation?.hotelId ?? '');
   const { data: payment } = usePaymentStatus(reservation?.paymentId ?? null);
+  const hotelImageUrl = (hotelData as any)?.image_url ?? null;
 
   // Map backend fields to frontend format
   const mappedReservation = reservation
@@ -85,12 +87,16 @@ export default function ReservationDetailScreen() {
 
         {/* Hotel card */}
         <View style={styles.card}>
-          <LinearGradient
-            colors={[mappedReservation.gradient[0], mappedReservation.gradient[1]]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.hotelGradient}
-          />
+          {hotelImageUrl ? (
+            <Image source={{ uri: hotelImageUrl }} style={styles.hotelGradient} />
+          ) : (
+            <LinearGradient
+              colors={[mappedReservation.gradient[0], mappedReservation.gradient[1]]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.hotelGradient}
+            />
+          )}
           <View style={styles.hotelInfo}>
             <Text variant="captionSmall" color={palette.primary} style={styles.hotelType}>
               {mappedReservation.hotelType}

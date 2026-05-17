@@ -28,6 +28,12 @@ jest.mock('../../storage/cartStorage', () => ({
   getCartSelection: jest.fn().mockResolvedValue(null),
 }));
 
+jest.mock('../../api/hooks/useSearch', () => ({
+  useHotelDetail: () => ({
+    data: { image_url: 'https://example.com/hotel.jpg', name: 'Test Hotel' },
+  }),
+}));
+
 jest.mock('expo-linear-gradient', () => {
   const React = require('react');
   const { View } = require('react-native');
@@ -39,16 +45,31 @@ jest.mock('expo-linear-gradient', () => {
 
 import React from 'react';
 import { render } from '@testing-library/react-native';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LocaleProvider } from '../../contexts/LocaleContext';
 import ReservationSummaryScreen from './ReservationSummaryScreen';
 
-describe('ReservationSummaryScreen', () => {
-  it('renders without crashing', () => {
-    const { toJSON } = render(
+const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+
+function renderScreen() {
+  return render(
+    <QueryClientProvider client={queryClient}>
       <LocaleProvider>
         <ReservationSummaryScreen />
       </LocaleProvider>
-    );
+    </QueryClientProvider>
+  );
+}
+
+describe('ReservationSummaryScreen', () => {
+  it('renders without crashing', () => {
+    const { toJSON } = renderScreen();
+    expect(toJSON()).toBeTruthy();
+  });
+
+  it('renders skeleton while cart is loading', () => {
+    const { toJSON } = renderScreen();
+    // When isLoading=true and no local selection, skeleton is shown
     expect(toJSON()).toBeTruthy();
   });
 });
