@@ -61,7 +61,7 @@ export function useBookings(filters?: { status?: string; timeframe?: string }) {
   });
 }
 
-export function useBookingDetail(bookingId: number) {
+export function useBookingDetail(bookingId: string) {
   return useQuery({
     queryKey: ['bookings', bookingId],
     queryFn: () => httpClient.get(`/bookings/${bookingId}`),
@@ -154,7 +154,7 @@ export function useBookingQR(bookingId: number) {
 export function useCancelBooking() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (bookingId: number) => httpClient.post(`/bookings/${bookingId}/cancel`),
+    mutationFn: (bookingId: string) => httpClient.post(`/bookings/${bookingId}/cancel`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bookings'] });
     },

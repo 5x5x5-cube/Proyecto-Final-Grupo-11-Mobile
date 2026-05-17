@@ -32,7 +32,7 @@ export default function ReservationDetailScreen() {
   const { t } = useTranslation('mobile');
   const { formatFixedPrice, formatDate } = useLocale();
 
-  const { data: reservationData, isLoading } = useBookingDetail(route.params.id ?? 1);
+  const { data: reservationData, isLoading } = useBookingDetail(route.params.id ?? '');
   const reservation = reservationData as any;
   const { data: hotelData } = useHotelDetail(reservation?.hotelId ?? '');
   const { data: payment } = usePaymentStatus(reservation?.paymentId ?? null);

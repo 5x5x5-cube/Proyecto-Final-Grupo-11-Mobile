@@ -1,5 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
+import { render } from '@testing-library/react-native';
 
 jest.mock('@expo/vector-icons', () => ({
   MaterialCommunityIcons: 'MaterialCommunityIcons',
@@ -15,7 +15,7 @@ const options = [
 describe('DatePickerModal', () => {
   it('renders without crashing when visible', () => {
     expect(() =>
-      renderer.create(
+      render(
         <DatePickerModal
           visible
           onClose={jest.fn()}
@@ -30,7 +30,7 @@ describe('DatePickerModal', () => {
 
   it('renders without crashing when not visible', () => {
     expect(() =>
-      renderer.create(
+      render(
         <DatePickerModal
           visible={false}
           onClose={jest.fn()}

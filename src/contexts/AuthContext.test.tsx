@@ -40,10 +40,11 @@ describe('AuthContext', () => {
       </AuthProvider>
     );
 
-    await waitFor(() => {
-      expect(getByTestId('loading').props.children).toBe('false');
+    await act(async () => {
+      await new Promise<void>(resolve => setImmediate(resolve));
     });
 
+    expect(getByTestId('loading').props.children).toBe('false');
     expect(getByTestId('auth').props.children).toBe('false');
     expect(getByTestId('name').props.children).toBe('');
   });
